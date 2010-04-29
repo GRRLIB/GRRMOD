@@ -29,7 +29,7 @@
 
 #ifndef _IN_VIRTCH_
 
-#include "..\include\mikmod_internals.h"
+#include "../include/mikmod_internals.h"
 
 extern BOOL  VC1_Init(void);
 extern BOOL  VC2_Init(void);

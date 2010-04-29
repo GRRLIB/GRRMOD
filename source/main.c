@@ -10,6 +10,27 @@
 
 // Mod file
 #include "music_mod.h"
+#include "music_xm.h"
+#include "music_s3m.h"
+#include "music_it.h"
+
+#define MAX_WIDTH 6.0f
+#define MIN_WIDTH 0.2f
+#define DECAY 0.5f;
+
+typedef struct
+{
+    int freq;
+    int vol;
+    int realvol;
+    float width;
+} CH;
+
+static CH channel1 = {0, 0, 0, MIN_WIDTH};
+static CH channel2 = {0, 0, 0, MIN_WIDTH};
+static CH channel3 = {0, 0, 0, MIN_WIDTH};
+static CH channel4 = {0, 0, 0, MIN_WIDTH};
+
 
 typedef struct _MOD_READER
 {
@@ -28,7 +49,7 @@ static BOOL GRRMOD_Seek(MREADER * reader, long offset, int whence);
 static long GRRMOD_Tell(MREADER * reader);
 
 
-#define AUDIOBUFFER 2048
+#define AUDIOBUFFER 4096
 u8  SoundBuffer[2][AUDIOBUFFER]  __attribute__((__aligned__(32)));
 u8  tempbuffer[AUDIOBUFFER];
 int whichab = 0;
@@ -49,19 +70,13 @@ static void sound_callback()
 
         whichab ^= 1;
         memset(&SoundBuffer[whichab], 0, AUDIOBUFFER);
-        //so.samples_mixed_so_far = so.play_position = 0;
 
-//YmMusicCumpute c la lib que jai porter qui prepare le buffer, nous ca sera mikmod qui le fera.
-//ymMusicCompute((void *)pMusic, (ymsample *)&tempbuffer,AUDIOBUFFER >> 2);
-
-/* ?????????????????????????
         if(module)
         {
-            setBuffer((s16 *)music_mod, music_mod_size);
+            setBuffer((s16 *)&tempbuffer, AUDIOBUFFER>>3);
             MikMod_Update();
-            Player_Active();
         }
-*/
+
         count = AUDIOBUFFER >> 3;
         src = (u32 *)&tempbuffer;
         dst = (u32 *)&SoundBuffer[whichab];
@@ -79,26 +94,47 @@ static void sound_callback()
     }
 }
 
+float calc_size(SBYTE voice, CH* channel)
+{
+    int freq = Voice_GetFrequency(voice);
+    int vol = Voice_GetVolume(voice);
+    int realvol = Voice_RealVolume(voice);
+
+    if (freq != channel->freq || vol != channel->vol || realvol > channel->realvol)
+    {
+        channel->width = MAX_WIDTH;
+    }
+    else
+    {
+        channel->width -= DECAY;
+        if (channel->width < MIN_WIDTH)
+            channel->width = MIN_WIDTH;
+    }
+
+    channel->vol = vol;
+    channel->freq = freq;
+    channel->realvol = realvol;
+
+    return channel->width;
+}
+
+
 int main(int argc, char **argv) {
-    // Initialise the Graphics & Video subsystem
+    float a = 0.0f;
+
     GRRLIB_Init();
 
-	// Register all the drivers
-	MikMod_RegisterAllDrivers();
-	// Register all the module loaders
-	MikMod_RegisterAllLoaders();
+    MikMod_RegisterAllDrivers();
+    MikMod_RegisterAllLoaders();
 
-	// Initialize the library
+    md_mode = 0;
+    md_mode |= DMODE_16BITS;
+    md_mode |= DMODE_SOFT_MUSIC;
+    md_mode |= DMODE_SOFT_SNDFX;
+    //md_mode |= DMODE_STEREO;  //this causes some modules (s3m mostly) to play back incorrectly on wii, i dont know why
+    md_mode |= DMODE_HQMIXER;
 
-	// Init mikmod
-	md_mode = 0;
-	md_mode |= DMODE_16BITS;
-	md_mode |= DMODE_SOFT_MUSIC;
-	md_mode |= DMODE_SOFT_SNDFX;
-	//md_mode |= DMODE_STEREO;  this causes some modules (s3m mostly) to play back incorrectly on wii, i dont know why
-	md_mode |= DMODE_HQMIXER;
-
-	md_mixfreq = 48000;
+    md_mixfreq = 24000;
 
     if(MikMod_Init(""))
     {
@@ -119,10 +155,8 @@ int main(int argc, char **argv) {
     }
     module = Player_LoadGeneric((MREADER *)Reader, 256, 0);
 
-    // Load module
     if(module)
     {
-        // start module
         module->wrap = true;    // The module will restart when it's finished
         Player_Start(module);
     }
@@ -134,40 +168,83 @@ int main(int argc, char **argv) {
     AUDIO_Init(NULL);       /*** Start audio subsystem ***/
     AUDIO_SetDSPSampleRate(AI_SAMPLERATE_48KHZ); /*** Set default samplerate to 48khz ***/
     AUDIO_RegisterDMACallback( (void *)sound_callback );/*** and the DMA Callback ***/
+
+    memset(&SoundBuffer[0], 0, AUDIOBUFFER);
     DCFlushRange((char *)&SoundBuffer[0], AUDIOBUFFER);
 
+    memset(&SoundBuffer[1], 0, AUDIOBUFFER);
+    DCFlushRange((char *)&SoundBuffer[1], AUDIOBUFFER);
+
     playing=1;
-    //on l'appel une fois pour demarer le bordel ;)
     sound_callback();
 
-
-
-    // Initialise the Wiimotes
     WPAD_Init();
+
+    GRRLIB_Settings.antialias = true;
+    GRRLIB_SetBackgroundColour(0x00, 0x00, 0x00, 0xFF);
 
     // Loop forever
     while(1) {
+        GRRLIB_2dMode();
         WPAD_ScanPads();  // Scan the Wiimotes
 
         if (WPAD_ButtonsDown(0) & WPAD_BUTTON_HOME) {
             break;
         }
-/* ?????????????????????????
-        if(module)
-        {
-            MikMod_Update();
-        }
-*/
+
+        GRRLIB_Camera3dSettings(0.0f, 0.0f,13.0f, 0,1,0, 0,0,0);
+
+        GRRLIB_SetLightAmbiant(0x333333FF);
+        GRRLIB_SetLightDiff(0,(guVector){0.0f,0.0f,0.0f},20.0f,1.0f,0x00FFFFFF);
+        GRRLIB_SetLightDiff(1,(guVector){0.0f,13.0f,3.0f},20.0f,1.0f,0xFF00FFFF);
+        GRRLIB_SetLightDiff(2,(guVector){0.0f,-13.0f,3.0f},20.0f,1.0f,0xFFFF00FF);
+        GRRLIB_SetLightDiff(3,(guVector){13.0f,0.0f,3.0f},20.0f,1.0f,0xFF0000FF);
+        GRRLIB_SetLightDiff(4,(guVector){-13.0f,0.0f,3.0f},20.0f,1.0f,0x00FF00FF);
+
+        GRRLIB_3dMode(0.1,1000,45,0,1);
+
+        GRRLIB_ObjectInit();
+        GRRLIB_ObjectScale(1.0f,calc_size(0, &channel1),1.0f);
+        GRRLIB_ObjectTrans(-3.0f, 0.0f, 0.0f);
+        GRRLIB_ObjectRotate(a,a*2,a*3);
+        GRRLIB_ObjectEnd();
+        GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
+
+        GRRLIB_ObjectInit();
+        GRRLIB_ObjectScale(1.0f,calc_size(1, &channel2),1.0f);
+        GRRLIB_ObjectTrans(-1.0f, 0.0f, 0.0f);
+        GRRLIB_ObjectRotate(a,a*2,a*3);
+        GRRLIB_ObjectEnd();
+        GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
+
+        GRRLIB_ObjectInit();
+        GRRLIB_ObjectScale(1.0f,calc_size(2, &channel3),1.0f);
+        GRRLIB_ObjectTrans(1.0f, 0.0f, 0.0f);
+        GRRLIB_ObjectRotate(a,a*2,a*3);
+        GRRLIB_ObjectEnd();
+        GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
+
+        GRRLIB_ObjectInit();
+        GRRLIB_ObjectScale(1.0f,calc_size(3, &channel4),1.0f);
+        GRRLIB_ObjectTrans(3.0f, 0.0f, 0.0f);
+        GRRLIB_ObjectRotate(a,a*2,a*3);
+        GRRLIB_ObjectEnd();
+        GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
+
+
+        a+=0.5f;
+        GRRLIB_2dMode();
+
         GRRLIB_Render();  // Render the frame buffer to the TV
     }
 
-	// Kill module renderer if it exists
-	if(module)
-	{
-		Player_Stop();
-		Player_Free(module);
-		MikMod_Exit();
-	}
+    // Kill module renderer if it exists
+    if(module)
+    {
+        Player_Stop();
+        Player_Free(module);
+        MikMod_Exit();
+    }
     AUDIO_StopDMA();
     AUDIO_RegisterDMACallback(NULL);
 

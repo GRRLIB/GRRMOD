@@ -40,7 +40,7 @@
 #include <stdlib.h>
 #endif
 
-#include "..\include\mikmod_internals.h"
+#include "../include/mikmod_internals.h"
 
 #ifdef SUNOS
 extern int fprintf(FILE *, const char *, ...);

@@ -40,8 +40,8 @@
 
 #include <string.h>
 
-#include "..\include\mikmod_internals.h"
-#include "..\include\virtualfile.h"
+#include "../include/mikmod_internals.h"
+#include "../include/virtualfile.h"
 
 typedef struct WAV {
 	CHAR  rID[4];

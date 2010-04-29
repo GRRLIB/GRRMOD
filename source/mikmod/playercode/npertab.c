@@ -30,7 +30,7 @@
 #include "config.h"
 #endif
 
-#include "..\include\mikmod_internals.h"
+#include "../include/mikmod_internals.h"
 
 UWORD npertab[7 * OCTAVE] = {
 	/* Octaves 6 -> 0 */
