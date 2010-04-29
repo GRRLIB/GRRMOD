@@ -194,7 +194,7 @@ int main(int argc, char **argv) {
 
         GRRLIB_Camera3dSettings(0.0f, 0.0f,13.0f, 0,1,0, 0,0,0);
 
-        GRRLIB_SetLightAmbiant(0x333333FF);
+        GRRLIB_SetLightAmbient(0x333333FF);
         GRRLIB_SetLightDiff(0,(guVector){0.0f,0.0f,0.0f},20.0f,1.0f,0x00FFFFFF);
         GRRLIB_SetLightDiff(1,(guVector){0.0f,13.0f,3.0f},20.0f,1.0f,0xFF00FFFF);
         GRRLIB_SetLightDiff(2,(guVector){0.0f,-13.0f,3.0f},20.0f,1.0f,0xFFFF00FF);
@@ -203,32 +203,16 @@ int main(int argc, char **argv) {
 
         GRRLIB_3dMode(0.1,1000,45,0,1);
 
-        GRRLIB_ObjectInit();
-        GRRLIB_ObjectScale(1.0f,calc_size(0, &channel1),1.0f);
-        GRRLIB_ObjectTrans(-3.0f, 0.0f, 0.0f);
-        GRRLIB_ObjectRotate(a,a*2,a*3);
-        GRRLIB_ObjectEnd();
+	GRRLIB_ObjectViewInv(-3.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(0, &channel1),1.0f);
         GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
 
-        GRRLIB_ObjectInit();
-        GRRLIB_ObjectScale(1.0f,calc_size(1, &channel2),1.0f);
-        GRRLIB_ObjectTrans(-1.0f, 0.0f, 0.0f);
-        GRRLIB_ObjectRotate(a,a*2,a*3);
-        GRRLIB_ObjectEnd();
+	GRRLIB_ObjectViewInv(-1.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(1, &channel2),1.0f);
         GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
 
-        GRRLIB_ObjectInit();
-        GRRLIB_ObjectScale(1.0f,calc_size(2, &channel3),1.0f);
-        GRRLIB_ObjectTrans(1.0f, 0.0f, 0.0f);
-        GRRLIB_ObjectRotate(a,a*2,a*3);
-        GRRLIB_ObjectEnd();
+	GRRLIB_ObjectViewInv(1.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(2, &channel3),1.0f);
         GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
 
-        GRRLIB_ObjectInit();
-        GRRLIB_ObjectScale(1.0f,calc_size(3, &channel4),1.0f);
-        GRRLIB_ObjectTrans(3.0f, 0.0f, 0.0f);
-        GRRLIB_ObjectRotate(a,a*2,a*3);
-        GRRLIB_ObjectEnd();
+	GRRLIB_ObjectViewInv(3.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(3, &channel4),1.0f);
         GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
 
 
