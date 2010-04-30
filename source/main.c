@@ -203,16 +203,16 @@ int main(int argc, char **argv) {
 
         GRRLIB_3dMode(0.1,1000,45,0,1);
 
-	GRRLIB_ObjectViewInv(-3.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(0, &channel1),1.0f);
+        GRRLIB_ObjectViewInv(-3.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(0, &channel1),1.0f);
         GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
 
-	GRRLIB_ObjectViewInv(-1.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(1, &channel2),1.0f);
+        GRRLIB_ObjectViewInv(-1.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(1, &channel2),1.0f);
         GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
 
-	GRRLIB_ObjectViewInv(1.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(2, &channel3),1.0f);
+        GRRLIB_ObjectViewInv(1.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(2, &channel3),1.0f);
         GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
 
-	GRRLIB_ObjectViewInv(3.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(3, &channel4),1.0f);
+        GRRLIB_ObjectViewInv(3.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(3, &channel4),1.0f);
         GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
 
 
@@ -237,6 +237,9 @@ int main(int argc, char **argv) {
     exit(0);  // Use exit() to exit a program, do not use 'return' from main()
 }
 
+/**
+ * This function has the same behaviour as feof.
+ */
 static BOOL GRRMOD_Eof(MREADER * reader)
 {
     MOD_READER *pReader = (MOD_READER *) reader;
@@ -244,6 +247,9 @@ static BOOL GRRMOD_Eof(MREADER * reader)
     return (pReader->Size == (pReader->Offset)) ? true : false;
 }
 
+/**
+ * This function copies length bytes of data into dest, and return zero if an error occured, and any nonzero value otherwise. Note that an end-of-file condition will not be considered as an error in this case.
+ */
 static BOOL GRRMOD_Read(MREADER * reader, void *ptr, size_t size)
 {
     MOD_READER *pReader = (MOD_READER *) reader;
@@ -254,6 +260,9 @@ static BOOL GRRMOD_Read(MREADER * reader, void *ptr, size_t size)
     return 1;
 }
 
+/**
+ * This function has the same behaviour as fgetc.
+ */
 static int GRRMOD_Get(MREADER * reader)
 {
     MOD_READER *pReader = (MOD_READER *) reader;
@@ -265,6 +274,9 @@ static int GRRMOD_Get(MREADER * reader)
     return((int)buf);
 }
 
+/**
+ * This function has the same behaviour as fseek, with offset 0 meaning the start of the object (module, sample) being loaded.
+ */
 static BOOL GRRMOD_Seek(MREADER * reader, long offset, int whence)
 {
     MOD_READER *pReader = (MOD_READER *) reader;
@@ -277,6 +289,9 @@ static BOOL GRRMOD_Seek(MREADER * reader, long offset, int whence)
     return 1;
 }
 
+/**
+ * This function has the same behaviour as ftell, with offset 0 meaning the start of the object being loaded.
+ */
 static long GRRMOD_Tell(MREADER * reader)
 {
     MOD_READER *pReader = (MOD_READER *) reader;
