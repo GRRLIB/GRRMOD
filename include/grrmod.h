@@ -47,10 +47,10 @@ THE SOFTWARE.
    extern "C" {
 #endif /* __cplusplus */
 
-
-void GRRMOD_Init();
+s8 GRRMOD_Init();
 void GRRMOD_End();
 void GRRMOD_SetMOD(const void *mem, u64 size);
+void GRRMOD_SetFrequency(u32 freq);
 
 //==============================================================================
 // C++ footer

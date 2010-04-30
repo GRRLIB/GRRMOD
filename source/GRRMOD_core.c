@@ -48,14 +48,20 @@ static MODULE *module;	/**<  */
 u8  SoundBuffer[2][AUDIOBUFFER]  __attribute__((__aligned__(32)));
 u8  tempbuffer[AUDIOBUFFER];
 int whichab = 0;
-static int playing = 0;
+static bool playing = false;
 
 
 /**
  * Initialize GRRMOD. Call this once at the beginning your code.
+ * @return A number representating a code:
+ *         -     0 : The operation completed successfully.
+ *         -    -1 : Failed to initialize the MOD engine.
  * @see GRRMOD_End
  */
-void GRRMOD_Init() {
+s8 GRRMOD_Init() {
+    AUDIO_Init(NULL);
+    GRRMOD_SetFrequency(48000);
+
     MikMod_RegisterAllDrivers();
     MikMod_RegisterAllLoaders();
 
@@ -66,11 +72,10 @@ void GRRMOD_Init() {
     //md_mode |= DMODE_STEREO;  //this causes some modules (s3m mostly) to play back incorrectly on wii, i dont know why
     md_mode |= DMODE_HQMIXER;
 
-    md_mixfreq = 24000;
-
     if(MikMod_Init("")) {
-        exit(0);
+        return -1;
     }
+	return 0;
 }
 
 /**
@@ -112,9 +117,7 @@ void GRRMOD_SetMOD(const void *mem, u64 size) {
         exit(0);
     }
 
-    AUDIO_Init(NULL);       /*** Start audio subsystem ***/
-    AUDIO_SetDSPSampleRate(AI_SAMPLERATE_48KHZ); /*** Set default samplerate to 48khz ***/
-    AUDIO_RegisterDMACallback( (void *)GRRMOD_Callback );/*** and the DMA Callback ***/
+    AUDIO_RegisterDMACallback( (void *)GRRMOD_Callback ); // and the DMA Callback
 
     memset(&SoundBuffer[0], 0, AUDIOBUFFER);
     DCFlushRange((char *)&SoundBuffer[0], AUDIOBUFFER);
@@ -122,8 +125,18 @@ void GRRMOD_SetMOD(const void *mem, u64 size) {
     memset(&SoundBuffer[1], 0, AUDIOBUFFER);
     DCFlushRange((char *)&SoundBuffer[1], AUDIOBUFFER);
 
-    playing = 1;
+    playing = true;
     GRRMOD_Callback();
+}
+
+/**
+ * Set the frequency. Values are harcoded at 48000kHz.
+ * @param freq Frequency to set in kHz.
+ */
+void GRRMOD_SetFrequency(u32 freq)
+{
+	AUDIO_SetDSPSampleRate(AI_SAMPLERATE_48KHZ);
+	md_mixfreq = 24000;
 }
 
 /**
