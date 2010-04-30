@@ -3,7 +3,7 @@
         - Test Code -
 ============================================*/
 #include <grrlib.h>
-#include "mikmod_build.h"
+#include "grrmod.h"
 
 #include <stdlib.h>
 #include <wiiuse/wpad.h>
@@ -30,93 +30,7 @@ static CH channel1 = {0, 0, 0, MIN_WIDTH};
 static CH channel2 = {0, 0, 0, MIN_WIDTH};
 static CH channel3 = {0, 0, 0, MIN_WIDTH};
 static CH channel4 = {0, 0, 0, MIN_WIDTH};
-
-
-typedef struct _MOD_READER
-{
-    MREADER Core;
-    u64     Offset;
-    char    *BufferPtr;
-    u64     Size;
-} MOD_READER;
-
-static MODULE *module;
-
-static BOOL GRRMOD_Eof(MREADER * reader);
-static BOOL GRRMOD_Read(MREADER * reader, void *ptr, size_t size);
-static int GRRMOD_Get(MREADER * reader);
-static BOOL GRRMOD_Seek(MREADER * reader, long offset, int whence);
-static long GRRMOD_Tell(MREADER * reader);
-
-
-#define AUDIOBUFFER 4096
-u8  SoundBuffer[2][AUDIOBUFFER]  __attribute__((__aligned__(32)));
-u8  tempbuffer[AUDIOBUFFER];
-int whichab = 0;
-static int playing = 0;
-
-static void sound_callback()
-{
-    u32 *src;
-    u32 *dst;
-    int count;
-
-    if (playing)
-    {
-        AUDIO_StopDMA();
-        AUDIO_InitDMA((u32)SoundBuffer[whichab], AUDIOBUFFER);
-        DCFlushRange(&SoundBuffer[whichab], AUDIOBUFFER);
-        AUDIO_StartDMA();
-
-        whichab ^= 1;
-        memset(&SoundBuffer[whichab], 0, AUDIOBUFFER);
-
-        if(module)
-        {
-            setBuffer((s16 *)&tempbuffer, AUDIOBUFFER>>3);
-            MikMod_Update();
-        }
-
-        count = AUDIOBUFFER >> 3;
-        src = (u32 *)&tempbuffer;
-        dst = (u32 *)&SoundBuffer[whichab];
-
-        while ( count )
-        {
-            *dst++ = *src;
-            *dst++ = *src++;
-            count--;
-        }
-    }
-    else
-    {
-        memset(tempbuffer, 0, AUDIOBUFFER);
-    }
-}
-
-float calc_size(SBYTE voice, CH* channel)
-{
-    int freq = Voice_GetFrequency(voice);
-    int vol = Voice_GetVolume(voice);
-    int realvol = Voice_RealVolume(voice);
-
-    if (freq != channel->freq || vol != channel->vol || realvol > channel->realvol)
-    {
-        channel->width = MAX_WIDTH;
-    }
-    else
-    {
-        channel->width -= DECAY;
-        if (channel->width < MIN_WIDTH)
-            channel->width = MIN_WIDTH;
-    }
-
-    channel->vol = vol;
-    channel->freq = freq;
-    channel->realvol = realvol;
-
-    return channel->width;
-}
+static float calc_size(u8 voice, CH* channel);
 
 
 int main(int argc, char **argv) {
@@ -124,59 +38,9 @@ int main(int argc, char **argv) {
 
     GRRLIB_Init();
 
-    MikMod_RegisterAllDrivers();
-    MikMod_RegisterAllLoaders();
+	GRRMOD_Init();
 
-    md_mode = 0;
-    md_mode |= DMODE_16BITS;
-    md_mode |= DMODE_SOFT_MUSIC;
-    md_mode |= DMODE_SOFT_SNDFX;
-    //md_mode |= DMODE_STEREO;  //this causes some modules (s3m mostly) to play back incorrectly on wii, i dont know why
-    md_mode |= DMODE_HQMIXER;
-
-    md_mixfreq = 24000;
-
-    if(MikMod_Init(""))
-    {
-        exit(0);
-    }
-
-    MOD_READER *Reader = (MOD_READER *)malloc(sizeof (MOD_READER));
-    if(Reader)
-    {
-        Reader->Offset = 0;
-        Reader->BufferPtr = (char *)music_mod; // Buffer
-        Reader->Size = music_mod_size;   // File size
-        Reader->Core.Eof = &GRRMOD_Eof;
-        Reader->Core.Read = &GRRMOD_Read;
-        Reader->Core.Get = &GRRMOD_Get;
-        Reader->Core.Seek = &GRRMOD_Seek;
-        Reader->Core.Tell = &GRRMOD_Tell;
-    }
-    module = Player_LoadGeneric((MREADER *)Reader, 256, 0);
-
-    if(module)
-    {
-        module->wrap = true;    // The module will restart when it's finished
-        Player_Start(module);
-    }
-    else
-    {
-        exit(0);
-    }
-
-    AUDIO_Init(NULL);       /*** Start audio subsystem ***/
-    AUDIO_SetDSPSampleRate(AI_SAMPLERATE_48KHZ); /*** Set default samplerate to 48khz ***/
-    AUDIO_RegisterDMACallback( (void *)sound_callback );/*** and the DMA Callback ***/
-
-    memset(&SoundBuffer[0], 0, AUDIOBUFFER);
-    DCFlushRange((char *)&SoundBuffer[0], AUDIOBUFFER);
-
-    memset(&SoundBuffer[1], 0, AUDIOBUFFER);
-    DCFlushRange((char *)&SoundBuffer[1], AUDIOBUFFER);
-
-    playing=1;
-    sound_callback();
+	GRRMOD_SetMOD(music_mod, music_mod_size);
 
     WPAD_Init();
 
@@ -222,79 +86,32 @@ int main(int argc, char **argv) {
         GRRLIB_Render();  // Render the frame buffer to the TV
     }
 
-    // Kill module renderer if it exists
-    if(module)
-    {
-        Player_Stop();
-        Player_Free(module);
-        MikMod_Exit();
-    }
-    AUDIO_StopDMA();
-    AUDIO_RegisterDMACallback(NULL);
-
+	GRRMOD_End();
     GRRLIB_Exit(); // Be a good boy, clear the memory allocated by GRRLIB
 
     exit(0);  // Use exit() to exit a program, do not use 'return' from main()
 }
 
-/**
- * This function has the same behaviour as feof.
- */
-static BOOL GRRMOD_Eof(MREADER * reader)
-{
-    MOD_READER *pReader = (MOD_READER *) reader;
+static float calc_size(u8 voice, CH* channel) {
+/*
+    int freq = Voice_GetFrequency(voice);
+    int vol = Voice_GetVolume(voice);
+    int realvol = Voice_RealVolume(voice);
 
-    return (pReader->Size == (pReader->Offset)) ? true : false;
-}
-
-/**
- * This function copies length bytes of data into dest, and return zero if an error occured, and any nonzero value otherwise. Note that an end-of-file condition will not be considered as an error in this case.
- */
-static BOOL GRRMOD_Read(MREADER * reader, void *ptr, size_t size)
-{
-    MOD_READER *pReader = (MOD_READER *) reader;
-
-    memcpy(ptr, pReader->BufferPtr + pReader->Offset, size);
-    pReader->Offset += size;
-
-    return 1;
-}
-
-/**
- * This function has the same behaviour as fgetc.
- */
-static int GRRMOD_Get(MREADER * reader)
-{
-    MOD_READER *pReader = (MOD_READER *) reader;
-    char buf;
-
-    buf = *(pReader->BufferPtr + pReader->Offset);
-    pReader->Offset++;
-
-    return((int)buf);
-}
-
-/**
- * This function has the same behaviour as fseek, with offset 0 meaning the start of the object (module, sample) being loaded.
- */
-static BOOL GRRMOD_Seek(MREADER * reader, long offset, int whence)
-{
-    MOD_READER *pReader = (MOD_READER *) reader;
-
-    if(whence == SEEK_SET)
-        pReader->Offset = offset;
+    if (freq != channel->freq || vol != channel->vol || realvol > channel->realvol)
+    {
+        channel->width = MAX_WIDTH;
+    }
     else
-        pReader->Offset += offset;
+    {
+        channel->width -= DECAY;
+        if (channel->width < MIN_WIDTH)
+            channel->width = MIN_WIDTH;
+    }
 
-    return 1;
-}
-
-/**
- * This function has the same behaviour as ftell, with offset 0 meaning the start of the object being loaded.
- */
-static long GRRMOD_Tell(MREADER * reader)
-{
-    MOD_READER *pReader = (MOD_READER *) reader;
-
-    return pReader->Offset;
+    channel->vol = vol;
+    channel->freq = freq;
+    channel->realvol = realvol;
+*/
+    return channel->width;
 }
