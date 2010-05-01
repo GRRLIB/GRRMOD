@@ -154,6 +154,33 @@ void GRRMOD_SetVolume(s8 musicvolume)
 }
 
 /**
+ * This function returns the frequency of the sample currently playing on the specified voice.
+ * @param voice The number of the voice to get frequency.
+ * @return The current frequency of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
+ */
+u32 GRRMOD_GetVoiceFrequency(u8 voice) {
+    return Voice_GetFrequency(voice);
+}
+
+/**
+ * This function returns the volume of the sample currently playing on the specified voice.
+ * @param voice The number of the voice to get volume.
+ * @return The current volume of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
+ */
+u32 GRRMOD_GetVoiceVolume(u8 voice) {
+    return Voice_GetVolume(voice);
+}
+
+/**
+ * This function returns the actual playing volume of the specified voice.
+ * @param voice The number of the voice to analyze (starting from zero).
+ * @return The real volume of the voice when the function was called, in the range 0-65535.
+ */
+u32 GRRMOD_GetRealVoiceVolume(u8 voice) {
+    return Voice_RealVolume(voice);
+}
+
+/**
  *
  */
 static void GRRMOD_Callback()

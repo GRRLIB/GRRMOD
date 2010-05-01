@@ -100,10 +100,9 @@ int main(int argc, char **argv) {
 }
 
 static float calc_size(u8 voice, CH* channel) {
-/*
-    int freq = Voice_GetFrequency(voice);
-    int vol = Voice_GetVolume(voice);
-    int realvol = Voice_RealVolume(voice);
+    int freq = GRRMOD_GetVoiceFrequency(voice);
+    int vol = GRRMOD_GetVoiceVolume(voice);
+    int realvol = GRRMOD_GetRealVoiceVolume(voice);
 
     if (freq != channel->freq || vol != channel->vol || realvol > channel->realvol)
     {
@@ -119,6 +118,6 @@ static float calc_size(u8 voice, CH* channel) {
     channel->vol = vol;
     channel->freq = freq;
     channel->realvol = realvol;
-*/
+
     return channel->width;
 }
