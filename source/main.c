@@ -35,12 +35,13 @@ static float calc_size(u8 voice, CH* channel);
 
 int main(int argc, char **argv) {
     float a = 0.0f;
+    u8 Volume = 64;
 
     GRRLIB_Init();
 
-	GRRMOD_Init();
+    GRRMOD_Init();
 
-	GRRMOD_SetMOD(music_mod, music_mod_size);
+    GRRMOD_SetMOD(music_mod, music_mod_size);
 
     WPAD_Init();
 
@@ -54,6 +55,12 @@ int main(int argc, char **argv) {
 
         if (WPAD_ButtonsDown(0) & WPAD_BUTTON_HOME) {
             break;
+        }
+        if (WPAD_ButtonsHeld(0) & WPAD_BUTTON_PLUS) {
+            GRRMOD_SetVolume(++Volume);
+        }
+        if (WPAD_ButtonsHeld(0) & WPAD_BUTTON_MINUS) {
+            GRRMOD_SetVolume(--Volume);
         }
 
         GRRLIB_Camera3dSettings(0.0f, 0.0f,13.0f, 0,1,0, 0,0,0);
@@ -86,7 +93,7 @@ int main(int argc, char **argv) {
         GRRLIB_Render();  // Render the frame buffer to the TV
     }
 
-	GRRMOD_End();
+    GRRMOD_End();
     GRRLIB_Exit(); // Be a good boy, clear the memory allocated by GRRLIB
 
     exit(0);  // Use exit() to exit a program, do not use 'return' from main()

@@ -51,6 +51,7 @@ s8 GRRMOD_Init();
 void GRRMOD_End();
 void GRRMOD_SetMOD(const void *mem, u64 size);
 void GRRMOD_SetFrequency(u32 freq);
+void GRRMOD_SetVolume(s8 musicvolume);
 
 //==============================================================================
 // C++ footer

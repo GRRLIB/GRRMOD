@@ -75,7 +75,7 @@ s8 GRRMOD_Init() {
     if(MikMod_Init("")) {
         return -1;
     }
-	return 0;
+    return 0;
 }
 
 /**
@@ -135,8 +135,22 @@ void GRRMOD_SetMOD(const void *mem, u64 size) {
  */
 void GRRMOD_SetFrequency(u32 freq)
 {
-	AUDIO_SetDSPSampleRate(AI_SAMPLERATE_48KHZ);
-	md_mixfreq = 24000;
+    AUDIO_SetDSPSampleRate(AI_SAMPLERATE_48KHZ);
+    md_mixfreq = 24000;
+}
+
+/**
+ * Set the volume levels for the MOD music (call it after MODPlay_SetMOD()).
+ * @param musicvolume The music volume, 0 to 64.
+ */
+void GRRMOD_SetVolume(s8 musicvolume)
+{
+    if(musicvolume < 0)
+        musicvolume = 0;
+    else if(musicvolume > 64)
+        musicvolume = 64;
+
+    Player_SetVolume(musicvolume * 2);
 }
 
 /**
