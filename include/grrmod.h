@@ -60,6 +60,7 @@ void GRRMOD_Start();
 void GRRMOD_Stop();
 void GRRMOD_Pause();
 void GRRMOD_GetSongTitle(char *Buffer, u32 Size);
+void GRRMOD_GetModType(char *Buffer, u32 Size);
 
 //==============================================================================
 // C++ footer

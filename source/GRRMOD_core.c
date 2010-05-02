@@ -88,7 +88,7 @@ void GRRMOD_End() {
 }
 
 /**
- *
+ * Load a MOD file from memory.
  */
 void GRRMOD_SetMOD(const void *mem, u64 size) {
     MOD_READER *Reader = (MOD_READER *)malloc(sizeof (MOD_READER));
@@ -102,7 +102,7 @@ void GRRMOD_SetMOD(const void *mem, u64 size) {
         Reader->Core.Seek = &GRRMOD_Seek;
         Reader->Core.Tell = &GRRMOD_Tell;
 
-        module = Player_LoadGeneric((MREADER *)Reader, 256, 0);
+        module = Player_LoadGeneric((MREADER *)Reader, 128, 0);
         if(module) {
             module->wrap = true;    // The module will restart when it's finished
         }
@@ -110,7 +110,7 @@ void GRRMOD_SetMOD(const void *mem, u64 size) {
 }
 
 /**
- *
+ * Unload a MOD file.
  */
 void GRRMOD_Unload() {
     GRRMOD_Stop();
@@ -169,6 +169,21 @@ void GRRMOD_Pause() {
 void GRRMOD_GetSongTitle(char *Buffer, u32 Size) {
     if(module) {
         strncpy(Buffer, module->songname, Size);
+    }
+    else {
+        Buffer = '\0';
+    }
+}
+
+/**
+ * Get the MOD type.
+ */
+void GRRMOD_GetModType(char *Buffer, u32 Size) {
+    if(module) {
+        strncpy(Buffer, module->modtype, Size);
+    }
+    else {
+        Buffer = '\0';
     }
 }
 
