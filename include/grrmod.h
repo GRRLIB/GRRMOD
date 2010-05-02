@@ -50,11 +50,16 @@ THE SOFTWARE.
 s8 GRRMOD_Init();
 void GRRMOD_End();
 void GRRMOD_SetMOD(const void *mem, u64 size);
+void GRRMOD_Unload();
 void GRRMOD_SetFrequency(u32 freq);
 void GRRMOD_SetVolume(s8 musicvolume);
 u32 GRRMOD_GetVoiceFrequency(u8 voice);
 u32 GRRMOD_GetVoiceVolume(u8 voice);
 u32 GRRMOD_GetRealVoiceVolume(u8 voice);
+void GRRMOD_Start();
+void GRRMOD_Stop();
+void GRRMOD_Pause();
+void GRRMOD_GetSongTitle(char *Buffer, u32 Size);
 
 //==============================================================================
 // C++ footer

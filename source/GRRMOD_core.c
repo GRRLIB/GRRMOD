@@ -45,9 +45,9 @@ typedef struct _MOD_READER
 static MODULE *module;	/**<  */
 
 #define AUDIOBUFFER 4096	/**< Audio buffer size. */
-u8  SoundBuffer[2][AUDIOBUFFER]  __attribute__((__aligned__(32)));
-u8  tempbuffer[AUDIOBUFFER];
-int whichab = 0;
+static u8  SoundBuffer[2][AUDIOBUFFER]  __attribute__((__aligned__(32)));
+static u8  tempbuffer[AUDIOBUFFER];
+static u32 whichab = 0;
 static bool playing = false;
 
 
@@ -83,13 +83,8 @@ s8 GRRMOD_Init() {
  * Ensure this function is only ever called once.
  */
 void GRRMOD_End() {
-    if(module) {
-        Player_Stop();
-        Player_Free(module);
-        MikMod_Exit();
-    }
-    AUDIO_StopDMA();
-    AUDIO_RegisterDMACallback(NULL);
+    GRRMOD_Unload();
+    MikMod_Exit();
 }
 
 /**
@@ -99,34 +94,82 @@ void GRRMOD_SetMOD(const void *mem, u64 size) {
     MOD_READER *Reader = (MOD_READER *)malloc(sizeof (MOD_READER));
     if(Reader) {
         Reader->Offset = 0;
-        Reader->BufferPtr = (char *)mem; // Buffer
-        Reader->Size = size;   // File size
+        Reader->BufferPtr = (char *)mem;
+        Reader->Size = size;
         Reader->Core.Eof = &GRRMOD_Eof;
         Reader->Core.Read = &GRRMOD_Read;
         Reader->Core.Get = &GRRMOD_Get;
         Reader->Core.Seek = &GRRMOD_Seek;
         Reader->Core.Tell = &GRRMOD_Tell;
-    }
-    module = Player_LoadGeneric((MREADER *)Reader, 256, 0);
 
+        module = Player_LoadGeneric((MREADER *)Reader, 256, 0);
+        if(module) {
+            module->wrap = true;    // The module will restart when it's finished
+        }
+    }
+}
+
+/**
+ *
+ */
+void GRRMOD_Unload() {
+    GRRMOD_Stop();
     if(module) {
-        module->wrap = true;    // The module will restart when it's finished
-        Player_Start(module);
+        Player_Free(module);
     }
-    else {
-        exit(0);
-    }
+}
 
-    AUDIO_RegisterDMACallback( (void *)GRRMOD_Callback ); // and the DMA Callback
+/**
+ * This function starts the specified module playback.
+ */
+void GRRMOD_Start() {
+    if(playing || module == NULL)   return;
+
+    Player_Start(module);
 
     memset(&SoundBuffer[0], 0, AUDIOBUFFER);
-    DCFlushRange((char *)&SoundBuffer[0], AUDIOBUFFER);
-
     memset(&SoundBuffer[1], 0, AUDIOBUFFER);
+
+    DCFlushRange((char *)&SoundBuffer[0], AUDIOBUFFER);
     DCFlushRange((char *)&SoundBuffer[1], AUDIOBUFFER);
 
+    whichab = 0;
     playing = true;
-    GRRMOD_Callback();
+
+    AUDIO_RegisterDMACallback( GRRMOD_Callback );
+    AUDIO_InitDMA((u32)SoundBuffer[whichab], AUDIOBUFFER);
+    AUDIO_StartDMA();
+}
+
+/**
+ * This function stops the currently playing module.
+ */
+void GRRMOD_Stop() {
+    if(!playing) return;
+
+    AUDIO_StopDMA();
+    AUDIO_RegisterDMACallback(NULL);
+
+    playing = false;
+
+    Player_SetPosition(0);
+    Player_Stop();
+}
+
+/**
+ * This function toggles the playing/paused status of the module.
+ */
+void GRRMOD_Pause() {
+    Player_TogglePause();
+}
+
+/**
+ * Get the song title.
+ */
+void GRRMOD_GetSongTitle(char *Buffer, u32 Size) {
+    if(module) {
+        strncpy(Buffer, module->songname, Size);
+    }
 }
 
 /**
@@ -181,7 +224,7 @@ u32 GRRMOD_GetRealVoiceVolume(u8 voice) {
 }
 
 /**
- *
+ * Callback function for DMA.
  */
 static void GRRMOD_Callback()
 {
@@ -203,14 +246,19 @@ static void GRRMOD_Callback()
             MikMod_Update();
         }
 
-        count = AUDIOBUFFER >> 3;
-        src = (u32 *)&tempbuffer;
-        dst = (u32 *)&SoundBuffer[whichab];
+        if(Player_Paused()) {
+            memset(tempbuffer, 0, AUDIOBUFFER);
+        }
+        else {
+            count = AUDIOBUFFER >> 3;
+            src = (u32 *)&tempbuffer;
+            dst = (u32 *)&SoundBuffer[whichab];
 
-        while ( count ) {
-            *dst++ = *src;
-            *dst++ = *src++;
-            count--;
+            while ( count ) {
+                *dst++ = *src;
+                *dst++ = *src++;
+                count--;
+            }
         }
     }
     else {
