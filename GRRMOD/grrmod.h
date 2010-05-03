@@ -73,11 +73,16 @@ void GRRMOD_GetModType(char *Buffer, u32 Size);
 /** @} */ // end of group
 /**
  * @mainpage GRRMOD Documentation
- * @image html grrlib_logo.png
+ * @image html grrmod_logo.png
  * Welcome to the GRRMOD documentation.
  *
  * @section Introduction
  * GRRMOD is a MOD player library for Wii application developers.
+ * It supports the following format:
+ * - MOD (15 and 31 instruments)
+ * - IT (Impulse Tracker)
+ * - S3M (Scream Tracker 3)
+ * - XM (FastTracker 2)
  *
  * @section Links
  * Forum: http://grrlib.santo.fr/forum\n

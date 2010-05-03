@@ -1,0 +1,38 @@
+ifeq ($(strip $(DEVKITPPC)),)
+  $(error "Use   export DEVKITPPC=<path to>devkitPPC   and try again")
+endif
+
+ifeq ($(strip $(DEVKITPRO)),)
+  $(error "Use   export DEVKITPRO=<path to>devkitPRO   and try again")
+endif
+
+PREFIX	:= $(DEVKITPPC)/bin/powerpc-eabi-
+CC		:=	$(PREFIX)gcc
+AR		:=	$(PREFIX)ar
+
+LIBOGC_INC	:=	$(DEVKITPRO)/libogc/include
+LIBOGC_LIB	:=	$(DEVKITPRO)/libogc/lib/wii
+
+INCLUDE	:= -Imikmod/include -I$(LIBOGC_INC)
+MACHDEP := -DGEKKO -mrvl -mcpu=750 -meabi -mhard-float
+CFLAGS  := -O2 $(MACHDEP) $(INCLUDE)
+
+LIB 	:= grrmod
+CFILES	:= $(wildcard *.c) $(wildcard mikmod/drivers/*.c) $(wildcard mikmod/loaders/*.c) $(wildcard mikmod/mmio/*.c) $(wildcard mikmod/playercode/*.c)
+OFILES	:= $(CFILES:.c=.o)
+ARC 	:= lib$(LIB).a
+HDR 	:= $(LIB).h
+
+all : $(OFILES)
+	$(AR) -r $(ARC) $(OFILES)
+
+clean :
+	rm -f $(OFILES) $(ARC)
+
+install :
+	mkdir -p  $(LIBOGC_LIB)  $(LIBOGC_INC)
+	cp -f $(ARC) $(LIBOGC_LIB)/
+	cp -f $(HDR) $(LIBOGC_INC)/
+
+%.o : %.c
+	$(CC) $(CFLAGS) -c $< -o $@

@@ -20,7 +20,7 @@ BUILD		:=	build
 SOURCES		:=	source GRRMOD GRRMOD/mikmod/drivers GRRMOD/mikmod/loaders \
 				GRRMOD/mikmod/mmio GRRMOD/mikmod/playercode
 DATA		:=	data
-INCLUDES	:=  include GRRMOD GRRMOD/mikmod/include
+INCLUDES	:=  GRRMOD GRRMOD/mikmod/include
 
 #---------------------------------------------------------------------------------
 # options for code generation
