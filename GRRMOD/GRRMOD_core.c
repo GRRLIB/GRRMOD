@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 #include "grrmod.h"
 #include <string.h>
-#include "mikmod_build.h"
+#include "mikmod/include/mikmod_build.h"
 
 static void GRRMOD_Callback();
 static BOOL GRRMOD_Eof(MREADER * reader);

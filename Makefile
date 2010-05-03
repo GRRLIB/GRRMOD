@@ -17,10 +17,10 @@ include $(DEVKITPPC)/wii_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source source/mikmod/drivers source/mikmod/loaders source/mikmod/mmio \
-				source/mikmod/playercode
+SOURCES		:=	source GRRMOD GRRMOD/mikmod/drivers GRRMOD/mikmod/loaders \
+				GRRMOD/mikmod/mmio GRRMOD/mikmod/playercode
 DATA		:=	data
-INCLUDES	:=  include
+INCLUDES	:=  include GRRMOD GRRMOD/mikmod/include
 
 #---------------------------------------------------------------------------------
 # options for code generation
