@@ -43,7 +43,6 @@ static float calc_size(u8 voice, CH* channel);
 
 
 int main(int argc, char **argv) {
-    char SongTitle[255] = "", ModType[255] = "";
     float a = 0.0f;
     u8 Volume = 64;
     s8 SongNum = 0;
@@ -59,8 +58,6 @@ int main(int argc, char **argv) {
     GRRMOD_Init();
 
     GRRMOD_SetMOD(PlayList[0].Mem, PlayList[0].Size);
-    GRRMOD_GetSongTitle(SongTitle, 255);
-    GRRMOD_GetModType(ModType, 255);
 
     WPAD_Init();
 
@@ -95,8 +92,6 @@ int main(int argc, char **argv) {
             if(SongNum < 0) SongNum = 0;
             GRRMOD_Unload();
             GRRMOD_SetMOD(PlayList[SongNum].Mem, PlayList[SongNum].Size);
-            GRRMOD_GetSongTitle(SongTitle, 255);
-            GRRMOD_GetModType(ModType, 255);
             GRRMOD_Start();
         }
         if (WPAD_ButtonsDown(0) & WPAD_BUTTON_RIGHT) {
@@ -104,8 +99,6 @@ int main(int argc, char **argv) {
             if(SongNum > 3) SongNum = 3;
             GRRMOD_Unload();
             GRRMOD_SetMOD(PlayList[SongNum].Mem, PlayList[SongNum].Size);
-            GRRMOD_GetSongTitle(SongTitle, 255);
-            GRRMOD_GetModType(ModType, 255);
             GRRMOD_Start();
         }
 
@@ -135,8 +128,8 @@ int main(int argc, char **argv) {
 
         a+=0.5f;
         GRRLIB_2dMode();
-        GRRLIB_Printf(10, 10, tex_Font, 0xFFFFFFFF, 1, "Song: %s", SongTitle);
-        GRRLIB_Printf(10, 26, tex_Font, 0xFFFFFFFF, 1, "Type: %s", ModType);
+        GRRLIB_Printf(10, 10, tex_Font, 0xFFFFFFFF, 1, "Song: %s", GRRMOD_GetSongTitle());
+        GRRLIB_Printf(10, 26, tex_Font, 0xFFFFFFFF, 1, "Type: %s", GRRMOD_GetModType());
         GRRLIB_Printf(10, 42, tex_Font, 0xFFFFFFFF, 1, "1 = Play; 2 = Stop; A = Pause; Left = Prev; Right = Next");
 
         GRRLIB_Render();  // Render the frame buffer to the TV

@@ -34,15 +34,20 @@ static long GRRMOD_Tell(MREADER * reader);
 /**
  * Structure to hold the music information.
  */
-typedef struct _MOD_READER
-{
-    MREADER Core;		/**<  */
-    u64     Offset;		/**<  */
+typedef struct _MOD_READER {
+    MREADER Core;		/**< Structure with a bunch of pointers to functions. */
+    u64     Offset;		/**< Current file position. */
     char    *BufferPtr;	/**< Pointer to the music data. */
     u64     Size;		/**< Size of the music data. */
 } MOD_READER;
 
-static MODULE *module;	/**<  */
+typedef struct _GRRMOD_DATA {
+    char *ModType;    /**< A string representing the MOD type. */
+    char *SongTitle;  /**< A string representing the song title. */
+} GRRMOD_DATA;
+
+static MODULE *module = NULL;	/**< Module structure. */
+static GRRMOD_DATA MusicData = {};
 
 #define AUDIOBUFFER 4096	/**< Audio buffer size. */
 static u8  SoundBuffer[2][AUDIOBUFFER]  __attribute__((__aligned__(32)));
@@ -102,9 +107,14 @@ void GRRMOD_SetMOD(const void *mem, u64 size) {
         Reader->Core.Seek = &GRRMOD_Seek;
         Reader->Core.Tell = &GRRMOD_Tell;
 
+        if(module) {
+            GRRMOD_Unload();
+        }
         module = Player_LoadGeneric((MREADER *)Reader, 128, 0);
         if(module) {
             module->wrap = true;    // The module will restart when it's finished
+            MusicData.SongTitle = strdup(module->songname);
+            MusicData.ModType = strdup(module->modtype);
         }
     }
 }
@@ -116,6 +126,15 @@ void GRRMOD_Unload() {
     GRRMOD_Stop();
     if(module) {
         Player_Free(module);
+        module = NULL;
+    }
+    if(MusicData.ModType) {
+        free(MusicData.ModType);
+        MusicData.ModType = NULL;
+    }
+    if(MusicData.SongTitle) {
+        free(MusicData.SongTitle);
+        MusicData.SongTitle = NULL;
     }
 }
 
@@ -165,26 +184,18 @@ void GRRMOD_Pause() {
 
 /**
  * Get the song title.
+ * @return Pointer to the song title.
  */
-void GRRMOD_GetSongTitle(char *Buffer, u32 Size) {
-    if(module) {
-        strncpy(Buffer, module->songname, Size);
-    }
-    else {
-        Buffer = '\0';
-    }
+char *GRRMOD_GetSongTitle() {
+    return MusicData.SongTitle;
 }
 
 /**
  * Get the MOD type.
+ * @return Pointer to the MOD type.
  */
-void GRRMOD_GetModType(char *Buffer, u32 Size) {
-    if(module) {
-        strncpy(Buffer, module->modtype, Size);
-    }
-    else {
-        Buffer = '\0';
-    }
+char *GRRMOD_GetModType() {
+    return MusicData.ModType;
 }
 
 /**
