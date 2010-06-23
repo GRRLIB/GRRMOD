@@ -35,10 +35,10 @@ static long GRRMOD_Tell(MREADER * reader);
  * Structure to hold the music information.
  */
 typedef struct _MOD_READER {
-    MREADER Core;		/**< Structure with a bunch of pointers to functions. */
-    u64     Offset;		/**< Current file position. */
-    char    *BufferPtr;	/**< Pointer to the music data. */
-    u64     Size;		/**< Size of the music data. */
+    MREADER Core;       /**< Structure with a bunch of pointers to functions. */
+    u64     Offset;     /**< Current file position. */
+    char    *BufferPtr; /**< Pointer to the music data. */
+    u64     Size;       /**< Size of the music data. */
 } MOD_READER;
 
 typedef struct _GRRMOD_DATA {
@@ -46,10 +46,10 @@ typedef struct _GRRMOD_DATA {
     char *SongTitle;  /**< A string representing the song title. */
 } GRRMOD_DATA;
 
-static MODULE *module = NULL;	/**< Module structure. */
+static MODULE *module = NULL;   /**< Module structure. */
 static GRRMOD_DATA MusicData = {};
 
-#define AUDIOBUFFER 4096	/**< Audio buffer size. */
+#define AUDIOBUFFER 4096    /**< Audio buffer size. */
 static u8  SoundBuffer[2][AUDIOBUFFER]  __attribute__((__aligned__(32)));
 static u8  tempbuffer[AUDIOBUFFER];
 static u32 whichab = 0;
