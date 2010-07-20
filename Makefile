@@ -18,15 +18,15 @@ include $(DEVKITPPC)/wii_rules
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
 SOURCES		:=	source GRRMOD GRRMOD/mikmod/drivers GRRMOD/mikmod/loaders \
-				GRRMOD/mikmod/mmio GRRMOD/mikmod/playercode
+				GRRMOD/mikmod/mmio GRRMOD/mikmod/playercode GRRMOD/mpg123
 DATA		:=	data
-INCLUDES	:=  GRRMOD GRRMOD/mikmod/include
+INCLUDES	:=  GRRMOD GRRMOD/mikmod/include GRRMOD/mpg123
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS	= -g -O2 -Wall $(MACHDEP) $(INCLUDE) -DHAVE_MALLOC_H
+CFLAGS	= -g -O2 -Wall $(MACHDEP) $(INCLUDE) -DHAVE_MALLOC_H -DOPT_GENERIC -DREAL_IS_FLOAT -DNOXFERMEM
 CXXFLAGS	=	$(CFLAGS)
 
 LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
@@ -160,6 +160,11 @@ $(OUTPUT).elf: $(OFILES)
 	$(bin2o)
 #---------------------------------------------------------------------------------
 %.s3m.o	:	%.s3m
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	$(bin2o)
+#---------------------------------------------------------------------------------
+%.mp3.o	:	%.mp3
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	$(bin2o)

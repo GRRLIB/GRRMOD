@@ -44,7 +44,7 @@ s8 GRRMOD_Init() {
     AUDIO_Init(NULL);
     GRRMOD_SetFrequency(48000);
 
-    GRRMOD_MOD_Init();
+    GRRMOD_MP3_Init();
 
     return 0;
 }
@@ -56,14 +56,14 @@ s8 GRRMOD_Init() {
 void GRRMOD_End() {
     GRRMOD_Unload();
 
-    GRRMOD_MOD_End();
+    GRRMOD_MP3_End();
 }
 
 /**
  * Load a MOD file from memory.
  */
 void GRRMOD_SetMOD(const void *mem, u64 size) {
-    GRRMOD_MOD_SetMOD(mem, size);
+    GRRMOD_MP3_SetMOD(mem, size);
 }
 
 /**
@@ -71,7 +71,7 @@ void GRRMOD_SetMOD(const void *mem, u64 size) {
  */
 void GRRMOD_Unload() {
     GRRMOD_Stop();
-    GRRMOD_MOD_Unload();
+    GRRMOD_MP3_Unload();
 }
 
 /**
@@ -80,7 +80,7 @@ void GRRMOD_Unload() {
 void GRRMOD_Start() {
     if(playing)   return;
 
-    GRRMOD_MOD_Start();
+    GRRMOD_MP3_Start();
 
     memset(&SoundBuffer[0], 0, AUDIOBUFFER);
     memset(&SoundBuffer[1], 0, AUDIOBUFFER);
@@ -109,14 +109,14 @@ void GRRMOD_Stop() {
     playing = false;
     paused = false;
 
-    GRRMOD_MOD_Stop();
+    GRRMOD_MP3_Stop();
 }
 
 /**
  * This function toggles the playing/paused status of the module.
  */
 void GRRMOD_Pause() {
-    GRRMOD_MOD_Pause();
+    GRRMOD_MP3_Pause();
     paused = !paused;
 }
 
@@ -125,7 +125,7 @@ void GRRMOD_Pause() {
  * @return Pointer to the song title.
  */
 char *GRRMOD_GetSongTitle() {
-    return GRRMOD_MOD_GetSongTitle();
+    return GRRMOD_MP3_GetSongTitle();
 }
 
 /**
@@ -133,7 +133,7 @@ char *GRRMOD_GetSongTitle() {
  * @return Pointer to the MOD type.
  */
 char *GRRMOD_GetModType() {
-    return GRRMOD_MOD_GetModType();
+    return GRRMOD_MP3_GetModType();
 }
 
 /**
@@ -143,7 +143,7 @@ char *GRRMOD_GetModType() {
 void GRRMOD_SetFrequency(u32 freq)
 {
     AUDIO_SetDSPSampleRate(AI_SAMPLERATE_48KHZ);
-    GRRMOD_MOD_SetFrequency(freq);
+    GRRMOD_MP3_SetFrequency(freq);
 }
 
 /**
@@ -152,7 +152,7 @@ void GRRMOD_SetFrequency(u32 freq)
  */
 void GRRMOD_SetVolume(s8 musicvolume)
 {
-    GRRMOD_MOD_SetVolume(musicvolume);
+    GRRMOD_MP3_SetVolume(musicvolume);
 }
 
 /**
@@ -161,7 +161,7 @@ void GRRMOD_SetVolume(s8 musicvolume)
  * @return The current frequency of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
  */
 u32 GRRMOD_GetVoiceFrequency(u8 voice) {
-    return GRRMOD_MOD_GetVoiceFrequency(voice);
+    return GRRMOD_MP3_GetVoiceFrequency(voice);
 }
 
 /**
@@ -170,7 +170,7 @@ u32 GRRMOD_GetVoiceFrequency(u8 voice) {
  * @return The current volume of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
  */
 u32 GRRMOD_GetVoiceVolume(u8 voice) {
-    return GRRMOD_MOD_GetVoiceVolume(voice);
+    return GRRMOD_MP3_GetVoiceVolume(voice);
 }
 
 /**
@@ -179,7 +179,7 @@ u32 GRRMOD_GetVoiceVolume(u8 voice) {
  * @return The real volume of the voice when the function was called, in the range 0-65535.
  */
 u32 GRRMOD_GetRealVoiceVolume(u8 voice) {
-    return GRRMOD_MOD_GetRealVoiceVolume(voice);
+    return GRRMOD_MP3_GetRealVoiceVolume(voice);
 }
 
 /**
@@ -200,7 +200,7 @@ static void GRRMOD_Callback()
         whichab ^= 1;
         memset(&SoundBuffer[whichab], 0, AUDIOBUFFER);
 
-        GRRMOD_MOD_Update(tempbuffer);
+        GRRMOD_MP3_Update(tempbuffer);
 
         if(paused) {
             memset(tempbuffer, 0, AUDIOBUFFER);

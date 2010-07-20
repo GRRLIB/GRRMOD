@@ -12,6 +12,7 @@
 #include "Impact_9_png.h"
 
 // Mod file
+#include "music_mp3.h"
 #include "music_mod.h"
 #include "music_xm.h"
 #include "music_s3m.h"
@@ -46,7 +47,8 @@ int main(int argc, char **argv) {
     float a = 0.0f;
     u8 Volume = 64;
     s8 SongNum = 0;
-    PLAYLIST PlayList[] = { {(u8 *)music_mod, music_mod_size},
+    PLAYLIST PlayList[] = { {(u8 *)music_mp3, music_mp3_size},
+                            {(u8 *)music_mod, music_mod_size},
                             {(u8 *)music_s3m, music_s3m_size},
                             {(u8 *)music_it, music_it_size},
                             {(u8 *)music_xm, music_xm_size} };
@@ -96,7 +98,7 @@ int main(int argc, char **argv) {
         }
         if (WPAD_ButtonsDown(0) & WPAD_BUTTON_RIGHT) {
             SongNum++;
-            if(SongNum > 3) SongNum = 3;
+            if(SongNum > 4) SongNum = 4;
             GRRMOD_Unload();
             GRRMOD_SetMOD(PlayList[SongNum].Mem, PlayList[SongNum].Size);
             GRRMOD_Start();

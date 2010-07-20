@@ -60,6 +60,23 @@ char *GRRMOD_MOD_GetSongTitle();
 char *GRRMOD_MOD_GetModType();
 void GRRMOD_MOD_Update(u8 *buffer);
 
+// MP3 functions
+s8 GRRMOD_MP3_Init();
+void GRRMOD_MP3_End();
+void GRRMOD_MP3_SetMOD(const void *mem, u64 size);
+void GRRMOD_MP3_Unload();
+void GRRMOD_MP3_SetFrequency(u32 freq);
+void GRRMOD_MP3_SetVolume(s8 musicvolume);
+u32 GRRMOD_MP3_GetVoiceFrequency(u8 voice);
+u32 GRRMOD_MP3_GetVoiceVolume(u8 voice);
+u32 GRRMOD_MP3_GetRealVoiceVolume(u8 voice);
+void GRRMOD_MP3_Start();
+void GRRMOD_MP3_Stop();
+void GRRMOD_MP3_Pause();
+char *GRRMOD_MP3_GetSongTitle();
+char *GRRMOD_MP3_GetModType();
+void GRRMOD_MP3_Update(u8 *buffer);
+
 //==============================================================================
 // C++ footer
 //==============================================================================
