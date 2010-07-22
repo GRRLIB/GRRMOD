@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 static void GRRMOD_Callback();
 
-static u8  SoundBuffer[2][AUDIOBUFFER]  __attribute__((__aligned__(32)));
+static u8  SoundBuffer[2][AUDIOBUFFER]  ATTRIBUTE_ALIGN(32);
 static u8  tempbuffer[AUDIOBUFFER];
 static u32 whichab = 0;
 static bool playing = false;
@@ -78,15 +78,15 @@ void GRRMOD_Unload() {
  * This function starts the specified module playback.
  */
 void GRRMOD_Start() {
-    if(playing)   return;
+    if(playing) return;
 
     GRRMOD_MP3_Start();
 
     memset(&SoundBuffer[0], 0, AUDIOBUFFER);
     memset(&SoundBuffer[1], 0, AUDIOBUFFER);
 
-    DCFlushRange((char *)&SoundBuffer[0], AUDIOBUFFER);
-    DCFlushRange((char *)&SoundBuffer[1], AUDIOBUFFER);
+    DCFlushRange(&SoundBuffer[0], AUDIOBUFFER);
+    DCFlushRange(&SoundBuffer[1], AUDIOBUFFER);
 
     whichab = 0;
     playing = true;
@@ -107,7 +107,6 @@ void GRRMOD_Stop() {
     AUDIO_RegisterDMACallback(NULL);
 
     playing = false;
-    paused = false;
 
     GRRMOD_MP3_Stop();
 }
@@ -116,6 +115,8 @@ void GRRMOD_Stop() {
  * This function toggles the playing/paused status of the module.
  */
 void GRRMOD_Pause() {
+    if(!playing) return;
+
     GRRMOD_MP3_Pause();
     paused = !paused;
 }

@@ -24,15 +24,15 @@ LIBOGC_LIB	:=	$(DEVKITPRO)/libogc/lib/wii
 #---------------------------------------------------------------------------------
 TARGET		:=	libgrrmod
 BUILD		:=	build
-SOURCES		:=	. mikmod/drivers mikmod/loaders mikmod/mmio mikmod/playercode
-INCLUDES	:=	mikmod/include
+SOURCES		:=	. mikmod/drivers mikmod/loaders mikmod/mmio mikmod/playercode mpg123
+INCLUDES	:=	mikmod/include mpg123
 HDR			:=	grrmod.h
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
 MACHDEP		:=	-DGEKKO -mcpu=750 -meabi -msdata=eabi -mhard-float -fmodulo-sched -ffunction-sections -fdata-sections
-CFLAGS		:=	-O2 $(MACHDEP) $(INCLUDE)
+CFLAGS		:=	-O2 $(MACHDEP) $(INCLUDE)  -DOPT_GENERIC -DREAL_IS_FLOAT -DNOXFERMEM
 CXXFLAGS	:=	$(CFLAGS)
 
 #---------------------------------------------------------------------------------
