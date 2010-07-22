@@ -12,7 +12,7 @@
 
 /* A macro to check at compile time which set of API functions to expect.
    This should be incremented at least each time a new symbol is added to the header. */
-#define MPG123_API_VERSION 25
+#define MPG123_API_VERSION 27
 
 /* These aren't actually in use... seems to work without using libtool. */
 #ifdef BUILD_MPG123_DLL
@@ -169,6 +169,7 @@ enum mpg123_param_flags
 	,MPG123_FORCE_FLOAT  = 0x400 /**< 010000000000 Force floating point output (32 or 64 bits depends on mpg123 internal precision). */
 	,MPG123_PLAIN_ID3TEXT = 0x800 /**< 100000000000 Do not translate ID3 text data to UTF-8. ID3 strings will contain the raw text data, with the first byte containing the ID3 encoding code. */
 	,MPG123_IGNORE_STREAMLENGTH = 0x1000 /**< 1000000000000 Ignore any stream length information contained in the stream, which can be contained in a 'TLEN' frame of an ID3v2 tag or a Xing tag */
+	,MPG123_SKIP_ID3V2 = 0x2000 /**< 10 0000 0000 0000 Do not parse ID3v2 tags, just skip them. */
 };
 
 /** choices for MPG123_RVA */
@@ -383,6 +384,11 @@ EXPORT void mpg123_rates(const long **list, size_t *number);
  *  \param list Store a pointer to the encodings array there.
  *  \param number Store the number of encodings there. */
 EXPORT void mpg123_encodings(const int **list, size_t *number);
+
+/** Return the size (in bytes) of one mono sample of the named encoding.
+ * \param encoding The encoding value to analyze.
+ * \return positive size of encoding in bytes, 0 on invalid encoding. */
+EXPORT int mpg123_encsize(int encoding);
 
 /** Configure a mpg123 handle to accept no output format at all, 
  *  use before specifying supported formats with mpg123_format */

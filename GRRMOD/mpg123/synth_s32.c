@@ -31,7 +31,7 @@
 /* Mono-related synths; they wrap over _some_ synth_1to1_s32 (could be generic, could be i386). */
 #define SYNTH_NAME       fr->synths.plain[r_1to1][f_32]
 #define MONO_NAME        synth_1to1_s32_mono
-#define MONO2STEREO_NAME synth_1to1_s32_mono2stereo
+#define MONO2STEREO_NAME synth_1to1_s32_m2s
 #include "synth_mono.h"
 #undef SYNTH_NAME
 #undef MONO_NAME
@@ -49,7 +49,7 @@
 #ifdef OPT_X86_64
 /* Assembler routines. */
 int synth_1to1_s32_x86_64_asm(real *window, real *b0, int32_t *samples, int bo1);
-int synth_1to1_s32_stereo_x86_64_asm(real *window, real *b0l, real *b0r, int32_t *samples, int bo1);
+int synth_1to1_s32_s_x86_64_asm(real *window, real *b0l, real *b0r, int32_t *samples, int bo1);
 void dct64_real_x86_64(real *out0, real *out1, real *samples);
 /* Hull for C mpg123 API */
 int synth_1to1_s32_x86_64(real *bandPtr,int channel, mpg123_handle *fr, int final)
@@ -131,7 +131,7 @@ int synth_1to1_s32_stereo_x86_64(real *bandPtr_l, real *bandPtr_r, mpg123_handle
 		dct64_real_x86_64(bufr[0]+fr->bo,bufr[1]+fr->bo+1,bandPtr_r);
 	}
 
-	clip = synth_1to1_s32_stereo_x86_64_asm(fr->decwin, b0l, b0r, samples, bo1);
+	clip = synth_1to1_s32_s_x86_64_asm(fr->decwin, b0l, b0r, samples, bo1);
 
 	fr->buffer.fill += 256;
 
@@ -142,7 +142,7 @@ int synth_1to1_s32_stereo_x86_64(real *bandPtr_l, real *bandPtr_r, mpg123_handle
 #ifdef OPT_SSE
 /* Assembler routines. */
 int synth_1to1_s32_sse_asm(real *window, real *b0, int32_t *samples, int bo1);
-int synth_1to1_s32_stereo_sse_asm(real *window, real *b0l, real *b0r, int32_t *samples, int bo1);
+int synth_1to1_s32_s_sse_asm(real *window, real *b0l, real *b0r, int32_t *samples, int bo1);
 void dct64_real_sse(real *out0, real *out1, real *samples);
 /* Hull for C mpg123 API */
 int synth_1to1_s32_sse(real *bandPtr,int channel, mpg123_handle *fr, int final)
@@ -224,7 +224,7 @@ int synth_1to1_s32_stereo_sse(real *bandPtr_l, real *bandPtr_r, mpg123_handle *f
 		dct64_real_sse(bufr[0]+fr->bo,bufr[1]+fr->bo+1,bandPtr_r);
 	}
 
-	clip = synth_1to1_s32_stereo_sse_asm(fr->decwin, b0l, b0r, samples, bo1);
+	clip = synth_1to1_s32_s_sse_asm(fr->decwin, b0l, b0r, samples, bo1);
 
 	fr->buffer.fill += 256;
 
@@ -248,7 +248,7 @@ int synth_1to1_s32_stereo_sse(real *bandPtr_l, real *bandPtr_r, mpg123_handle *f
 /* Mono-related synths; they wrap over _some_ synth_2to1_s32 (could be generic, could be i386). */
 #define SYNTH_NAME       fr->synths.plain[r_2to1][f_32]
 #define MONO_NAME        synth_2to1_s32_mono
-#define MONO2STEREO_NAME synth_2to1_s32_mono2stereo
+#define MONO2STEREO_NAME synth_2to1_s32_m2s
 #include "synth_mono.h"
 #undef SYNTH_NAME
 #undef MONO_NAME
@@ -277,7 +277,7 @@ int synth_1to1_s32_stereo_sse(real *bandPtr_l, real *bandPtr_r, mpg123_handle *f
 /* Mono-related synths; they wrap over _some_ synth_4to1_s32 (could be generic, could be i386). */
 #define SYNTH_NAME       fr->synths.plain[r_4to1][f_32]
 #define MONO_NAME        synth_4to1_s32_mono
-#define MONO2STEREO_NAME synth_4to1_s32_mono2stereo
+#define MONO2STEREO_NAME synth_4to1_s32_m2s
 #include "synth_mono.h"
 #undef SYNTH_NAME
 #undef MONO_NAME
@@ -305,7 +305,7 @@ int synth_1to1_s32_stereo_sse(real *bandPtr_l, real *bandPtr_r, mpg123_handle *f
 /* These are all in one header, there's no flexibility to gain. */
 #define SYNTH_NAME       synth_ntom_s32
 #define MONO_NAME        synth_ntom_s32_mono
-#define MONO2STEREO_NAME synth_ntom_s32_mono2stereo
+#define MONO2STEREO_NAME synth_ntom_s32_m2s
 #include "synth_ntom.h"
 #undef SYNTH_NAME
 #undef MONO_NAME

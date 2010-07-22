@@ -70,7 +70,6 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
     int encoding; // Unneeded value encoding
     size_t fakegot;
     size_t num_rates;
-    const long *rates;
 
     // Set global value
     Offset = 0;
@@ -78,7 +77,7 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
     Size = size;
 
     // Get bitrates
-    mpg123_rates(&rates, &num_rates);
+    mpg123_rates(NULL, &num_rates);
 
     // Get new mpg123 handle
     mh = mpg123_new(NULL, &result);
@@ -93,7 +92,7 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
 
     // Set all bitrates as ok
     for(i = 0; i < (int)num_rates; ++i) {
-        mpg123_format(mh, rates[i], MPG123_STEREO, MPG123_ENC_SIGNED_16);
+        mpg123_format(mh, frequency, MPG123_STEREO, MPG123_ENC_SIGNED_16);
     }
 
     result = mpg123_decode(mh, (unsigned char *)mem, size, NULL, 0, &fakegot);
@@ -182,12 +181,12 @@ char *GRRMOD_MP3_GetModType() {
 }
 
 /**
- * Set the frequency. Values are harcoded at 48000kHz.
+ * Set the frequency. This should be called before GRRMOD_MP3_SetMOD.
  * @param freq Frequency to set in kHz.
  */
 void GRRMOD_MP3_SetFrequency(u32 freq)
 {
-
+    frequency = freq;
 }
 
 /**

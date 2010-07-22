@@ -138,12 +138,15 @@ char *GRRMOD_GetModType() {
 }
 
 /**
- * Set the frequency. Values are harcoded at 48000kHz.
+ * Set the frequency. Only 32000Hz and 48000Hz are available.
  * @param freq Frequency to set in kHz.
  */
 void GRRMOD_SetFrequency(u32 freq)
 {
-    AUDIO_SetDSPSampleRate(AI_SAMPLERATE_48KHZ);
+    if(freq==32000)
+        AUDIO_SetDSPSampleRate(AI_SAMPLERATE_32KHZ);
+    else
+        AUDIO_SetDSPSampleRate(AI_SAMPLERATE_48KHZ);
     GRRMOD_MP3_SetFrequency(freq);
 }
 
@@ -188,10 +191,6 @@ u32 GRRMOD_GetRealVoiceVolume(u8 voice) {
  */
 static void GRRMOD_Callback()
 {
-    u32 *src;
-    u32 *dst;
-    int count;
-
     if (playing) {
         AUDIO_StopDMA();
         AUDIO_InitDMA((u32)SoundBuffer[whichab], AUDIOBUFFER);
@@ -207,15 +206,7 @@ static void GRRMOD_Callback()
             memset(tempbuffer, 0, AUDIOBUFFER);
         }
         else {
-            count = AUDIOBUFFER >> 3;
-            src = (u32 *)&tempbuffer;
-            dst = (u32 *)&SoundBuffer[whichab];
-
-            while ( count ) {
-                *dst++ = *src;
-                *dst++ = *src++;
-                count--;
-            }
+            memcpy(SoundBuffer[whichab], tempbuffer, AUDIOBUFFER);
         }
     }
     else {

@@ -50,11 +50,11 @@ static const char* decname[] =
 
 #if (defined OPT_X86) && (defined OPT_MULTI)
 #include "getcpuflags.h"
-struct cpuflags cpu_flags;
+static struct cpuflags cpu_flags;
 #else
 /* Faking stuff for non-multi builds. The same code for synth function choice is used.
    Just no runtime dependency of result... */
-char cpu_flags;
+#define cpu_flags nothing
 #define cpu_i586(s)     1
 #define cpu_fpu(s)      1
 #define cpu_mmx(s)      1
@@ -93,7 +93,7 @@ char cpu_flags;
 
 /* The call of left and right plain synth, wrapped.
    This may be replaced by a direct stereo optimized synth. */
-int synth_stereo_wrap(real *bandPtr_l, real *bandPtr_r, mpg123_handle *fr)
+static int synth_stereo_wrap(real *bandPtr_l, real *bandPtr_r, mpg123_handle *fr)
 {
 	int clip;
 	clip  = (fr->synth)(bandPtr_l, 0, fr, 0);
@@ -101,7 +101,7 @@ int synth_stereo_wrap(real *bandPtr_l, real *bandPtr_r, mpg123_handle *fr)
 	return clip;
 }
 
-const struct synth_s synth_base =
+static const struct synth_s synth_base =
 {
 	{ /* plain */
 		 OUT_SYNTHS(synth_1to1, synth_1to1_8bit, synth_1to1_real, synth_1to1_s32)
@@ -124,13 +124,13 @@ const struct synth_s synth_base =
 #		endif
 	},
 	{ /* mono2stereo */
-		 OUT_SYNTHS(synth_1to1_mono2stereo, synth_1to1_8bit_mono2stereo, synth_1to1_real_mono2stereo, synth_1to1_s32_mono2stereo)
+		 OUT_SYNTHS(synth_1to1_m2s, synth_1to1_8bit_m2s, synth_1to1_real_m2s, synth_1to1_s32_m2s)
 #		ifndef NO_DOWNSAMPLE
-		,OUT_SYNTHS(synth_2to1_mono2stereo, synth_2to1_8bit_mono2stereo, synth_2to1_real_mono2stereo, synth_2to1_s32_mono2stereo)
-		,OUT_SYNTHS(synth_4to1_mono2stereo, synth_4to1_8bit_mono2stereo, synth_4to1_real_mono2stereo, synth_4to1_s32_mono2stereo)
+		,OUT_SYNTHS(synth_2to1_m2s, synth_2to1_8bit_m2s, synth_2to1_real_m2s, synth_2to1_s32_m2s)
+		,OUT_SYNTHS(synth_4to1_m2s, synth_4to1_8bit_m2s, synth_4to1_real_m2s, synth_4to1_s32_m2s)
 #		endif
 #		ifndef NO_NTOM
-		,OUT_SYNTHS(synth_ntom_mono2stereo, synth_ntom_8bit_mono2stereo, synth_ntom_real_mono2stereo, synth_ntom_s32_mono2stereo)
+		,OUT_SYNTHS(synth_ntom_m2s, synth_ntom_8bit_m2s, synth_ntom_real_m2s, synth_ntom_s32_m2s)
 #		endif
 	},
 	{ /* mono*/
@@ -601,7 +601,7 @@ int frame_cpu_opt(mpg123_handle *fr, const char* cpu)
 		{
 			fr->synths.plain[r_1to1][f_8] = synth_1to1_8bit_wrap;
 			fr->synths.mono[r_1to1][f_8] = synth_1to1_8bit_wrap_mono;
-			fr->synths.mono2stereo[r_1to1][f_8] = synth_1to1_8bit_wrap_mono2stereo;
+			fr->synths.mono2stereo[r_1to1][f_8] = synth_1to1_8bit_wrap_m2s;
 		}
 #		endif
 #		endif
@@ -706,7 +706,7 @@ int frame_cpu_opt(mpg123_handle *fr, const char* cpu)
 	{
 		fr->synths.plain[r_1to1][f_8] = synth_1to1_8bit_wrap;
 		fr->synths.mono[r_1to1][f_8] = synth_1to1_8bit_wrap_mono;
-		fr->synths.mono2stereo[r_1to1][f_8] = synth_1to1_8bit_wrap_mono2stereo;
+		fr->synths.mono2stereo[r_1to1][f_8] = synth_1to1_8bit_wrap_m2s;
 	}
 #	endif
 #	endif

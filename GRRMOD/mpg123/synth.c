@@ -14,7 +14,7 @@
 	Part 1: All synth functions that produce signed short.
 	That is:
 		- synth_1to1 with cpu-specific variants (synth_1to1_i386, synth_1to1_i586 ...)
-		- synth_1to1_mono and synth_1to1_mono2stereo; which use fr->synths.plain[r_1to1][f_16].
+		- synth_1to1_mono and synth_1to1_m2s; which use fr->synths.plain[r_1to1][f_16].
 	Nearly every decoder variant has it's own synth_1to1, while the mono conversion is shared.
 */
 
@@ -31,7 +31,7 @@
 /* Mono-related synths; they wrap over _some_ synth_1to1. */
 #define SYNTH_NAME       fr->synths.plain[r_1to1][f_16]
 #define MONO_NAME        synth_1to1_mono
-#define MONO2STEREO_NAME synth_1to1_mono2stereo
+#define MONO2STEREO_NAME synth_1to1_m2s
 #include "synth_mono.h"
 #undef SYNTH_NAME
 #undef MONO_NAME
@@ -143,7 +143,7 @@ int synth_1to1_mmx(real *bandPtr, int channel, mpg123_handle *fr, int final)
 #ifdef ACCURATE_ROUNDING
 /* This is defined in assembler. */
 int synth_1to1_sse_accurate_asm(real *window, real *b0, short *samples, int bo1);
-int synth_1to1_stereo_sse_accurate_asm(real *window, real *b0l, real *b0r, short *samples, int bo1);
+int synth_1to1_s_sse_accurate_asm(real *window, real *b0l, real *b0r, short *samples, int bo1);
 void dct64_real_sse(real *out0, real *out1, real *samples);
 /* This is just a hull to use the mpg123 handle. */
 int synth_1to1_sse(real *bandPtr,int channel, mpg123_handle *fr, int final)
@@ -223,7 +223,7 @@ int synth_1to1_stereo_sse(real *bandPtr_l, real *bandPtr_r, mpg123_handle *fr)
 		dct64_real_sse(bufr[0]+fr->bo,bufr[1]+fr->bo+1,bandPtr_r);
 	}
 
-	clip = synth_1to1_stereo_sse_accurate_asm(fr->decwin, b0l, b0r, samples, bo1);
+	clip = synth_1to1_s_sse_accurate_asm(fr->decwin, b0l, b0r, samples, bo1);
 
 	fr->buffer.fill += 128;
 
@@ -262,7 +262,7 @@ int synth_1to1_3dnowext(real *bandPtr, int channel, mpg123_handle *fr, int final
 #ifdef ACCURATE_ROUNDING
 /* Assembler routines. */
 int synth_1to1_x86_64_accurate_asm(real *window, real *b0, short *samples, int bo1);
-int synth_1to1_stereo_x86_64_accurate_asm(real *window, real *b0l, real *b0r, short *samples, int bo1);
+int synth_1to1_s_x86_64_accurate_asm(real *window, real *b0l, real *b0r, short *samples, int bo1);
 void dct64_real_x86_64(real *out0, real *out1, real *samples);
 /* Hull for C mpg123 API */
 int synth_1to1_x86_64(real *bandPtr,int channel, mpg123_handle *fr, int final)
@@ -343,7 +343,7 @@ int synth_1to1_stereo_x86_64(real *bandPtr_l, real *bandPtr_r, mpg123_handle *fr
 		dct64_real_x86_64(bufr[0]+fr->bo,bufr[1]+fr->bo+1,bandPtr_r);
 	}
 
-	clip = synth_1to1_stereo_x86_64_accurate_asm(fr->decwin, b0l, b0r, samples, bo1);
+	clip = synth_1to1_s_x86_64_accurate_asm(fr->decwin, b0l, b0r, samples, bo1);
 
 	fr->buffer.fill += 128;
 
@@ -352,7 +352,7 @@ int synth_1to1_stereo_x86_64(real *bandPtr_l, real *bandPtr_r, mpg123_handle *fr
 #else
 /* This is defined in assembler. */
 int synth_1to1_x86_64_asm(short *window, short *b0, short *samples, int bo1);
-int synth_1to1_stereo_x86_64_asm(short *window, short *b0l, short *b0r, short *samples, int bo1);
+int synth_1to1_s_x86_64_asm(short *window, short *b0l, short *b0r, short *samples, int bo1);
 void dct64_x86_64(short *out0, short *out1, real *samples);
 /* This is just a hull to use the mpg123 handle. */
 int synth_1to1_x86_64(real *bandPtr,int channel, mpg123_handle *fr, int final)
@@ -431,7 +431,7 @@ int synth_1to1_stereo_x86_64(real *bandPtr_l,real *bandPtr_r, mpg123_handle *fr)
 		dct64_x86_64(bufr[0]+fr->bo,bufr[1]+fr->bo+1,bandPtr_r);
 	}
 
-	clip = synth_1to1_stereo_x86_64_asm((short *)fr->decwins, b0l, b0r, samples, bo1);
+	clip = synth_1to1_s_x86_64_asm((short *)fr->decwins, b0l, b0r, samples, bo1);
 
 	fr->buffer.fill += 128;
 
@@ -556,7 +556,7 @@ int synth_1to1_arm(real *bandPtr,int channel, mpg123_handle *fr, int final)
 
 #define SYNTH_NAME       fr->synths.plain[r_2to1][f_16]
 #define MONO_NAME        synth_2to1_mono
-#define MONO2STEREO_NAME synth_2to1_mono2stereo
+#define MONO2STEREO_NAME synth_2to1_m2s
 #include "synth_mono.h"
 #undef SYNTH_NAME
 #undef MONO_NAME
@@ -593,7 +593,7 @@ int synth_1to1_arm(real *bandPtr,int channel, mpg123_handle *fr, int final)
 
 #define SYNTH_NAME       fr->synths.plain[r_4to1][f_16] /* This is just for the _i386 one... gotta check if it is really useful... */
 #define MONO_NAME        synth_4to1_mono
-#define MONO2STEREO_NAME synth_4to1_mono2stereo
+#define MONO2STEREO_NAME synth_4to1_m2s
 #include "synth_mono.h"
 #undef SYNTH_NAME
 #undef MONO_NAME
@@ -621,7 +621,7 @@ int synth_1to1_arm(real *bandPtr,int channel, mpg123_handle *fr, int final)
 /* These are all in one header, there's no flexibility to gain. */
 #define SYNTH_NAME       synth_ntom
 #define MONO_NAME        synth_ntom_mono
-#define MONO2STEREO_NAME synth_ntom_mono2stereo
+#define MONO2STEREO_NAME synth_ntom_m2s
 #include "synth_ntom.h"
 #undef SYNTH_NAME
 #undef MONO_NAME

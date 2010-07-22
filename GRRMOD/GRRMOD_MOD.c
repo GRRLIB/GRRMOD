@@ -166,7 +166,7 @@ char *GRRMOD_MOD_GetModType() {
 }
 
 /**
- * Set the frequency. Values are harcoded at 48000kHz.
+ * Set the frequency. Values are harcoded at 48000Hz.
  * @param freq Frequency to set in kHz.
  */
 void GRRMOD_MOD_SetFrequency(u32 freq)
