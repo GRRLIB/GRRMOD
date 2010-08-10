@@ -43,7 +43,29 @@ THE SOFTWARE.
    extern "C" {
 #endif /* __cplusplus */
 
+/**
+ * Structure to hold the list of functions to use.
+ */
+typedef  struct GRRLIB_FuntionsList {
+    s8 (*Init)(void);
+    void (*End)(void);
+    void (*SetMOD)(const void *mem, u64 size);
+    void (*Unload)(void);
+    void (*SetFrequency)(u32 freq);
+    void (*SetVolume)(s8 musicvolume);
+    u32 (*GetVoiceFrequency)(u8 voice);
+    u32 (*GetVoiceVolume)(u8 voice);
+    u32 (*GetRealVoiceVolume)(u8 voice);
+    void (*Start)(void);
+    void (*Stop)(void);
+    void (*Pause)(void);
+    char *(*GetSongTitle)(void);
+    char *(*GetModType)(void);
+    void (*Update)(u8 *buffer);
+} GRRLIB_FuntionsList;
+
 // Module functions
+void GRRMOD_MOD_Register(GRRLIB_FuntionsList *RegFunc);
 s8 GRRMOD_MOD_Init();
 void GRRMOD_MOD_End();
 void GRRMOD_MOD_SetMOD(const void *mem, u64 size);
@@ -61,6 +83,7 @@ char *GRRMOD_MOD_GetModType();
 void GRRMOD_MOD_Update(u8 *buffer);
 
 // MP3 functions
+void GRRMOD_MP3_Register(GRRLIB_FuntionsList *RegFunc);
 s8 GRRMOD_MP3_Init();
 void GRRMOD_MP3_End();
 void GRRMOD_MP3_SetMOD(const void *mem, u64 size);

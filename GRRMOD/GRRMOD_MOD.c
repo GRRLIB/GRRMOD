@@ -48,6 +48,24 @@ typedef struct _GRRMOD_DATA {
 static GRRMOD_DATA MusicData = {};
 static MODULE *module = NULL;   /**< Module structure. */
 
+void GRRMOD_MOD_Register(GRRLIB_FuntionsList *RegFunc) {
+    RegFunc->Init = GRRMOD_MOD_Init;
+    RegFunc->End = GRRMOD_MOD_End;
+    RegFunc->SetMOD = GRRMOD_MOD_SetMOD;
+    RegFunc->Unload = GRRMOD_MOD_Unload;
+    RegFunc->SetFrequency = GRRMOD_MOD_SetFrequency;
+    RegFunc->SetVolume = GRRMOD_MOD_SetVolume;
+    RegFunc->GetVoiceFrequency = GRRMOD_MOD_GetVoiceFrequency;
+    RegFunc->GetVoiceVolume = GRRMOD_MOD_GetVoiceVolume;
+    RegFunc->GetRealVoiceVolume = GRRMOD_MOD_GetRealVoiceVolume;
+    RegFunc->Start = GRRMOD_MOD_Start;
+    RegFunc->Stop = GRRMOD_MOD_Stop;
+    RegFunc->Pause = GRRMOD_MOD_Pause;
+    RegFunc->GetSongTitle = GRRMOD_MOD_GetSongTitle;
+    RegFunc->GetModType = GRRMOD_MOD_GetModType;
+    RegFunc->Update = GRRMOD_MOD_Update;
+}
+
 /**
  * Initialize GRRMOD. Call this once at the beginning your code.
  * @return A number representating a code:
@@ -220,9 +238,23 @@ u32 GRRMOD_MOD_GetRealVoiceVolume(u8 voice) {
  * @param buffer The buffer to update.
  */
 void GRRMOD_MOD_Update(u8 *buffer) {
+    static u8  tempbuffer[AUDIOBUFFER];
+    u32 *src;
+    u32 *dst;
+    int count;
+
     if(module) {
-        setBuffer((s16 *)buffer, AUDIOBUFFER>>3);
+        setBuffer((s16 *)tempbuffer, AUDIOBUFFER>>3);
         MikMod_Update();
+
+        count = AUDIOBUFFER >> 3;
+        src = (u32 *)&tempbuffer;
+        dst = (u32 *)buffer;
+        while ( count ) {
+            *dst++ = *src;
+            *dst++ = *src++;
+            count--;
+        }
     }
 }
 

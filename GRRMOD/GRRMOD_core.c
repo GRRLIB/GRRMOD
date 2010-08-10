@@ -31,6 +31,7 @@ static u8  tempbuffer[AUDIOBUFFER];
 static u32 whichab = 0;
 static bool playing = false;
 static bool paused = false;
+static GRRLIB_FuntionsList RegFunc;
 
 
 /**
@@ -41,10 +42,13 @@ static bool paused = false;
  * @see GRRMOD_End
  */
 s8 GRRMOD_Init() {
+    GRRMOD_MOD_Register(&RegFunc);
+    //GRRMOD_MP3_Register(&RegFunc);
+
     AUDIO_Init(NULL);
     GRRMOD_SetFrequency(48000);
 
-    GRRMOD_MP3_Init();
+    RegFunc.Init();
 
     return 0;
 }
@@ -56,14 +60,14 @@ s8 GRRMOD_Init() {
 void GRRMOD_End() {
     GRRMOD_Unload();
 
-    GRRMOD_MP3_End();
+    RegFunc.End();
 }
 
 /**
  * Load a MOD file from memory.
  */
 void GRRMOD_SetMOD(const void *mem, u64 size) {
-    GRRMOD_MP3_SetMOD(mem, size);
+    RegFunc.SetMOD(mem, size);
 }
 
 /**
@@ -71,7 +75,7 @@ void GRRMOD_SetMOD(const void *mem, u64 size) {
  */
 void GRRMOD_Unload() {
     GRRMOD_Stop();
-    GRRMOD_MP3_Unload();
+    RegFunc.Unload();
 }
 
 /**
@@ -80,7 +84,7 @@ void GRRMOD_Unload() {
 void GRRMOD_Start() {
     if(playing) return;
 
-    GRRMOD_MP3_Start();
+    RegFunc.Start();
 
     memset(&SoundBuffer[0], 0, AUDIOBUFFER);
     memset(&SoundBuffer[1], 0, AUDIOBUFFER);
@@ -108,7 +112,7 @@ void GRRMOD_Stop() {
 
     playing = false;
 
-    GRRMOD_MP3_Stop();
+    RegFunc.Stop();
 }
 
 /**
@@ -117,7 +121,7 @@ void GRRMOD_Stop() {
 void GRRMOD_Pause() {
     if(!playing) return;
 
-    GRRMOD_MP3_Pause();
+    RegFunc.Pause();
     paused = !paused;
 }
 
@@ -126,7 +130,7 @@ void GRRMOD_Pause() {
  * @return Pointer to the song title.
  */
 char *GRRMOD_GetSongTitle() {
-    return GRRMOD_MP3_GetSongTitle();
+    return RegFunc.GetSongTitle();
 }
 
 /**
@@ -134,7 +138,7 @@ char *GRRMOD_GetSongTitle() {
  * @return Pointer to the MOD type.
  */
 char *GRRMOD_GetModType() {
-    return GRRMOD_MP3_GetModType();
+    return RegFunc.GetModType();
 }
 
 /**
@@ -147,7 +151,7 @@ void GRRMOD_SetFrequency(u32 freq)
         AUDIO_SetDSPSampleRate(AI_SAMPLERATE_32KHZ);
     else
         AUDIO_SetDSPSampleRate(AI_SAMPLERATE_48KHZ);
-    GRRMOD_MP3_SetFrequency(freq);
+    RegFunc.SetFrequency(freq);
 }
 
 /**
@@ -156,7 +160,7 @@ void GRRMOD_SetFrequency(u32 freq)
  */
 void GRRMOD_SetVolume(s8 musicvolume)
 {
-    GRRMOD_MP3_SetVolume(musicvolume);
+    RegFunc.SetVolume(musicvolume);
 }
 
 /**
@@ -165,7 +169,7 @@ void GRRMOD_SetVolume(s8 musicvolume)
  * @return The current frequency of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
  */
 u32 GRRMOD_GetVoiceFrequency(u8 voice) {
-    return GRRMOD_MP3_GetVoiceFrequency(voice);
+    return RegFunc.GetVoiceFrequency(voice);
 }
 
 /**
@@ -174,7 +178,7 @@ u32 GRRMOD_GetVoiceFrequency(u8 voice) {
  * @return The current volume of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
  */
 u32 GRRMOD_GetVoiceVolume(u8 voice) {
-    return GRRMOD_MP3_GetVoiceVolume(voice);
+    return RegFunc.GetVoiceVolume(voice);
 }
 
 /**
@@ -183,14 +187,13 @@ u32 GRRMOD_GetVoiceVolume(u8 voice) {
  * @return The real volume of the voice when the function was called, in the range 0-65535.
  */
 u32 GRRMOD_GetRealVoiceVolume(u8 voice) {
-    return GRRMOD_MP3_GetRealVoiceVolume(voice);
+    return RegFunc.GetRealVoiceVolume(voice);
 }
 
 /**
  * Callback function for DMA.
  */
-static void GRRMOD_Callback()
-{
+static void GRRMOD_Callback() {
     if (playing) {
         AUDIO_StopDMA();
         AUDIO_InitDMA((u32)SoundBuffer[whichab], AUDIOBUFFER);
@@ -200,7 +203,7 @@ static void GRRMOD_Callback()
         whichab ^= 1;
         memset(&SoundBuffer[whichab], 0, AUDIOBUFFER);
 
-        GRRMOD_MP3_Update(tempbuffer);
+        RegFunc.Update(tempbuffer);
 
         if(paused) {
             memset(tempbuffer, 0, AUDIOBUFFER);

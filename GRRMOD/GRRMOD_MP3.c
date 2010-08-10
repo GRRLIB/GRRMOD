@@ -42,6 +42,24 @@ static long frequency;
 static int channels;
 static off_t samples;
 
+void GRRMOD_MP3_Register(GRRLIB_FuntionsList *RegFunc) {
+    RegFunc->Init = GRRMOD_MP3_Init;
+    RegFunc->End = GRRMOD_MP3_End;
+    RegFunc->SetMOD = GRRMOD_MP3_SetMOD;
+    RegFunc->Unload = GRRMOD_MP3_Unload;
+    RegFunc->SetFrequency = GRRMOD_MP3_SetFrequency;
+    RegFunc->SetVolume = GRRMOD_MP3_SetVolume;
+    RegFunc->GetVoiceFrequency = GRRMOD_MP3_GetVoiceFrequency;
+    RegFunc->GetVoiceVolume = GRRMOD_MP3_GetVoiceVolume;
+    RegFunc->GetRealVoiceVolume = GRRMOD_MP3_GetRealVoiceVolume;
+    RegFunc->Start = GRRMOD_MP3_Start;
+    RegFunc->Stop = GRRMOD_MP3_Stop;
+    RegFunc->Pause = GRRMOD_MP3_Pause;
+    RegFunc->GetSongTitle = GRRMOD_MP3_GetSongTitle;
+    RegFunc->GetModType = GRRMOD_MP3_GetModType;
+    RegFunc->Update = GRRMOD_MP3_Update;
+}
+
 /**
  * Initialize GRRMOD. Call this once at the beginning your code.
  * @return A number representating a code:
@@ -63,7 +81,7 @@ void GRRMOD_MP3_End() {
 }
 
 /**
- * Load a MOD file from memory.
+ * Load a MP3 file from memory.
  */
 void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
     int result, i;
@@ -132,7 +150,7 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
 }
 
 /**
- * Unload a MOD file.
+ * Unload a MP3 file.
  */
 void GRRMOD_MP3_Unload() {
     if(mh) {
@@ -173,7 +191,7 @@ char *GRRMOD_MP3_GetSongTitle() {
 }
 
 /**
- * Get the MOD type.
+ * Get the MP3 type.
  * @return Pointer to the MOD type.
  */
 char *GRRMOD_MP3_GetModType() {
