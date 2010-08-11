@@ -67,11 +67,11 @@ void GRRMOD_MOD_Register(GRRLIB_FuntionsList *RegFunc) {
 }
 
 /**
- * Initialize GRRMOD. Call this once at the beginning your code.
+ * Initialize MOD library.
  * @return A number representating a code:
  *         -     0 : The operation completed successfully.
  *         -    -1 : Failed to initialize the MOD engine.
- * @see GRRMOD_End
+ * @see GRRMOD_MOD_End
  */
 s8 GRRMOD_MOD_Init() {
     MikMod_RegisterAllDrivers();

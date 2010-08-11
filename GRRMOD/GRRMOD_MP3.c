@@ -61,15 +61,16 @@ void GRRMOD_MP3_Register(GRRLIB_FuntionsList *RegFunc) {
 }
 
 /**
- * Initialize GRRMOD. Call this once at the beginning your code.
+ * Initialize MP3 library.
  * @return A number representating a code:
  *         -     0 : The operation completed successfully.
- *         -    -1 : Failed to initialize the MOD engine.
- * @see GRRMOD_End
+ *         -    -1 : Failed to initialize the MP3 engine.
+ * @see GRRMOD_MP3_End
  */
 s8 GRRMOD_MP3_Init() {
-    mpg123_init();
-    return 0;
+    if(mpg123_init() == MPG123_OK)
+        return 0;
+    return -1;
 }
 
 /**
@@ -113,7 +114,7 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
         mpg123_format(mh, frequency, MPG123_STEREO, MPG123_ENC_SIGNED_16);
     }
 
-    result = mpg123_decode(mh, (unsigned char *)mem, size, NULL, 0, &fakegot);
+    result = mpg123_decode(mh, (u8 *)BufferPtr, Size, NULL, 0, &fakegot);
 
     if(result != MPG123_NEW_FORMAT) {
         // Failed to get data
@@ -134,7 +135,7 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
     samples = mpg123_length(mh);
 
     char Temp[1024];
-
+/*
     mpg123_id3v1 *v1;
     mpg123_id3v2 *v2;
     //mpg123_scan(mh);
@@ -144,7 +145,7 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
         //sprintf(Temp, "ID3: %s", v1->title);
         MusicData.SongTitle = strdup(v1->title);
     }
-
+*/
     sprintf(Temp, "MP3: %li Hz, %i channels, encoding value %i\n", frequency, channels, encoding);
     MusicData.ModType = strdup(Temp);
 }
@@ -213,7 +214,9 @@ void GRRMOD_MP3_SetFrequency(u32 freq)
  */
 void GRRMOD_MP3_SetVolume(s8 musicvolume)
 {
-    mpg123_volume(mh, musicvolume/100.0);
+    if(mh) {
+        mpg123_volume(mh, musicvolume/100.0);
+    }
 }
 
 /**
@@ -297,7 +300,7 @@ void GRRMOD_MP3_Update(u8 *outbuf) {
         }
 
         // Grab data
-        result = mpg123_decode(mh, (unsigned char *)(BufferPtr + Offset), dataIn, outbuf + have_read, need, &have_now);
+        result = mpg123_decode(mh, (u8 *)(BufferPtr + Offset), dataIn, outbuf + have_read, need, &have_now);
 
         Offset += dataIn;
 

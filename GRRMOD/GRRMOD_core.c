@@ -38,7 +38,7 @@ static GRRLIB_FuntionsList RegFunc;
  * Initialize GRRMOD. Call this once at the beginning your code.
  * @return A number representating a code:
  *         -     0 : The operation completed successfully.
- *         -    -1 : Failed to initialize the MOD engine.
+ *         -    -1 : Failed to initialize engine.
  * @see GRRMOD_End
  */
 s8 GRRMOD_Init() {
@@ -48,9 +48,7 @@ s8 GRRMOD_Init() {
     AUDIO_Init(NULL);
     GRRMOD_SetFrequency(48000);
 
-    RegFunc.Init();
-
-    return 0;
+    return RegFunc.Init();
 }
 
 /**
