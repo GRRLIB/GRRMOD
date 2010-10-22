@@ -24,7 +24,9 @@ LIBOGC_LIB	:=	$(DEVKITPRO)/libogc/lib/wii
 #---------------------------------------------------------------------------------
 TARGET		:=	libgrrmod
 BUILD		:=	build
-SOURCES		:=	. mikmod/drivers mikmod/loaders mikmod/mmio mikmod/playercode mpg123
+SOURCES		:=	.
+SOURCES		+=	mikmod/drivers mikmod/loaders mikmod/mmio mikmod/playercode
+SOURCES		+=	mpg123
 INCLUDES	:=	mikmod/include mpg123
 HDR			:=	grrmod.h
 
@@ -38,7 +40,7 @@ CXXFLAGS	:=	$(CFLAGS)
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:=	
+LIBS	:=	-laesnd
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

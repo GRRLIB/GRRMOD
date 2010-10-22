@@ -203,8 +203,7 @@ char *GRRMOD_MP3_GetModType() {
  * Set the frequency. This should be called before GRRMOD_MP3_SetMOD.
  * @param freq Frequency to set in kHz.
  */
-void GRRMOD_MP3_SetFrequency(u32 freq)
-{
+void GRRMOD_MP3_SetFrequency(u32 freq) {
     frequency = freq;
 }
 
@@ -212,8 +211,7 @@ void GRRMOD_MP3_SetFrequency(u32 freq)
  * Set the volume levels for the MOD music (call it after MODPlay_SetMOD()).
  * @param musicvolume The music volume, 0 to 64.
  */
-void GRRMOD_MP3_SetVolume(s8 musicvolume)
-{
+void GRRMOD_MP3_SetVolume(s8 musicvolume) {
     if(mh) {
         mpg123_volume(mh, musicvolume/100.0);
     }
@@ -255,7 +253,7 @@ void GRRMOD_MP3_Update(u8 *outbuf) {
         return;
     }
     // Clear data to ensure no garbage bytes
-    memset(outbuf, 0, AUDIOBUFFER);//memset(outbuf, 0, renderSamples * 4);
+    memset(outbuf, 0, SNDBUFFERSIZE);//memset(outbuf, 0, renderSamples * 4);
 
     // Start with assumption that we have enough data
     int result = MPG123_OK;
@@ -264,7 +262,7 @@ void GRRMOD_MP3_Update(u8 *outbuf) {
     int over = 0;
 
     // Bookkeeping
-    int need = (AUDIOBUFFER / 4) * channels * 2;//int need = renderSamples * channels * 2;
+    int need = (SNDBUFFERSIZE / 4) * channels * 2;//int need = renderSamples * channels * 2;
     int have_read = 0;
 
     // Loop, grabbing enough data to get samples

@@ -28,7 +28,7 @@ THE SOFTWARE.
 #ifndef __GRRMOD_INTERNALS_H__
 #define __GRRMOD_INTERNALS_H__
 
-#define AUDIOBUFFER 4096    /**< Audio buffer size. */
+#define SNDBUFFERSIZE   (5760)    /**< Audio buffer size. */
 
 //==============================================================================
 // Includes
@@ -46,7 +46,7 @@ THE SOFTWARE.
 /**
  * Structure to hold the list of functions to use.
  */
-typedef  struct GRRLIB_FuntionsList {
+typedef struct GRRLIB_FuntionsList {
     s8 (*Init)(void);
     void (*End)(void);
     void (*SetMOD)(const void *mem, u64 size);

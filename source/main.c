@@ -62,6 +62,7 @@ int main(int argc, char **argv) {
     GRRMOD_SetMOD(PlayList[0].Mem, PlayList[0].Size);
 
     WPAD_Init();
+    WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC);
 
     GRRLIB_Settings.antialias = true;
     GRRLIB_SetBackgroundColour(0x00, 0x00, 0x00, 0xFF);

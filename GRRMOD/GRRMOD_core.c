@@ -23,16 +23,30 @@ THE SOFTWARE.
 #include "grrmod.h"
 #include "GRRMOD_internals.h"
 #include <string.h>
+#include <aesndlib.h>
 
-static void GRRMOD_Callback();
+#define STACKSIZE       8192
 
-static u8  SoundBuffer[2][AUDIOBUFFER]  ATTRIBUTE_ALIGN(32);
-static u8  tempbuffer[AUDIOBUFFER];
-static u32 whichab = 0;
-static bool playing = false;
+static BOOL thr_running = false;
+static bool sndPlaying = false;
 static bool paused = false;
+
+static vu32 curr_audio = 0;
+static u8 audioBuf[2][SNDBUFFERSIZE] ATTRIBUTE_ALIGN(32);
+
+static lwpq_t player_queue;
+static lwp_t hplayer;
+static u8 player_stack[STACKSIZE] ATTRIBUTE_ALIGN(8);
+static void* player(void *);
+
+static s32 mod_freq = 48000;
+static AESNDPB  *modvoice = NULL;
+
 static GRRLIB_FuntionsList RegFunc;
 
+// Static Functions
+static void* player(void *arg);
+static void __aesndvoicecallback(AESNDPB *pb,u32 state);
 
 /**
  * Initialize GRRMOD. Call this once at the beginning your code.
@@ -45,8 +59,23 @@ s8 GRRMOD_Init() {
     GRRMOD_MOD_Register(&RegFunc);
     //GRRMOD_MP3_Register(&RegFunc);
 
-    AUDIO_Init(NULL);
+    AESND_Init();
+
+    modvoice = AESND_AllocateVoice(__aesndvoicecallback);
+    if(modvoice) {
+        AESND_SetVoiceFormat(modvoice, VOICE_STEREO16);
+        AESND_SetVoiceFrequency(modvoice, mod_freq);
+        AESND_SetVoiceVolume(modvoice, 255, 255);
+        AESND_SetVoiceStream(modvoice, true);
+    }
+
     GRRMOD_SetFrequency(48000);
+
+    LWP_InitQueue(&player_queue);
+
+    sndPlaying = false;
+    thr_running = false;
+    paused = false;
 
     return RegFunc.Init();
 }
@@ -80,35 +109,39 @@ void GRRMOD_Unload() {
  * This function starts the specified module playback.
  */
 void GRRMOD_Start() {
-    if(playing) return;
+    if(sndPlaying) return;
 
     RegFunc.Start();
 
-    memset(&SoundBuffer[0], 0, AUDIOBUFFER);
-    memset(&SoundBuffer[1], 0, AUDIOBUFFER);
+    memset(audioBuf[0], 0, SNDBUFFERSIZE);
+    memset(audioBuf[1], 0, SNDBUFFERSIZE);
 
-    DCFlushRange(&SoundBuffer[0], AUDIOBUFFER);
-    DCFlushRange(&SoundBuffer[1], AUDIOBUFFER);
+    DCFlushRange(audioBuf[0], SNDBUFFERSIZE);
+    DCFlushRange(audioBuf[1], SNDBUFFERSIZE);
 
-    whichab = 0;
-    playing = true;
+    while(thr_running);
+
+    curr_audio = 0;
     paused = false;
-
-    AUDIO_RegisterDMACallback( GRRMOD_Callback );
-    AUDIO_InitDMA((u32)SoundBuffer[whichab], AUDIOBUFFER);
-    AUDIO_StartDMA();
+    sndPlaying = true;
+    if(LWP_CreateThread(&hplayer, player, NULL, player_stack, STACKSIZE, 80)!=-1) {
+        AESND_SetVoiceStop(modvoice, false);
+        return;
+    }
+    sndPlaying = false;
 }
 
 /**
  * This function stops the currently playing module.
  */
 void GRRMOD_Stop() {
-    if(!playing) return;
+    if(!sndPlaying) return;
+    AESND_SetVoiceStop(modvoice, true);
 
-    AUDIO_StopDMA();
-    AUDIO_RegisterDMACallback(NULL);
-
-    playing = false;
+    curr_audio = 0;
+    sndPlaying = false;
+    LWP_ThreadSignal(player_queue);
+    LWP_JoinThread(hplayer, NULL);
 
     RegFunc.Stop();
 }
@@ -117,7 +150,7 @@ void GRRMOD_Stop() {
  * This function toggles the playing/paused status of the module.
  */
 void GRRMOD_Pause() {
-    if(!playing) return;
+    if(!sndPlaying) return;
 
     RegFunc.Pause();
     paused = !paused;
@@ -143,21 +176,18 @@ char *GRRMOD_GetModType() {
  * Set the frequency. Only 32000Hz and 48000Hz are available.
  * @param freq Frequency to set in kHz.
  */
-void GRRMOD_SetFrequency(u32 freq)
-{
-    if(freq==32000)
-        AUDIO_SetDSPSampleRate(AI_SAMPLERATE_32KHZ);
-    else
-        AUDIO_SetDSPSampleRate(AI_SAMPLERATE_48KHZ);
-    RegFunc.SetFrequency(freq);
+void GRRMOD_SetFrequency(u32 freq) {
+    if(freq==32000 || freq==48000) {
+        mod_freq = 48000;
+        RegFunc.SetFrequency(freq);
+    }
 }
 
 /**
  * Set the volume levels for the MOD music (call it after MODPlay_SetMOD()).
  * @param musicvolume The music volume, 0 to 64.
  */
-void GRRMOD_SetVolume(s8 musicvolume)
-{
+void GRRMOD_SetVolume(s8 musicvolume) {
     RegFunc.SetVolume(musicvolume);
 }
 
@@ -189,28 +219,40 @@ u32 GRRMOD_GetRealVoiceVolume(u8 voice) {
 }
 
 /**
- * Callback function for DMA.
+ * Set a buffer to update. This routine is called inside a thread.
  */
-static void GRRMOD_Callback() {
-    if (playing) {
-        AUDIO_StopDMA();
-        AUDIO_InitDMA((u32)SoundBuffer[whichab], AUDIOBUFFER);
-        DCFlushRange(&SoundBuffer[whichab], AUDIOBUFFER);
-        AUDIO_StartDMA();
-
-        whichab ^= 1;
-        memset(&SoundBuffer[whichab], 0, AUDIOBUFFER);
-
-        RegFunc.Update(tempbuffer);
-
-        if(paused) {
-            memset(tempbuffer, 0, AUDIOBUFFER);
-        }
-        else {
-            memcpy(SoundBuffer[whichab], tempbuffer, AUDIOBUFFER);
+static void* player(void *arg) {
+    u32 i;
+    thr_running = true;
+    while(sndPlaying) {
+        LWP_ThreadSleep(player_queue);
+        if(sndPlaying) {
+            if(paused) {
+                for(i=0; i<(SNDBUFFERSIZE>>1); i++)
+                    ((u16*)((u8*)audioBuf[curr_audio]))[i] = 0;
+            }
+            else {
+                RegFunc.Update(((u8*)audioBuf[curr_audio]));
+            }
         }
     }
-    else {
-        memset(tempbuffer, 0, AUDIOBUFFER);
+    thr_running = false;
+
+    return 0;
+}
+
+/**
+ * Callback function for AESND_AllocateVoice.
+ */
+static void __aesndvoicecallback(AESNDPB *pb, u32 state) {
+    switch(state) {
+        case VOICE_STATE_STOPPED:
+        case VOICE_STATE_RUNNING:
+            break;
+        case VOICE_STATE_STREAM:
+            AESND_SetVoiceBuffer(pb, (void*)audioBuf[curr_audio], SNDBUFFERSIZE);
+            LWP_ThreadSignal(player_queue);
+            curr_audio ^= 1;
+            break;
     }
 }
