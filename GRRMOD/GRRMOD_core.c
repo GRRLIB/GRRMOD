@@ -184,11 +184,20 @@ void GRRMOD_SetFrequency(u32 freq) {
 }
 
 /**
- * Set the volume levels for the MOD music (call it after MODPlay_SetMOD()).
- * @param musicvolume The music volume, 0 to 64.
+ * Set the volume levels for the music (call it after MODPlay_SetMOD()).
+ * @param volume_l The music volume (left), 0 to 255.
+ * @param volume_r The music volume (right), 0 to 255.
  */
-void GRRMOD_SetVolume(s8 musicvolume) {
-    RegFunc.SetVolume(musicvolume);
+void GRRMOD_SetVolume(s16 volume_l, s16 volume_r) {
+    if(volume_l < 0)
+        volume_l = 0;
+    else if(volume_l > 255)
+        volume_l = 255;
+    if(volume_r < 0)
+        volume_r = 0;
+    else if(volume_r > 255)
+        volume_r = 255;
+    AESND_SetVoiceVolume(modvoice, volume_l, volume_r);
 }
 
 /**

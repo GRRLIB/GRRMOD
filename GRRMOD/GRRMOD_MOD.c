@@ -54,7 +54,6 @@ void GRRMOD_MOD_Register(GRRLIB_FuntionsList *RegFunc) {
     RegFunc->SetMOD = GRRMOD_MOD_SetMOD;
     RegFunc->Unload = GRRMOD_MOD_Unload;
     RegFunc->SetFrequency = GRRMOD_MOD_SetFrequency;
-    RegFunc->SetVolume = GRRMOD_MOD_SetVolume;
     RegFunc->GetVoiceFrequency = GRRMOD_MOD_GetVoiceFrequency;
     RegFunc->GetVoiceVolume = GRRMOD_MOD_GetVoiceVolume;
     RegFunc->GetRealVoiceVolume = GRRMOD_MOD_GetRealVoiceVolume;
@@ -192,19 +191,6 @@ void GRRMOD_MOD_SetFrequency(u32 freq) {
 }
 
 /**
- * Set the volume levels for the MOD music (call it after MODPlay_SetMOD()).
- * @param musicvolume The music volume, 0 to 64.
- */
-void GRRMOD_MOD_SetVolume(s8 musicvolume) {
-    if(musicvolume < 0)
-        musicvolume = 0;
-    else if(musicvolume > 64)
-        musicvolume = 64;
-
-    Player_SetVolume(musicvolume * 2);
-}
-
-/**
  * This function returns the frequency of the sample currently playing on the specified voice.
  * @param voice The number of the voice to get frequency.
  * @return The current frequency of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
@@ -259,8 +245,7 @@ void GRRMOD_MOD_Update(u8 *buffer) {
 /**
  * This function has the same behaviour as feof.
  */
-static BOOL GRRMOD_Eof(MREADER * reader)
-{
+static BOOL GRRMOD_Eof(MREADER * reader) {
     MOD_READER *pReader = (MOD_READER *) reader;
 
     return (pReader->Size == (pReader->Offset)) ? true : false;
@@ -269,8 +254,7 @@ static BOOL GRRMOD_Eof(MREADER * reader)
 /**
  * This function copies length bytes of data into dest, and return zero if an error occured, and any nonzero value otherwise. Note that an end-of-file condition will not be considered as an error in this case.
  */
-static BOOL GRRMOD_Read(MREADER * reader, void *ptr, size_t size)
-{
+static BOOL GRRMOD_Read(MREADER * reader, void *ptr, size_t size) {
     MOD_READER *pReader = (MOD_READER *) reader;
 
     memcpy(ptr, pReader->BufferPtr + pReader->Offset, size);
@@ -282,8 +266,7 @@ static BOOL GRRMOD_Read(MREADER * reader, void *ptr, size_t size)
 /**
  * This function has the same behaviour as fgetc.
  */
-static int GRRMOD_Get(MREADER * reader)
-{
+static int GRRMOD_Get(MREADER * reader) {
     MOD_READER *pReader = (MOD_READER *) reader;
     char buf;
 
@@ -296,8 +279,7 @@ static int GRRMOD_Get(MREADER * reader)
 /**
  * This function has the same behaviour as fseek, with offset 0 meaning the start of the object (module, sample) being loaded.
  */
-static BOOL GRRMOD_Seek(MREADER * reader, long offset, int whence)
-{
+static BOOL GRRMOD_Seek(MREADER * reader, long offset, int whence) {
     MOD_READER *pReader = (MOD_READER *) reader;
 
     if(whence == SEEK_SET)
@@ -311,8 +293,7 @@ static BOOL GRRMOD_Seek(MREADER * reader, long offset, int whence)
 /**
  * This function has the same behaviour as ftell, with offset 0 meaning the start of the object being loaded.
  */
-static long GRRMOD_Tell(MREADER * reader)
-{
+static long GRRMOD_Tell(MREADER * reader) {
     MOD_READER *pReader = (MOD_READER *) reader;
 
     return pReader->Offset;

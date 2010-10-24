@@ -52,7 +52,7 @@ void GRRMOD_End();
 void GRRMOD_SetMOD(const void *mem, u64 size);
 void GRRMOD_Unload();
 void GRRMOD_SetFrequency(u32 freq);
-void GRRMOD_SetVolume(s8 musicvolume);
+void GRRMOD_SetVolume(s16 volume_l, s16 volume_r);
 u32 GRRMOD_GetVoiceFrequency(u8 voice);
 u32 GRRMOD_GetVoiceVolume(u8 voice);
 u32 GRRMOD_GetRealVoiceVolume(u8 voice);

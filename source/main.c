@@ -45,7 +45,7 @@ static float calc_size(u8 voice, CH* channel);
 
 int main(int argc, char **argv) {
     float a = 0.0f;
-    u8 Volume = 64;
+    s16 Volume = 255;
     s8 SongNum = 0;
     PLAYLIST PlayList[] = { {(u8 *)music_mp3, music_mp3_size},
                             {(u8 *)music_mod, music_mod_size},
@@ -76,10 +76,12 @@ int main(int argc, char **argv) {
             break;
         }
         if (WPAD_ButtonsHeld(0) & WPAD_BUTTON_PLUS) {
-            GRRMOD_SetVolume(++Volume);
+            Volume++;
+            GRRMOD_SetVolume(Volume, Volume);
         }
         if (WPAD_ButtonsHeld(0) & WPAD_BUTTON_MINUS) {
-            GRRMOD_SetVolume(--Volume);
+            Volume--;
+            GRRMOD_SetVolume(Volume, Volume);
         }
         if (WPAD_ButtonsDown(0) & WPAD_BUTTON_A) {
             GRRMOD_Pause();

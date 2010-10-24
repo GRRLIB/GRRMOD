@@ -48,7 +48,6 @@ void GRRMOD_MP3_Register(GRRLIB_FuntionsList *RegFunc) {
     RegFunc->SetMOD = GRRMOD_MP3_SetMOD;
     RegFunc->Unload = GRRMOD_MP3_Unload;
     RegFunc->SetFrequency = GRRMOD_MP3_SetFrequency;
-    RegFunc->SetVolume = GRRMOD_MP3_SetVolume;
     RegFunc->GetVoiceFrequency = GRRMOD_MP3_GetVoiceFrequency;
     RegFunc->GetVoiceVolume = GRRMOD_MP3_GetVoiceVolume;
     RegFunc->GetRealVoiceVolume = GRRMOD_MP3_GetRealVoiceVolume;
@@ -205,16 +204,6 @@ char *GRRMOD_MP3_GetModType() {
  */
 void GRRMOD_MP3_SetFrequency(u32 freq) {
     frequency = freq;
-}
-
-/**
- * Set the volume levels for the MOD music (call it after MODPlay_SetMOD()).
- * @param musicvolume The music volume, 0 to 64.
- */
-void GRRMOD_MP3_SetVolume(s8 musicvolume) {
-    if(mh) {
-        mpg123_volume(mh, musicvolume/100.0);
-    }
 }
 
 /**
