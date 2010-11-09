@@ -16,19 +16,39 @@ LIBOGC_INC	:=	$(DEVKITPRO)/libogc/include
 LIBOGC_LIB	:=	$(DEVKITPRO)/libogc/lib/wii
 
 #---------------------------------------------------------------------------------
+# options for building the library, set to yes to include, anything else to exclude
+#---------------------------------------------------------------------------------
+USE_MOD		:=	yes
+USE_MP3		:=	yes
+
+#---------------------------------------------------------------------------------
 # TARGET is the name of the output
 # BUILD is the directory where object files & intermediate files will be placed
 # SOURCES is a list of directories containing source code
 # INCLUDES is a list of directories containing extra header files
 # HDR is a list of header files needed for installation
+# CFILES is a list of c files for our project
 #---------------------------------------------------------------------------------
 TARGET		:=	libgrrmod
 BUILD		:=	build
-SOURCES		:=	.
-SOURCES		+=	mikmod/drivers mikmod/loaders mikmod/mmio mikmod/playercode
-SOURCES		+=	mpg123
-INCLUDES	:=	mikmod/include mpg123
+SOURCES		:=	
+INCLUDES	:=	
 HDR			:=	grrmod.h
+CFILES		:=	GRRMOD_core.c
+
+#---------------------------------------------------------------------------------
+# conditional operation
+#---------------------------------------------------------------------------------
+ifeq ($(USE_MOD),yes)
+	CFILES		+=	GRRMOD_MOD.c
+	SOURCES		+=	mikmod/drivers mikmod/loaders mikmod/mmio mikmod/playercode
+	INCLUDES	+=	mikmod/include
+endif
+ifeq ($(USE_MP3),yes)
+	CFILES		+=	GRRMOD_MP3.c
+	SOURCES		+=	mpg123
+	INCLUDES	+=	mpg123
+endif
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -57,14 +77,14 @@ ifneq ($(BUILD),$(notdir $(CURDIR)))
 
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
 
-export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir))
+export VPATH	:=	$(CURDIR) $(foreach dir,$(SOURCES),$(CURDIR)/$(dir))
 
 export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 
 #---------------------------------------------------------------------------------
 # automatically build a list of object files for our project
 #---------------------------------------------------------------------------------
-CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
+CFILES		+=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 
 export OFILES	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o)
