@@ -87,7 +87,7 @@ char *GRRMOD_GetModType();
  * @section Links
  * Forum: http://grrlib.santo.fr/forum\n
  * Code: http://code.google.com/p/grrlib\n
- * IRC: <a href="irc://irc.efnet.net/grrlib">##GRRLIB</a> on EFnet
+ * IRC: <a href="irc://irc.efnet.net/grrlib">#GRRLIB</a> on EFnet
  *
  * @section Credits
  * Main Coders : NoNameNo, Crayon\n
