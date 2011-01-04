@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-Copyright (c) 2010 The GRRLIB Team
+Copyright (c) 2011 The GRRLIB Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -101,26 +101,25 @@ void GRRMOD_MOD_End() {
  * Load a MOD file from memory.
  */
 void GRRMOD_MOD_SetMOD(const void *mem, u64 size) {
-    MOD_READER *Reader = (MOD_READER *)malloc(sizeof (MOD_READER));
-    if(Reader) {
-        Reader->Offset = 0;
-        Reader->BufferPtr = (char *)mem;
-        Reader->Size = size;
-        Reader->Core.Eof = &GRRMOD_Eof;
-        Reader->Core.Read = &GRRMOD_Read;
-        Reader->Core.Get = &GRRMOD_Get;
-        Reader->Core.Seek = &GRRMOD_Seek;
-        Reader->Core.Tell = &GRRMOD_Tell;
+    MOD_READER Reader;
 
-        if(module) {
-            GRRMOD_MOD_Unload();
-        }
-        module = Player_LoadGeneric((MREADER *)Reader, 128, 0);
-        if(module) {
-            module->wrap = true;    // The module will restart when it's finished
-            MusicData.SongTitle = strdup(module->songname);
-            MusicData.ModType = strdup(module->modtype);
-        }
+    Reader.Offset = 0;
+    Reader.BufferPtr = (char *)mem;
+    Reader.Size = size;
+    Reader.Core.Eof = &GRRMOD_Eof;
+    Reader.Core.Read = &GRRMOD_Read;
+    Reader.Core.Get = &GRRMOD_Get;
+    Reader.Core.Seek = &GRRMOD_Seek;
+    Reader.Core.Tell = &GRRMOD_Tell;
+
+    if(module) {
+        GRRMOD_MOD_Unload();
+    }
+    module = Player_LoadGeneric((MREADER *)&Reader, 128, 0);
+    if(module) {
+        module->wrap = true;    // The module will restart when it's finished
+        MusicData.SongTitle = strdup(module->songname);
+        MusicData.ModType = strdup(module->modtype);
     }
 }
 

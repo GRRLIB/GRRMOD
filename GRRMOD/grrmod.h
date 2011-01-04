@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-Copyright (c) 2010 The GRRLIB Team
+Copyright (c) 2011 The GRRLIB Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -94,7 +94,7 @@ char *GRRMOD_GetModType();
  * Documentation  : Crayon, NoNameNo\n
  *
  * @section Licence
- * Copyright (c) 2010 The GRRLIB Team
+ * Copyright (c) 2011 The GRRLIB Team
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
