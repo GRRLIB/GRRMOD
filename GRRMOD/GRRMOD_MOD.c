@@ -76,12 +76,11 @@ s8 GRRMOD_MOD_Init() {
     MikMod_RegisterAllDrivers();
     MikMod_RegisterAllLoaders();
 
-    md_mode = 0;
-    md_mode |= DMODE_16BITS;
-    md_mode |= DMODE_SOFT_MUSIC;
-    md_mode |= DMODE_SOFT_SNDFX;
-    //md_mode |= DMODE_STEREO;  //this causes some modules (s3m mostly) to play back incorrectly on wii, i dont know why
-    md_mode |= DMODE_HQMIXER;
+    md_mode = DMODE_16BITS |
+              DMODE_SOFT_MUSIC |
+              DMODE_SOFT_SNDFX |
+              //DMODE_STEREO | //this causes some modules (s3m mostly) to play back incorrectly on wii, i dont know why
+              DMODE_HQMIXER;
 
     if(MikMod_Init("")) {
         return -1;
