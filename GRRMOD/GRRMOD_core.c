@@ -24,10 +24,11 @@ THE SOFTWARE.
 #include "GRRMOD_internals.h"
 #include <string.h>
 #include <aesndlib.h>
+#include <ogc/lwp_watchdog.h>
 
 #define STACKSIZE       8192
 
-static BOOL thr_running = false;
+static bool thr_running = false;
 static bool sndPlaying = false;
 static bool paused = false;
 
@@ -41,6 +42,10 @@ static void* player(void *);
 
 static s32 mod_freq = 48000;
 static AESNDPB  *modvoice = NULL;
+
+#ifdef _GRRMOD_DEBUG
+static u64 mixtime = 0;
+#endif
 
 static GRRLIB_FuntionsList RegFunc;
 
@@ -189,15 +194,9 @@ void GRRMOD_SetFrequency(u32 freq) {
  * @param volume_r The music volume (right), 0 to 255.
  */
 void GRRMOD_SetVolume(s16 volume_l, s16 volume_r) {
-    if(volume_l < 0)
-        volume_l = 0;
-    else if(volume_l > 255)
-        volume_l = 255;
-    if(volume_r < 0)
-        volume_r = 0;
-    else if(volume_r > 255)
-        volume_r = 255;
-    AESND_SetVoiceVolume(modvoice, volume_l, volume_r);
+    AESND_SetVoiceVolume(modvoice,
+        (volume_l<0) ? 0 : (volume_l>255) ? 255 : volume_l,
+        (volume_r<0) ? 0 : (volume_r>255) ? 255 : volume_r);
 }
 
 /**
@@ -231,6 +230,10 @@ u32 GRRMOD_GetRealVoiceVolume(u8 voice) {
  * Set a buffer to update. This routine is called inside a thread.
  */
 static void* player(void *arg) {
+#ifdef _GRRMOD_DEBUG
+u64 start;
+#endif
+
     u32 i;
     thr_running = true;
     while(sndPlaying) {
@@ -241,7 +244,13 @@ static void* player(void *arg) {
                     ((u16*)((u8*)audioBuf[curr_audio]))[i] = 0;
             }
             else {
+#ifdef _GRRMOD_DEBUG
+                start = gettime();
+#endif
                 RegFunc.Update(((u8*)audioBuf[curr_audio]));
+#ifdef _GRRMOD_DEBUG
+                mixtime = gettime() - start;
+#endif
             }
         }
     }
@@ -265,3 +274,9 @@ static void __aesndvoicecallback(AESNDPB *pb, u32 state) {
             break;
     }
 }
+
+#ifdef _GRRMOD_DEBUG
+u32 GRRMOD_MixingTime() {
+    return ticks_to_microsecs(mixtime);
+}
+#endif

@@ -28,7 +28,7 @@ THE SOFTWARE.
 #ifndef __GRRMOD_INTERNALS_H__
 #define __GRRMOD_INTERNALS_H__
 
-#define SNDBUFFERSIZE   (5760)    /**< Audio buffer size. */
+#define SNDBUFFERSIZE   (5760)    /**< Audio maximum buffer size. */
 
 //==============================================================================
 // Includes

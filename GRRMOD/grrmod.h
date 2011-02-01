@@ -62,6 +62,10 @@ void GRRMOD_Pause();
 char *GRRMOD_GetSongTitle();
 char *GRRMOD_GetModType();
 
+#ifdef _GRRMOD_DEBUG
+u32 GRRMOD_MixingTime();
+#endif
+
 //==============================================================================
 // C++ footer
 //==============================================================================

@@ -137,6 +137,10 @@ int main(int argc, char **argv) {
         GRRLIB_Printf(10, 26, tex_Font, 0xFFFFFFFF, 1, "Type: %s", GRRMOD_GetModType());
         GRRLIB_Printf(10, 42, tex_Font, 0xFFFFFFFF, 1, "1 = Play; 2 = Stop; A = Pause; Left = Prev; Right = Next");
 
+#ifdef _GRRMOD_DEBUG
+        GRRLIB_Printf(10, 58, tex_Font, 0xFFFFFFFF, 1, "Mixing Time: %04d", GRRMOD_MixingTime());
+#endif
+
         GRRLIB_Render();  // Render the frame buffer to the TV
     }
 
