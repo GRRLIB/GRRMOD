@@ -185,7 +185,7 @@ char *GRRMOD_MOD_GetModType() {
  * @param freq Frequency to set in kHz.
  */
 void GRRMOD_MOD_SetFrequency(u32 freq) {
-    md_mixfreq = 24000;
+    md_mixfreq = freq >> 1;
 }
 
 /**
@@ -220,23 +220,9 @@ u32 GRRMOD_MOD_GetRealVoiceVolume(u8 voice) {
  * @param buffer The buffer to update.
  */
 void GRRMOD_MOD_Update(u8 *buffer) {
-    static u8  tempbuffer[SNDBUFFERSIZE];
-    u32 *src;
-    u32 *dst;
-    int count;
-
     if(module) {
-        setBuffer((s16 *)tempbuffer, SNDBUFFERSIZE>>3);
+        setBuffer((s16 *)buffer, SNDBUFFERSIZE);
         MikMod_Update();
-
-        count = SNDBUFFERSIZE >> 3;
-        src = (u32 *)&tempbuffer;
-        dst = (u32 *)buffer;
-        while ( count ) {
-            *dst++ = *src;
-            *dst++ = *src++;
-            count--;
-        }
     }
 }
 

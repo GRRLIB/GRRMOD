@@ -46,40 +46,52 @@
 
 static int sLen=0;
 static SBYTE *audiobuffer=NULL;
+static SBYTE *tbuf=NULL;
 
 static BOOL NS_IsThere(void)
 {
 	return 1;
 }
 
-static void NS_Update(void)
+static void	NS_Exit(void)
+{
+	if(tbuf)
+	{
+		_mm_free(tbuf);
+	}
+	VC_Exit();
+}
+
+static void	NS_Update(void)
 {
 	if(audiobuffer)
 	{
-		// Render temporarily, then expand
-		SBYTE *tbuf= (SBYTE *)malloc(sLen / 2);
-		
 		// Grab it
-		VC_WriteBytes(tbuf,sLen / 2);
+		VC_WriteBytes(tbuf,sLen << 1);
 		
 		// Format it
-		int i;
-		
-		for(i = 0; i < sLen / 4; i++)
+		int i = 0;
+		SBYTE *inBuf = tbuf;
+		SBYTE *outBuf = audiobuffer;
+		for(; i < sLen; i++, inBuf+=2, outBuf+=8)
 		{
-			memcpy(audiobuffer + (i << 2), tbuf + (i << 1), 2);
-			memcpy(audiobuffer + (i << 2) + 2, tbuf + (i << 1), 2);
+			memcpy(outBuf,	   inBuf, 2);
+			memcpy(outBuf + 2, inBuf, 2);
+			memcpy(outBuf + 4, inBuf, 2);
+			memcpy(outBuf + 6, inBuf, 2);
 		}
-		
-		// Free it
-		free(tbuf);
 	}
 }
 
 void setBuffer(int16_t *buffer, int renderSamples)
 {
 	audiobuffer = (SBYTE *)buffer;
-	sLen = renderSamples * 4;
+	sLen = renderSamples >> 3;
+
+	if(tbuf == NULL)
+	{
+		tbuf= (SBYTE *)_mm_malloc(sLen << 1);
+	}
 }
 
 MIKMODAPI MDRIVER drv_nos={
@@ -96,7 +108,7 @@ MIKMODAPI MDRIVER drv_nos={
 	VC_SampleSpace,
 	VC_SampleLength,
 	VC_Init,
-	VC_Exit,
+	NS_Exit,
 	NULL,
 	VC_SetNumVoices,
 	VC_PlayStart,
