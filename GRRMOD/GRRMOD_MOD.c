@@ -75,6 +75,7 @@ void GRRMOD_MOD_Register(GRRLIB_FuntionsList *RegFunc) {
 s8 GRRMOD_MOD_Init() {
     MikMod_RegisterAllDrivers();
     MikMod_RegisterAllLoaders();
+    md_device = 1; // Only one device is used
 
     md_mode = DMODE_16BITS |
               DMODE_SOFT_MUSIC |
@@ -82,7 +83,9 @@ s8 GRRMOD_MOD_Init() {
               //DMODE_STEREO | //this causes some modules (s3m mostly) to play back incorrectly on wii, i dont know why
               DMODE_HQMIXER;
 
-    if(MikMod_Init("")) {
+    char CommandLine[15] = {};
+    sprintf(CommandLine, "buffer=%d", SNDBUFFERSIZE);
+    if(MikMod_Init(CommandLine)) {
         return -1;
     }
     return 0;

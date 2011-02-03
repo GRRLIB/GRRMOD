@@ -53,6 +53,21 @@ static BOOL NS_IsThere(void)
 	return 1;
 }
 
+static void NS_CommandLine(CHAR *cmdline)
+{
+	CHAR *ptr=MD_GetAtom("buffer",cmdline,0);
+
+	if (ptr) {
+		sLen = atoi(ptr) >> 3;
+
+		if(tbuf == NULL) {
+			tbuf= (SBYTE *)_mm_malloc(sLen << 1);
+		}
+
+		free(ptr);
+	}
+}
+
 static void	NS_Exit(void)
 {
 	if(tbuf)
@@ -64,34 +79,25 @@ static void	NS_Exit(void)
 
 static void	NS_Update(void)
 {
-	if(audiobuffer)
+	// Grab it
+	VC_WriteBytes(tbuf,sLen << 1);
+
+	// Format it
+	int i = 0;
+	SBYTE *inBuf = tbuf;
+	SBYTE *outBuf = audiobuffer;
+	for(; i < sLen; i++, inBuf+=2, outBuf+=8)
 	{
-		// Grab it
-		VC_WriteBytes(tbuf,sLen << 1);
-		
-		// Format it
-		int i = 0;
-		SBYTE *inBuf = tbuf;
-		SBYTE *outBuf = audiobuffer;
-		for(; i < sLen; i++, inBuf+=2, outBuf+=8)
-		{
-			memcpy(outBuf,	   inBuf, 2);
-			memcpy(outBuf + 2, inBuf, 2);
-			memcpy(outBuf + 4, inBuf, 2);
-			memcpy(outBuf + 6, inBuf, 2);
-		}
+		memcpy(outBuf,	   inBuf, 2);
+		memcpy(outBuf + 2, inBuf, 2);
+		memcpy(outBuf + 4, inBuf, 2);
+		memcpy(outBuf + 6, inBuf, 2);
 	}
 }
 
 void setBuffer(int16_t *buffer, int renderSamples)
 {
 	audiobuffer = (SBYTE *)buffer;
-	sLen = renderSamples >> 3;
-
-	if(tbuf == NULL)
-	{
-		tbuf= (SBYTE *)_mm_malloc(sLen << 1);
-	}
 }
 
 MIKMODAPI MDRIVER drv_nos={
@@ -100,8 +106,8 @@ MIKMODAPI MDRIVER drv_nos={
 	"Nosound Driver v3.0",
 	0,255,
 	"nosound",
-	NULL,
-	NULL,
+	"buffer:r:5760:Audio buffer size\n",
+	NS_CommandLine,
 	NS_IsThere,
 	VC_SampleLoad,
 	VC_SampleUnload,
