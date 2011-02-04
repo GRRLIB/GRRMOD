@@ -60,19 +60,26 @@ static void __aesndvoicecallback(AESNDPB *pb,u32 state);
  *         -    -1 : Failed to initialize engine.
  * @see GRRMOD_End
  */
-s8 GRRMOD_Init() {
+s8 GRRMOD_Init(bool stereo) {
     GRRMOD_MOD_Register(&RegFunc);
     //GRRMOD_MP3_Register(&RegFunc);
+
+    s8 errorCode = RegFunc.Init(stereo);
+    if(errorCode != 0) {
+        return errorCode;
+    }
 
     AESND_Init();
 
     modvoice = AESND_AllocateVoice(__aesndvoicecallback);
-    if(modvoice) {
-        AESND_SetVoiceFormat(modvoice, VOICE_STEREO16);
-        AESND_SetVoiceFrequency(modvoice, mod_freq);
-        AESND_SetVoiceVolume(modvoice, 255, 255);
-        AESND_SetVoiceStream(modvoice, true);
+    if(modvoice == NULL) {
+        return -1;
     }
+
+    AESND_SetVoiceFormat(modvoice, stereo ? VOICE_STEREO16 : VOICE_MONO16);
+    AESND_SetVoiceFrequency(modvoice, mod_freq);
+    AESND_SetVoiceVolume(modvoice, 255, 255);
+    AESND_SetVoiceStream(modvoice, true);
 
     GRRMOD_SetFrequency(48000);
 
@@ -82,7 +89,7 @@ s8 GRRMOD_Init() {
     thr_running = false;
     paused = false;
 
-    return RegFunc.Init();
+    return 0;
 }
 
 /**

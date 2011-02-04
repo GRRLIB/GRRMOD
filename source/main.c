@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
     GRRLIB_texImg *tex_Font = GRRLIB_LoadTexture(Impact_9_png);
     GRRLIB_InitTileSet(tex_Font, 10, 16, 32);
 
-    GRRMOD_Init();
+    GRRMOD_Init(true);
 
     GRRMOD_SetMOD(PlayList[0].Mem, PlayList[0].Size);
 

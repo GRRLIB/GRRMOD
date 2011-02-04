@@ -72,16 +72,19 @@ void GRRMOD_MOD_Register(GRRLIB_FuntionsList *RegFunc) {
  *         -    -1 : Failed to initialize the MOD engine.
  * @see GRRMOD_MOD_End
  */
-s8 GRRMOD_MOD_Init() {
+s8 GRRMOD_MOD_Init(bool stereo) {
     MikMod_RegisterAllDrivers();
     MikMod_RegisterAllLoaders();
     md_device = 1; // Only one device is used
 
     md_mode = DMODE_16BITS |
+              DMODE_HQMIXER |
               DMODE_SOFT_MUSIC |
-              DMODE_SOFT_SNDFX |
-              //DMODE_STEREO | //this causes some modules (s3m mostly) to play back incorrectly on wii, i dont know why
-              DMODE_HQMIXER;
+              DMODE_SOFT_SNDFX;
+
+    if(stereo) {
+        md_mode |= DMODE_STEREO; //this causes some modules (s3m mostly) to play back incorrectly on Wii
+    }
 
     char CommandLine[15] = {};
     sprintf(CommandLine, "buffer=%d", SNDBUFFERSIZE);

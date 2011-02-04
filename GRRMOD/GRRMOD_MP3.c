@@ -29,6 +29,7 @@ THE SOFTWARE.
 static u64     Offset;     /**< Current file position. */
 static char    *BufferPtr; /**< Pointer to the music data. */
 static u64     Size;       /**< Size of the music data. */
+static bool    IsStereo;   /**< Set to true is the music is stereo. */
 
 typedef struct _GRRMOD_DATA {
     char *ModType;    /**< A string representing the MOD type. */
@@ -66,7 +67,8 @@ void GRRMOD_MP3_Register(GRRLIB_FuntionsList *RegFunc) {
  *         -    -1 : Failed to initialize the MP3 engine.
  * @see GRRMOD_MP3_End
  */
-s8 GRRMOD_MP3_Init() {
+s8 GRRMOD_MP3_Init(bool stereo) {
+    IsStereo = stereo;
     if(mpg123_init() == MPG123_OK)
         return 0;
     return -1;
@@ -109,8 +111,9 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
     mpg123_format_none(mh);
 
     // Set all bitrates as ok
+    u8 channelcount = IsStereo ? MPG123_STEREO : MPG123_MONO;
     for(i = 0; i < (int)num_rates; ++i) {
-        mpg123_format(mh, frequency, MPG123_STEREO, MPG123_ENC_SIGNED_16);
+        mpg123_format(mh, frequency, channelcount, MPG123_ENC_SIGNED_16);
     }
 
     result = mpg123_decode(mh, (u8 *)BufferPtr, Size, NULL, 0, &fakegot);

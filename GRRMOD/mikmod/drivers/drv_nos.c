@@ -41,12 +41,10 @@
 #endif
 
 #include <string.h>
-#include <malloc.h>
 #include "mikmod_internals.h"
 
 static int sLen=0;
 static SBYTE *audiobuffer=NULL;
-static SBYTE *tbuf=NULL;
 
 static BOOL NS_IsThere(void)
 {
@@ -58,39 +56,14 @@ static void NS_CommandLine(CHAR *cmdline)
 	CHAR *ptr=MD_GetAtom("buffer",cmdline,0);
 
 	if (ptr) {
-		sLen = atoi(ptr) >> 2;
-
-		if(tbuf == NULL) {
-			tbuf= (SBYTE *)_mm_malloc(sLen << 1);
-		}
-
+		sLen = atoi(ptr);
 		free(ptr);
 	}
 }
 
-static void	NS_Exit(void)
-{
-	if(tbuf)
-	{
-		_mm_free(tbuf);
-	}
-	VC_Exit();
-}
-
 static void	NS_Update(void)
 {
-	// Grab it
-	VC_WriteBytes(tbuf,sLen << 1);
-
-	// Format it
-	int i = 0;
-	SBYTE *inBuf = tbuf;
-	SBYTE *outBuf = audiobuffer;
-	for(; i < sLen; i++, inBuf+=2, outBuf+=4)
-	{
-		memcpy(outBuf,	   inBuf, 2);
-		memcpy(outBuf + 2, inBuf, 2);
-	}
+	VC_WriteBytes(audiobuffer,sLen);
 }
 
 void setBuffer(int16_t *buffer, int renderSamples)
@@ -112,7 +85,7 @@ MIKMODAPI MDRIVER drv_nos={
 	VC_SampleSpace,
 	VC_SampleLength,
 	VC_Init,
-	NS_Exit,
+	VC_Exit,
 	NULL,
 	VC_SetNumVoices,
 	VC_PlayStart,

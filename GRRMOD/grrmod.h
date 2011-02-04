@@ -47,7 +47,7 @@ THE SOFTWARE.
    extern "C" {
 #endif /* __cplusplus */
 
-s8 GRRMOD_Init();
+s8 GRRMOD_Init(bool stereo);
 void GRRMOD_End();
 void GRRMOD_SetMOD(const void *mem, u64 size);
 void GRRMOD_Unload();

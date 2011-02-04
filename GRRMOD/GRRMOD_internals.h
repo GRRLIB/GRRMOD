@@ -47,7 +47,7 @@ THE SOFTWARE.
  * Structure to hold the list of functions to use.
  */
 typedef struct GRRLIB_FuntionsList {
-    s8 (*Init)(void);
+    s8 (*Init)(bool stereo);
     void (*End)(void);
     void (*SetMOD)(const void *mem, u64 size);
     void (*Unload)(void);
@@ -65,7 +65,7 @@ typedef struct GRRLIB_FuntionsList {
 
 // Module functions
 void GRRMOD_MOD_Register(GRRLIB_FuntionsList *RegFunc);
-s8 GRRMOD_MOD_Init();
+s8 GRRMOD_MOD_Init(bool stereo);
 void GRRMOD_MOD_End();
 void GRRMOD_MOD_SetMOD(const void *mem, u64 size);
 void GRRMOD_MOD_Unload();
@@ -82,7 +82,7 @@ void GRRMOD_MOD_Update(u8 *buffer);
 
 // MP3 functions
 void GRRMOD_MP3_Register(GRRLIB_FuntionsList *RegFunc);
-s8 GRRMOD_MP3_Init();
+s8 GRRMOD_MP3_Init(bool stereo);
 void GRRMOD_MP3_End();
 void GRRMOD_MP3_SetMOD(const void *mem, u64 size);
 void GRRMOD_MP3_Unload();
