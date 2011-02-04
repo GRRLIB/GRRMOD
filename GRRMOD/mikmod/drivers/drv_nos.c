@@ -58,7 +58,7 @@ static void NS_CommandLine(CHAR *cmdline)
 	CHAR *ptr=MD_GetAtom("buffer",cmdline,0);
 
 	if (ptr) {
-		sLen = atoi(ptr) >> 3;
+		sLen = atoi(ptr) >> 2;
 
 		if(tbuf == NULL) {
 			tbuf= (SBYTE *)_mm_malloc(sLen << 1);
@@ -86,12 +86,10 @@ static void	NS_Update(void)
 	int i = 0;
 	SBYTE *inBuf = tbuf;
 	SBYTE *outBuf = audiobuffer;
-	for(; i < sLen; i++, inBuf+=2, outBuf+=8)
+	for(; i < sLen; i++, inBuf+=2, outBuf+=4)
 	{
 		memcpy(outBuf,	   inBuf, 2);
 		memcpy(outBuf + 2, inBuf, 2);
-		memcpy(outBuf + 4, inBuf, 2);
-		memcpy(outBuf + 6, inBuf, 2);
 	}
 }
 

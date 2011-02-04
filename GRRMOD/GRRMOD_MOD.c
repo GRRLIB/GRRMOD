@@ -188,7 +188,7 @@ char *GRRMOD_MOD_GetModType() {
  * @param freq Frequency to set in kHz.
  */
 void GRRMOD_MOD_SetFrequency(u32 freq) {
-    md_mixfreq = freq >> 1;
+    md_mixfreq = freq;
 }
 
 /**
