@@ -98,7 +98,7 @@ u32 GRRMOD_MixingTime();
  * Documentation  : Crayon, NoNameNo\n
  *
  * @section Licence
- * Copyright (c) 2012 The GRRLIB Team
+ * Copyright (c) 2013 The GRRLIB Team
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
