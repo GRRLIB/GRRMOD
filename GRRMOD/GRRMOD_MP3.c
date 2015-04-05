@@ -69,8 +69,9 @@ void GRRMOD_MP3_Register(GRRLIB_FuntionsList *RegFunc) {
  */
 s8 GRRMOD_MP3_Init(bool stereo) {
     IsStereo = stereo;
-    if(mpg123_init() == MPG123_OK)
+    if(mpg123_init() == MPG123_OK) {
         return 0;
+    }
     return -1;
 }
 
@@ -102,7 +103,9 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
     // Get new mpg123 handle
     mh = mpg123_new(NULL, &result);
 
-    if(mh == NULL)  return;
+    if(mh == NULL) {
+        return;
+    }
 
     // Streaming mode
     mpg123_open_feed(mh);
@@ -166,9 +169,9 @@ void GRRMOD_MP3_Unload() {
  * This function starts the specified module playback.
  */
 void GRRMOD_MP3_Start() {
-    if(mh == NULL)   return;
-
-
+    if(mh == NULL) {
+        return;
+    }
 }
 
 /**

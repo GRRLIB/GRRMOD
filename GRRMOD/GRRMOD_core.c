@@ -121,7 +121,9 @@ void GRRMOD_Unload() {
  * This function starts the specified module playback.
  */
 void GRRMOD_Start() {
-    if(sndPlaying) return;
+    if(sndPlaying) {
+        return;
+    }
 
     RegFunc.Start();
 
@@ -147,7 +149,9 @@ void GRRMOD_Start() {
  * This function stops the currently playing module.
  */
 void GRRMOD_Stop() {
-    if(!sndPlaying) return;
+    if(!sndPlaying) {
+        return;
+    }
     AESND_SetVoiceStop(modvoice, true);
 
     curr_audio = 0;
@@ -162,7 +166,9 @@ void GRRMOD_Stop() {
  * This function toggles the playing/paused status of the module.
  */
 void GRRMOD_Pause() {
-    if(!sndPlaying) return;
+    if(!sndPlaying) {
+        return;
+    }
 
     RegFunc.Pause();
     paused = !paused;

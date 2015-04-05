@@ -54,7 +54,7 @@ endif
 # options for code generation
 #---------------------------------------------------------------------------------
 MACHDEP		:=	-DGEKKO -mcpu=750 -meabi -msdata=eabi -mhard-float -fmodulo-sched -ffunction-sections -fdata-sections
-CFLAGS		:=	-O2 $(MACHDEP) $(INCLUDE)  -DOPT_GENERIC -DREAL_IS_FLOAT -DNOXFERMEM
+CFLAGS		:=	-O2 $(MACHDEP) $(INCLUDE) -DOPT_GENERIC -DREAL_IS_FLOAT -DNOXFERMEM
 CXXFLAGS	:=	$(CFLAGS)
 
 #---------------------------------------------------------------------------------
