@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: mloader.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   These routines are used to access the available module loaders
 
@@ -39,11 +39,14 @@
 #endif
 #include <string.h>
 
-#include "../include/mikmod_internals.h"
-#include "../include/virtualfile.h"
+#include "mikmod_internals.h"
 
-		MREADER *modreader;
-		MODULE of;
+#ifdef SUNOS
+extern int fprintf(FILE *, const char *, ...);
+#endif
+
+MREADER *modreader;
+MODULE of;
 
 static	MLOADER *firstloader=NULL;
 
@@ -60,15 +63,18 @@ MIKMODAPI CHAR* MikMod_InfoLoader(void)
 
 	MUTEX_LOCK(lists);
 	/* compute size of buffer */
-	for(l=firstloader;l;l=l->next) len+=1+(l->next?1:0)+strlen(l->version);
+	for(l = firstloader; l; l = l->next)
+		len += 1 + (l->next ? 1 : 0) + strlen(l->version);
 
 	if(len)
-		if((list=_mm_malloc(len*sizeof(CHAR)))) {
-			list[0]=0;
-			/* list all registered module loders */
-			for(l=firstloader;l;l=l->next)
-				sprintf(list,(l->next)?"%s%s\n":"%s%s",list,l->version);
+	  if((list=(CHAR*)MikMod_malloc(len*sizeof(CHAR)))) {
+		CHAR *list_end = list;
+		list[0] = 0;
+		/* list all registered module loders */
+		for(l = firstloader; l; l = l->next) {
+		    list_end += sprintf(list_end, "%s%s", l->version, (l->next) ? "\n" : "");
 		}
+	}
 	MUTEX_UNLOCK(lists);
 	return list;
 }
@@ -81,7 +87,7 @@ void _mm_registerloader(MLOADER* ldr)
 		while(cruise->next) cruise = cruise->next;
 		cruise->next=ldr;
 	} else
-		firstloader=ldr; 
+		firstloader=ldr;
 }
 
 MIKMODAPI void MikMod_RegisterLoader(struct MLOADER* ldr)
@@ -101,9 +107,9 @@ BOOL ReadComment(UWORD len)
 	if(len) {
 		int i;
 
-		if(!(of.comment=(CHAR*)_mm_malloc(len+1))) return 0;
+		if(!(of.comment=(CHAR*)MikMod_malloc(len+1))) return 0;
 		_mm_read_UBYTES(of.comment,len,modreader);
-		
+
 		/* translate IT linefeeds */
 		for(i=0;i<len;i++)
 			if(of.comment[i]=='\r') of.comment[i]='\n';
@@ -111,7 +117,7 @@ BOOL ReadComment(UWORD len)
 		of.comment[len]=0;	/* just in case */
 	}
 	if(!of.comment[0]) {
-		free(of.comment);
+		MikMod_free(of.comment);
 		of.comment=NULL;
 	}
 	return 1;
@@ -125,9 +131,9 @@ BOOL ReadLinedComment(UWORD len,UWORD linelen)
 
 	lines = (len + linelen - 1) / linelen;
 	if (len) {
-		if(!(tempcomment=(CHAR*)_mm_malloc(len+1))) return 0;
-		if(!(storage=(CHAR*)_mm_malloc(linelen+1))) {
-			free(tempcomment);
+		if(!(tempcomment=(CHAR*)MikMod_malloc(len+1))) return 0;
+		if(!(storage=(CHAR*)MikMod_malloc(linelen+1))) {
+			MikMod_free(tempcomment);
 			return 0;
 		}
 		memset(tempcomment, ' ', len);
@@ -141,9 +147,9 @@ BOOL ReadLinedComment(UWORD len,UWORD linelen)
 		}
 
 		if(total>lines) {
-			if(!(of.comment=(CHAR*)_mm_malloc(total+1))) {
-				free(storage);
-				free(tempcomment);
+			if(!(of.comment=(CHAR*)MikMod_malloc(total+1))) {
+				MikMod_free(storage);
+				MikMod_free(tempcomment);
 				return 0;
 			}
 
@@ -153,8 +159,8 @@ BOOL ReadLinedComment(UWORD len,UWORD linelen)
 				storage[i]=0; /* if (i==linelen) */
 				strcat(of.comment,storage);strcat(of.comment,"\r");
 			}
-			free(storage);
-			free(tempcomment);
+			MikMod_free(storage);
+			MikMod_free(tempcomment);
 		}
 	}
 	return 1;
@@ -166,7 +172,7 @@ BOOL AllocPositions(int total)
 		_mm_errno=MMERR_NOT_A_MODULE;
 		return 0;
 	}
-	if(!(of.positions=_mm_calloc(total,sizeof(UWORD)))) return 0;
+	if(!(of.positions=(UWORD*)MikMod_calloc(total,sizeof(UWORD)))) return 0;
 	return 1;
 }
 
@@ -179,8 +185,8 @@ BOOL AllocPatterns(void)
 		return 0;
 	}
 	/* Allocate track sequencing array */
-	if(!(of.patterns=(UWORD*)_mm_calloc((ULONG)(of.numpat+1)*of.numchn,sizeof(UWORD)))) return 0;
-	if(!(of.pattrows=(UWORD*)_mm_calloc(of.numpat+1,sizeof(UWORD)))) return 0;
+	if(!(of.patterns=(UWORD*)MikMod_calloc((ULONG)(of.numpat+1)*of.numchn,sizeof(UWORD)))) return 0;
+	if(!(of.pattrows=(UWORD*)MikMod_calloc(of.numpat+1,sizeof(UWORD)))) return 0;
 
 	for(t=0;t<=of.numpat;t++) {
 		of.pattrows[t]=64;
@@ -197,27 +203,27 @@ BOOL AllocTracks(void)
 		_mm_errno=MMERR_NOT_A_MODULE;
 		return 0;
 	}
-	if(!(of.tracks=(UBYTE **)_mm_calloc(of.numtrk,sizeof(UBYTE *)))) return 0;
+	if(!(of.tracks=(UBYTE **)MikMod_calloc(of.numtrk,sizeof(UBYTE *)))) return 0;
 	return 1;
 }
 
 BOOL AllocInstruments(void)
 {
 	int t,n;
-	
+
 	if(!of.numins) {
 		_mm_errno=MMERR_NOT_A_MODULE;
 		return 0;
 	}
-	if(!(of.instruments=(INSTRUMENT*)_mm_calloc(of.numins,sizeof(INSTRUMENT))))
+	if(!(of.instruments=(INSTRUMENT*)MikMod_calloc(of.numins,sizeof(INSTRUMENT))))
 		return 0;
 
 	for(t=0;t<of.numins;t++) {
-		for(n=0;n<INSTNOTES;n++) { 
+		for(n=0;n<INSTNOTES;n++) {
 			/* Init note / sample lookup table */
 			of.instruments[t].samplenote[n]   = n;
 			of.instruments[t].samplenumber[n] = t;
-		}   
+		}
 		of.instruments[t].globvol = 64;
 	}
 	return 1;
@@ -231,7 +237,7 @@ BOOL AllocSamples(void)
 		_mm_errno=MMERR_NOT_A_MODULE;
 		return 0;
 	}
-	if(!(of.samples=(SAMPLE*)_mm_calloc(of.numsmp,sizeof(SAMPLE)))) return 0;
+	if(!(of.samples=(SAMPLE*)MikMod_calloc(of.numsmp,sizeof(SAMPLE)))) return 0;
 
 	for(u=0;u<of.numsmp;u++) {
 		of.samples[u].panning = 128; /* center */
@@ -254,8 +260,8 @@ static BOOL ML_LoadSamples(void)
 }
 
 /* Creates a CSTR out of a character buffer of 'len' bytes, but strips any
-   terminating non-printing characters like 0, spaces etc.                    */
-CHAR *DupStr(CHAR* s,UWORD len,BOOL strict)
+   terminating non-printing characters like 0, spaces etc. */
+CHAR *DupStr(const CHAR* s, UWORD len, BOOL strict)
 {
 	UWORD t;
 	CHAR *d=NULL;
@@ -274,7 +280,7 @@ CHAR *DupStr(CHAR* s,UWORD len,BOOL strict)
 
 	/* When the buffer wasn't completely empty, allocate a cstring and copy the
 	   buffer into that string, except for any control-chars */
-	if((d=(CHAR*)_mm_malloc(sizeof(CHAR)*(len+1)))) {
+	if((d=(CHAR*)MikMod_malloc(sizeof(CHAR)*(len+1)))) {
 		for(t=0;t<len;t++) d[t]=(s[t]<32)?'.':s[t];
 		d[len]=0;
 	}
@@ -285,53 +291,57 @@ static void ML_XFreeSample(SAMPLE *s)
 {
 	if(s->handle>=0)
 		MD_SampleUnload(s->handle);
-	if(s->samplename) free(s->samplename);
+
+/* moved samplename freeing to our caller ML_FreeEx(),
+ * because we are called conditionally. */
 }
 
 static void ML_XFreeInstrument(INSTRUMENT *i)
 {
-	if(i->insname) free(i->insname);
+	MikMod_free(i->insname);
 }
 
 static void ML_FreeEx(MODULE *mf)
 {
 	UWORD t;
 
-	if(mf->songname) free(mf->songname);
-	if(mf->comment)  free(mf->comment);
+	MikMod_free(mf->songname);
+	MikMod_free(mf->comment);
 
-	if(mf->modtype)   free(mf->modtype);
-	if(mf->positions) free(mf->positions);
-	if(mf->patterns)  free(mf->patterns);
-	if(mf->pattrows)  free(mf->pattrows);
+	MikMod_free(mf->modtype);
+	MikMod_free(mf->positions);
+	MikMod_free(mf->patterns);
+	MikMod_free(mf->pattrows);
 
 	if(mf->tracks) {
 		for(t=0;t<mf->numtrk;t++)
-			if(mf->tracks[t]) free(mf->tracks[t]);
-		free(mf->tracks);
+			MikMod_free(mf->tracks[t]);
+		MikMod_free(mf->tracks);
 	}
 	if(mf->instruments) {
 		for(t=0;t<mf->numins;t++)
 			ML_XFreeInstrument(&mf->instruments[t]);
-		free(mf->instruments);
+		MikMod_free(mf->instruments);
 	}
 	if(mf->samples) {
-		for(t=0;t<mf->numsmp;t++)
+		for(t=0;t<mf->numsmp;t++) {
+			MikMod_free(mf->samples[t].samplename);
 			if(mf->samples[t].length) ML_XFreeSample(&mf->samples[t]);
-		free(mf->samples);
+		}
+		MikMod_free(mf->samples);
 	}
 	memset(mf,0,sizeof(MODULE));
-	if(mf!=&of) free(mf);
+	if(mf!=&of) MikMod_free(mf);
 }
 
 static MODULE *ML_AllocUniMod(void)
 {
 	MODULE *mf;
 
-	return (mf=_mm_malloc(sizeof(MODULE)));
+	return (mf=(MODULE*)MikMod_malloc(sizeof(MODULE)));
 }
 
-void Player_Free_internal(MODULE *mf)
+static void Player_Free_internal(MODULE *mf)
 {
 	if(mf) {
 		Player_Exit_internal(mf);
@@ -370,7 +380,7 @@ static CHAR* Player_LoadTitle_internal(MREADER *reader)
 	return l->LoadTitle();
 }
 
-MIKMODAPI CHAR* Player_LoadTitleFP(VIRTUAL_FILE *fp)
+MIKMODAPI CHAR* Player_LoadTitleFP(FILE *fp)
 {
 	CHAR* result=NULL;
 	MREADER* reader;
@@ -384,10 +394,38 @@ MIKMODAPI CHAR* Player_LoadTitleFP(VIRTUAL_FILE *fp)
 	return result;
 }
 
-MIKMODAPI CHAR* Player_LoadTitle(CHAR* filename)
+MIKMODAPI CHAR* Player_LoadTitleMem(const char *buffer,int len)
+{
+	CHAR *result=NULL;
+	MREADER* reader;
+
+	if ((reader=_mm_new_mem_reader(buffer,len)))
+	{
+		MUTEX_LOCK(lists);
+		result=Player_LoadTitle_internal(reader);
+		MUTEX_UNLOCK(lists);
+		_mm_delete_mem_reader(reader);
+	}
+
+	return result;
+}
+
+MIKMODAPI CHAR* Player_LoadTitleGeneric(MREADER *reader)
+{
+	CHAR *result=NULL;
+
+	if (reader) {
+		MUTEX_LOCK(lists);
+		result=Player_LoadTitle_internal(reader);
+		MUTEX_UNLOCK(lists);
+	}
+	return result;
+}
+
+MIKMODAPI CHAR* Player_LoadTitle(const CHAR* filename)
 {
 	CHAR* result=NULL;
-	VIRTUAL_FILE* fp;
+	FILE* fp;
 	MREADER* reader;
 
 	if((fp=_mm_fopen(filename,"rb"))) {
@@ -403,35 +441,37 @@ MIKMODAPI CHAR* Player_LoadTitle(CHAR* filename)
 }
 
 /* Loads a module given an reader */
-MODULE* Player_LoadGeneric_internal(MREADER *reader,int maxchan,BOOL curious)
+static MODULE* Player_LoadGeneric_internal(MREADER *reader,int maxchan,BOOL curious)
 {
 	int t;
 	MLOADER *l;
 	BOOL ok;
 	MODULE *mf;
-	
+
 	modreader = reader;
 	_mm_errno = 0;
 	_mm_critical = 0;
 	_mm_iobase_setcur(modreader);
-	
+
 	/* Try to find a loader that recognizes the module */
 	for(l=firstloader;l;l=l->next) {
 		_mm_rewind(modreader);
 		if(l->Test()) break;
 	}
-	
+
 	if(!l) {
 		_mm_errno = MMERR_NOT_A_MODULE;
 		if(_mm_errorhandler) _mm_errorhandler();
-		_mm_rewind(modreader);_mm_iobase_revert();
+		_mm_rewind(modreader);
+		_mm_iobase_revert(modreader);
 		return NULL;
 	}
-	
+
 	/* init unitrk routines */
 	if(!UniInit()) {
 		if(_mm_errorhandler) _mm_errorhandler();
-		_mm_rewind(modreader);_mm_iobase_revert();
+		_mm_rewind(modreader);
+		_mm_iobase_revert(modreader);
 		return NULL;
 	}
 
@@ -442,18 +482,20 @@ MODULE* Player_LoadGeneric_internal(MREADER *reader,int maxchan,BOOL curious)
 	for (t = 0; t < UF_MAXCHAN; t++) of.chanvol[t] = 64;
 	for (t = 0; t < UF_MAXCHAN; t++)
 		of.panning[t] = ((t + 1) & 2) ? PAN_RIGHT : PAN_LEFT;
-	
+
 	/* init module loader and load the header / patterns */
-	if (!l->Init || l->Init()) {	
+	if (!l->Init || l->Init()) {
 		_mm_rewind(modreader);
 		ok = l->Load(curious);
-		/* propagate inflags=flags for in-module samples */
-		for (t = 0; t < of.numsmp; t++)
-			if (of.samples[t].inflags == 0)
-				of.samples[t].inflags = of.samples[t].flags;
+		if (ok) {
+			/* propagate inflags=flags for in-module samples */
+			for (t = 0; t < of.numsmp; t++)
+				if (of.samples[t].inflags == 0)
+					of.samples[t].inflags = of.samples[t].flags;
+		}
 	} else
 		ok = 0;
-	
+
 	/* free loader and unitrk allocations */
 	if (l->Cleanup) l->Cleanup();
 	UniCleanup();
@@ -461,24 +503,27 @@ MODULE* Player_LoadGeneric_internal(MREADER *reader,int maxchan,BOOL curious)
 	if(!ok) {
 		ML_FreeEx(&of);
 		if(_mm_errorhandler) _mm_errorhandler();
-		_mm_rewind(modreader);_mm_iobase_revert();
+		_mm_rewind(modreader);
+		_mm_iobase_revert(modreader);
 		return NULL;
 	}
 
 	if(!ML_LoadSamples()) {
 		ML_FreeEx(&of);
 		if(_mm_errorhandler) _mm_errorhandler();
-		_mm_rewind(modreader);_mm_iobase_revert();
+		_mm_rewind(modreader);
+		_mm_iobase_revert(modreader);
 		return NULL;
 	}
 
 	if(!(mf=ML_AllocUniMod())) {
 		ML_FreeEx(&of);
-		_mm_rewind(modreader);_mm_iobase_revert();
+		_mm_rewind(modreader);
+		_mm_iobase_revert(modreader);
 		if(_mm_errorhandler) _mm_errorhandler();
 		return NULL;
 	}
-	
+
 	/* If the module doesn't have any specific panning, create a
 	   MOD-like panning, with the channels half-separated. */
 	if (!(of.flags & UF_PANNING))
@@ -498,22 +543,22 @@ MODULE* Player_LoadGeneric_internal(MREADER *reader,int maxchan,BOOL curious)
 		if(maxchan<mf->numchn) mf->flags |= UF_NNA;
 
 		if(MikMod_SetNumVoices_internal(maxchan,-1)) {
-			_mm_iobase_revert();
+			_mm_iobase_revert(modreader);
 			Player_Free(mf);
 			return NULL;
 		}
 	}
 	if(SL_LoadSamples()) {
-		_mm_iobase_revert();
+		_mm_iobase_revert(modreader);
 		Player_Free_internal(mf);
 		return NULL;
 	}
 	if(Player_Init(mf)) {
-		_mm_iobase_revert();
+		_mm_iobase_revert(modreader);
 		Player_Free_internal(mf);
 		mf=NULL;
 	}
-	_mm_iobase_revert();
+	_mm_iobase_revert(modreader);
 	return mf;
 }
 
@@ -530,13 +575,25 @@ MIKMODAPI MODULE* Player_LoadGeneric(MREADER *reader,int maxchan,BOOL curious)
 	return result;
 }
 
+MIKMODAPI MODULE* Player_LoadMem(const char *buffer,int len,int maxchan,BOOL curious)
+{
+	MODULE* result=NULL;
+	MREADER* reader;
+
+	if ((reader=_mm_new_mem_reader(buffer, len))) {
+		result=Player_LoadGeneric(reader,maxchan,curious);
+		_mm_delete_mem_reader(reader);
+	}
+	return result;
+}
+
 /* Loads a module given a file pointer.
    File is loaded from the current file seek position. */
-MIKMODAPI MODULE* Player_LoadFP(VIRTUAL_FILE* fp,int maxchan,BOOL curious)
+MIKMODAPI MODULE* Player_LoadFP(FILE* fp,int maxchan,BOOL curious)
 {
 	MODULE* result=NULL;
 	struct MREADER* reader=_mm_new_file_reader (fp);
-	
+
 	if (reader) {
 		result=Player_LoadGeneric(reader,maxchan,curious);
 		_mm_delete_file_reader(reader);
@@ -546,9 +603,9 @@ MIKMODAPI MODULE* Player_LoadFP(VIRTUAL_FILE* fp,int maxchan,BOOL curious)
 
 /* Open a module via its filename.  The loader will initialize the specified
    song-player 'player'. */
-MIKMODAPI MODULE* Player_Load(CHAR* filename,int maxchan,BOOL curious)
+MIKMODAPI MODULE* Player_Load(const CHAR* filename,int maxchan,BOOL curious)
 {
-	VIRTUAL_FILE *fp;
+	FILE *fp;
 	MODULE *mf=NULL;
 
 	if((fp=_mm_fopen(filename,"rb"))) {

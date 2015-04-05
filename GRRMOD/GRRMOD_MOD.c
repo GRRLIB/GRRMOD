@@ -21,7 +21,7 @@ THE SOFTWARE.
 ------------------------------------------------------------------------------*/
 
 #include "GRRMOD_internals.h"
-#include "mikmod/include/mikmod_build.h"
+#include "mikmod/include/mikmod.h"
 #include <string.h>
 
 static BOOL GRRMOD_Eof(MREADER * reader);
@@ -272,10 +272,12 @@ static int GRRMOD_Get(MREADER * reader) {
 static BOOL GRRMOD_Seek(MREADER * reader, long offset, int whence) {
     MOD_READER *pReader = (MOD_READER *) reader;
 
-    if(whence == SEEK_SET)
+    if(whence == SEEK_SET) {
         pReader->Offset = offset;
-    else
+    }
+    else {
         pReader->Offset += offset;
+    }
 
     return 1;
 }

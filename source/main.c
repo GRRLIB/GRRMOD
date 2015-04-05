@@ -17,6 +17,7 @@
 #include "music_xm.h"
 #include "music_s3m.h"
 #include "music_it.h"
+#include "music_669.h"
 
 #define MAX_WIDTH 6.0f
 #define MIN_WIDTH 0.2f
@@ -51,7 +52,8 @@ int main(int argc, char **argv) {
                             {(u8 *)music_mod, music_mod_size},
                             {(u8 *)music_s3m, music_s3m_size},
                             {(u8 *)music_it, music_it_size},
-                            {(u8 *)music_xm, music_xm_size} };
+                            {(u8 *)music_xm, music_xm_size},
+                            {(u8 *)music_669, music_669_size} };
 
     GRRLIB_Init();
     GRRLIB_texImg *tex_Font = GRRLIB_LoadTexture(Impact_9_png);
@@ -94,14 +96,18 @@ int main(int argc, char **argv) {
         }
         if (WPAD_ButtonsDown(0) & WPAD_BUTTON_LEFT) {
             SongNum--;
-            if(SongNum < 0) SongNum = 0;
+            if(SongNum < 0) {
+                SongNum = 0;
+            }
             GRRMOD_Unload();
             GRRMOD_SetMOD(PlayList[SongNum].Mem, PlayList[SongNum].Size);
             GRRMOD_Start();
         }
         if (WPAD_ButtonsDown(0) & WPAD_BUTTON_RIGHT) {
             SongNum++;
-            if(SongNum > 4) SongNum = 4;
+            if(SongNum > 5) {
+                SongNum = 5;
+            }
             GRRMOD_Unload();
             GRRMOD_SetMOD(PlayList[SongNum].Mem, PlayList[SongNum].Size);
             GRRMOD_Start();
@@ -155,15 +161,14 @@ static float calc_size(u8 voice, CH* channel) {
     int vol = GRRMOD_GetVoiceVolume(voice);
     int realvol = GRRMOD_GetRealVoiceVolume(voice);
 
-    if (freq != channel->freq || vol != channel->vol || realvol > channel->realvol)
-    {
+    if (freq != channel->freq || vol != channel->vol || realvol > channel->realvol) {
         channel->width = MAX_WIDTH;
     }
-    else
-    {
+    else {
         channel->width -= DECAY;
-        if (channel->width < MIN_WIDTH)
+        if (channel->width < MIN_WIDTH) {
             channel->width = MIN_WIDTH;
+        }
     }
 
     channel->vol = vol;

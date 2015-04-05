@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_nos.c,v 1.1.1.1 2004/06/01 12:16:17 raph Exp $
+  $Id$
 
   Driver for no output
 
@@ -41,6 +41,7 @@
 #endif
 
 #include <string.h>
+#include <gctypes.h>
 #include "mikmod_internals.h"
 
 static int sLen=0;
