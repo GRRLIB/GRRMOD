@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-Copyright (c) 2014 The GRRLIB Team
+Copyright (c) 2015 The GRRLIB Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -90,7 +90,7 @@ u32 GRRMOD_MixingTime();
  *
  * @section Links
  * Forum: http://grrlib.santo.fr/forum\n
- * Code: http://code.google.com/p/grrlib\n
+ * Code: https://github.com/GRRLIB/GRRMOD\n
  * IRC: <a href="irc://irc.efnet.net/grrlib">#GRRLIB</a> on EFnet
  *
  * @section Credits
@@ -98,7 +98,7 @@ u32 GRRMOD_MixingTime();
  * Documentation  : Crayon, NoNameNo\n
  *
  * @section Licence
- * Copyright (c) 2014 The GRRLIB Team
+ * Copyright (c) 2015 The GRRLIB Team
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
