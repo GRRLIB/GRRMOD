@@ -67,6 +67,7 @@ void GRRMOD_MOD_Register(GRRLIB_FuntionsList *RegFunc) {
 
 /**
  * Initialize MOD library.
+ * @param stereo If set to true the music will play in stereo, otherwise it will mono.
  * @return A number representating a code:
  *         -     0 : The operation completed successfully.
  *         -    -1 : Failed to initialize the MOD engine.

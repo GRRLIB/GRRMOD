@@ -55,6 +55,7 @@ static void __aesndvoicecallback(AESNDPB *pb,u32 state);
 
 /**
  * Initialize GRRMOD. Call this once at the beginning your code.
+ * @param stereo If set to true the music will play in stereo, otherwise it will mono.
  * @return A number representating a code:
  *         -     0 : The operation completed successfully.
  *         -    -1 : Failed to initialize engine.

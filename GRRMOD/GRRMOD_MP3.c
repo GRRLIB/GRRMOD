@@ -62,6 +62,7 @@ void GRRMOD_MP3_Register(GRRLIB_FuntionsList *RegFunc) {
 
 /**
  * Initialize MP3 library.
+ * @param stereo If set to true the music will play in stereo, otherwise it will mono.
  * @return A number representating a code:
  *         -     0 : The operation completed successfully.
  *         -    -1 : Failed to initialize the MP3 engine.
@@ -241,7 +242,7 @@ u32 GRRMOD_MP3_GetRealVoiceVolume(u8 voice) {
 
 /**
  * Set a buffer to update. This routine should be called on a regular basis to update the sound.
- * @param buffer The buffer to update.
+ * @param outbuf The buffer to update.
  */
 void GRRMOD_MP3_Update(u8 *outbuf) {
     if(mh == NULL || outbuf == NULL) {
