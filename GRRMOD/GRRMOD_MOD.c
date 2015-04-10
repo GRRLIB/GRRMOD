@@ -27,7 +27,7 @@ THE SOFTWARE.
 static BOOL GRRMOD_Eof(MREADER * reader);
 static BOOL GRRMOD_Read(MREADER * reader, void *ptr, size_t size);
 static int GRRMOD_Get(MREADER * reader);
-static BOOL GRRMOD_Seek(MREADER * reader, long offset, int whence);
+static int GRRMOD_Seek(MREADER * reader, long offset, int whence);
 static long GRRMOD_Tell(MREADER * reader);
 
 /**
@@ -123,7 +123,7 @@ void GRRMOD_MOD_SetMOD(const void *mem, u64 size) {
     }
     module = Player_LoadGeneric((MREADER *)&Reader, 128, 0);
     if(module) {
-        module->wrap = true;    // The module will restart when it's finished
+        module->wrap = true; // The module will restart when it's finished
         MusicData.SongTitle = strdup(module->songname);
         MusicData.ModType = strdup(module->modtype);
     }
@@ -272,7 +272,7 @@ static int GRRMOD_Get(MREADER * reader) {
 /**
  * This function has the same behaviour as fseek, with offset 0 meaning the start of the object (module, sample) being loaded.
  */
-static BOOL GRRMOD_Seek(MREADER * reader, long offset, int whence) {
+static int GRRMOD_Seek(MREADER * reader, long offset, int whence) {
     MOD_READER *pReader = (MOD_READER *) reader;
 
     if(whence == SEEK_SET) {

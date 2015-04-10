@@ -254,8 +254,9 @@ u64 start;
         LWP_ThreadSleep(player_queue);
         if(sndPlaying) {
             if(paused) {
-                for(i=0; i<(SNDBUFFERSIZE>>1); i++)
+                for(i=0; i<(SNDBUFFERSIZE>>1); i++) {
                     ((u16*)((u8*)audioBuf[curr_audio]))[i] = 0;
+                }
             }
             else {
 #ifdef _GRRMOD_DEBUG
