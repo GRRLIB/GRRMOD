@@ -52,7 +52,7 @@ static BOOL NS_IsThere(void)
 	return 1;
 }
 
-static void NS_CommandLine(CHAR *cmdline)
+static void NS_CommandLine(const CHAR *cmdline)
 {
 	CHAR *ptr=MD_GetAtom("buffer",cmdline,0);
 
