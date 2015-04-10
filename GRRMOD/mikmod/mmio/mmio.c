@@ -51,7 +51,9 @@
 #include <unistd.h>
 #endif
 
+#ifdef HAVE_LIMITS_H
 #include <limits.h>
+#endif
 
 #include <stdio.h>
 #include <string.h>

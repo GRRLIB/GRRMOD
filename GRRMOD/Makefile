@@ -39,22 +39,32 @@ CFILES		:=	GRRMOD_core.c
 #---------------------------------------------------------------------------------
 # conditional operation
 #---------------------------------------------------------------------------------
+CFLAGS		+=	-DHAVE_FCNTL_H -DHAVE_INTTYPES_H -DHAVE_LIMITS_H -DHAVE_MALLOC_H \
+				-DHAVE_MEMCMP -DHAVE_SETENV -DHAVE_SNPRINTF -DHAVE_STDINT_H \
+				-DHAVE_STDLIB_H -DHAVE_STRCASECMP -DHAVE_STRDUP -DHAVE_STRINGS_H \
+				-DHAVE_STRING_H -DHAVE_STRSTR -DHAVE_SYS_STAT_H -DHAVE_SYS_TYPES_H \
+				-DHAVE_SYS_WAIT_H -DHAVE_UNISTD_H -DHAVE_ATOLL -DHAVE_LANGINFO_H \
+				-DHAVE_LIBM -DHAVE_LOCALE_H -DHAVE_NL_LANGINFO -DHAVE_SIGNAL_H \
+				-DHAVE_STDIO_H -DHAVE_SYS_SIGNAL_H -DHAVE_SYS_PARAM_H -DHAVE_STRERROR \
+				-DHAVE_SYS_RESOURCE_H
 ifeq ($(USE_MOD),yes)
 	CFILES		+=	GRRMOD_MOD.c
 	SOURCES		+=	mikmod/drivers mikmod/loaders mikmod/mmio mikmod/playercode
 	INCLUDES	+=	mikmod/include
+	CFLAGS		+=	
 endif
 ifeq ($(USE_MP3),yes)
 	CFILES		+=	GRRMOD_MP3.c
 	SOURCES		+=	mpg123
 	INCLUDES	+=	mpg123
+	CFLAGS		+=	-DOPT_GENERIC -DREAL_IS_FLOAT
 endif
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
 MACHDEP		:=	-DGEKKO -mcpu=750 -meabi -msdata=eabi -mhard-float -fmodulo-sched -ffunction-sections -fdata-sections
-CFLAGS		:=	-O2 $(MACHDEP) $(INCLUDE) -DOPT_GENERIC -DREAL_IS_FLOAT -DNOXFERMEM
+CFLAGS		+=	-O2 $(MACHDEP) $(INCLUDE)
 CXXFLAGS	:=	$(CFLAGS)
 
 #---------------------------------------------------------------------------------
