@@ -18,6 +18,8 @@
 #include "music_s3m.h"
 #include "music_it.h"
 #include "music_669.h"
+#include "music_med.h"
+#include "music_mtm.h"
 
 #define MAX_WIDTH 6.0f
 #define MIN_WIDTH 0.2f
@@ -53,7 +55,10 @@ int main(int argc, char **argv) {
                             {(u8 *)music_s3m, music_s3m_size},
                             {(u8 *)music_it, music_it_size},
                             {(u8 *)music_xm, music_xm_size},
-                            {(u8 *)music_669, music_669_size} };
+                            {(u8 *)music_669, music_669_size},
+                            {(u8 *)music_med, music_med_size},
+                            {(u8 *)music_mtm, music_mtm_size} };
+    const u8 LastIndex = sizeof(PlayList) / sizeof(*PlayList) - 1;
 
     GRRLIB_Init();
     GRRLIB_texImg *tex_Font = GRRLIB_LoadTexture(Impact_9_png);
@@ -105,8 +110,8 @@ int main(int argc, char **argv) {
         }
         if (WPAD_ButtonsDown(0) & WPAD_BUTTON_RIGHT) {
             SongNum++;
-            if(SongNum > 5) {
-                SongNum = 5;
+            if(SongNum > LastIndex) {
+                SongNum = LastIndex;
             }
             GRRMOD_Unload();
             GRRMOD_SetMOD(PlayList[SongNum].Mem, PlayList[SongNum].Size);
