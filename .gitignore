@@ -7,3 +7,6 @@ build
 
 # Compiled static library
 *.a
+
+# Programmer's Notepad state file
+*.pnps
