@@ -1,0 +1,9 @@
+# Folder
+build
+
+# Executable file
+*.dol
+*.elf
+
+# Compiled static library
+*.a
