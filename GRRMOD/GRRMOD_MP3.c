@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-Copyright (c) 2015 The GRRLIB Team
+Copyright (c) 2010-2015 The GRRLIB Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,10 @@ static long frequency;
 static int channels;
 static off_t samples;
 
+/**
+ * Register MP3 function list.
+ * @param RegFunc The function list to register.
+ */
 void GRRMOD_MP3_Register(GRRLIB_FuntionsList *RegFunc) {
     RegFunc->Init = GRRMOD_MP3_Init;
     RegFunc->End = GRRMOD_MP3_End;
