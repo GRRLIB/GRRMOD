@@ -14,12 +14,13 @@ before_install:
   - tar -xzvf 4.3.2.tar.gz
 
 install:
-  - echo $DEVKITPRO
-  - echo $DEVKITPPC
+  - echo ${DEVKITPRO}
+  - echo ${DEVKITPPC}
   - sudo perl devkitPPCupdate.pl
-  - echo $DEVKITPRO
-  - echo $DEVKITPPC
-  - cd GRRLIB-4.3.2/GRRLIB && make && sudo make install
+  - echo ${DEVKITPRO}
+  - echo ${DEVKITPPC}
+  - cd GRRLIB-4.3.2/GRRLIB && make
+  - sudo make install
 
 script:
   - make
