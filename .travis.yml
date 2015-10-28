@@ -11,7 +11,7 @@ before_install:
 install:
   - wget https://github.com/GRRLIB/GRRLIB/archive/4.3.2.tar.gz
   - tar -xzvf 4.3.2.tar.gz
-  - cd 4.3.2/GRRLIB && make && sudo make install
+  - cd GRRLIB-4.3.2/GRRLIB && make && sudo make install
   - sudo perl devkitPPCupdate.pl
 
 script:
