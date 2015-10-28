@@ -3,10 +3,13 @@ language: c
 os:
   - linux
 
+env:
+  global:
+    - DEVKITPRO=$HOME/devkitPro
+    - DEVKITPPC=${DEVKITPRO}/devkitPPC
+
 before_install:
   - wget http://sourceforge.net/projects/devkitpro/files/Automated%20Installer/devkitPPCupdate.pl
-  - export DEVKITPRO=$HOME/devkitPro
-  - export DEVKITPPC=${DEVKITPRO}/devkitPPC
 
 install:
   - sudo perl devkitPPCupdate.pl
