@@ -5,7 +5,7 @@ os:
 
 before_install:
   - wget http://sourceforge.net/projects/devkitpro/files/Automated%20Installer/devkitPPCupdate.pl
-  - export DEVKITPRO=$HOME/travis/devkitPro
+  - export DEVKITPRO=$HOME/devkitPro
   - export DEVKITPPC=${DEVKITPRO}/devkitPPC
 
 install:
