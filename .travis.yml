@@ -17,8 +17,6 @@ install:
   - sudo perl devkitPPCupdate.pl
   - cd GRRLIB-4.3.2/GRRLIB && make
   - sudo -E make install
-  - sudo -E sh -c 'echo $DEVKITPPC'
-  - sudo DEVKITPRO=$HOME/devkitPro:DEVKITPPC=${DEVKITPRO}/devkitPPC make install
 
 script:
   - make
