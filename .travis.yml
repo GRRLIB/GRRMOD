@@ -9,10 +9,10 @@ before_install:
   - export DEVKITPPC=${DEVKITPRO}/devkitPPC
 
 install:
+  - sudo perl devkitPPCupdate.pl
   - wget https://github.com/GRRLIB/GRRLIB/archive/4.3.2.tar.gz
   - tar -xzvf 4.3.2.tar.gz
   - cd GRRLIB-4.3.2/GRRLIB && make && sudo make install
-  - sudo perl devkitPPCupdate.pl
 
 script:
   - make
