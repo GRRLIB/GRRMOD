@@ -10,11 +10,15 @@ env:
 
 before_install:
   - wget http://sourceforge.net/projects/devkitpro/files/Automated%20Installer/devkitPPCupdate.pl
-
-install:
-  - sudo perl devkitPPCupdate.pl
   - wget https://github.com/GRRLIB/GRRLIB/archive/4.3.2.tar.gz
   - tar -xzvf 4.3.2.tar.gz
+
+install:
+  - echo $DEVKITPRO
+  - echo $DEVKITPPC
+  - sudo perl devkitPPCupdate.pl
+  - echo $DEVKITPRO
+  - echo $DEVKITPPC
   - cd GRRLIB-4.3.2/GRRLIB && make && sudo make install
 
 script:
