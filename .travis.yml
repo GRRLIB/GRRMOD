@@ -1,0 +1,13 @@
+language: c
+
+before_install:
+  - wget http://sourceforge.net/projects/devkitpro/files/Automated%20Installer/devkitPPCupdate.pl
+  - export DEVKITPRO=/home/travis/devkitPro
+  - export DEVKITPPC=${DEVKITPRO}/devkitPPC
+  - export DEVKITARM=${DEVKITPRO}/devkitARM
+
+install:
+  - sudo perl devkitPPCupdate.pl
+
+script:
+  - make
