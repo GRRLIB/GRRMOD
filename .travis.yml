@@ -15,12 +15,8 @@ before_install:
 
 install:
   - sudo perl devkitPPCupdate.pl
-  - echo ${DEVKITPRO}
-  - echo ${DEVKITPPC}
   - cd GRRLIB-4.3.2/GRRLIB && make
-  - echo ${DEVKITPRO}
-  - echo ${DEVKITPPC}
-  - sudo make install
+  - make install
 
 script:
   - make
