@@ -1,13 +1,18 @@
 language: c
 
+os:
+  - linux
+
 before_install:
   - wget http://sourceforge.net/projects/devkitpro/files/Automated%20Installer/devkitPPCupdate.pl
-  - export DEVKITPRO=/home/travis/devkitPro
+  - export DEVKITPRO=$HOME/travis/devkitPro
   - export DEVKITPPC=${DEVKITPRO}/devkitPPC
-  - export DEVKITARM=${DEVKITPRO}/devkitARM
 
 install:
+  - wget https://github.com/GRRLIB/GRRLIB/archive/4.3.2.tar.gz
+  - tar -xzvf GRRLIB-4.3.2.tar.gz
+  - cd GRRLIB-4.3.2/GRRLIB && make && sudo make install
   - sudo perl devkitPPCupdate.pl
 
 script:
-  - cd GRRMOD && make
+  - make

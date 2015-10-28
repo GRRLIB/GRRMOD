@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/GRRLIB/GRRMOD.svg?branch=master)](https://travis-ci.org/GRRLIB/GRRMOD)
+
 # GRRMOD
 GRRMOD is a MOD player library for Wii application developers.
 
