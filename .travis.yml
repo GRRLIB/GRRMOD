@@ -10,4 +10,4 @@ install:
   - sudo perl devkitPPCupdate.pl
 
 script:
-  - make
+  - cd GRRMOD && make
