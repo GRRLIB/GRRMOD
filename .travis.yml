@@ -16,7 +16,7 @@ before_install:
 install:
   - sudo perl devkitPPCupdate.pl
   - cd GRRLIB-4.3.2/GRRLIB && make
-  - make install
+  - sudo -E su $USER -c 'make install'
 
 script:
   - make
