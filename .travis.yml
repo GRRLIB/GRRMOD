@@ -18,4 +18,4 @@ install:
   - cd GRRLIB-4.3.2/GRRLIB && sudo -E make all install && cd ../..
 
 script:
-  - make
+  - cd GRRMOD && make && cd ..
