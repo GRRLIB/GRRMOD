@@ -1,6 +1,6 @@
 /*	MikMod sound library
-	(c) 1998, 1999, 2000, 2001 Miodrag Vallat and others - see file AUTHORS
-	for complete list.
+	(c) 1998-2014 Miodrag Vallat and others - see file AUTHORS
+	for a complete list.
 
 	This library is free software; you can redistribute it and/or modify
 	it under the terms of the GNU Library General Public License as
@@ -19,8 +19,6 @@
 */
 
 /*==============================================================================
-
-  $Id$
 
   These routines are used to access the available soundcard drivers.
 
@@ -59,9 +57,8 @@ MIKMODAPI MDRIVER *md_driver	= NULL;
 MIKMODAPI UWORD md_device	= 0;	/* autodetect */
 MIKMODAPI UWORD md_mixfreq	= 44100;
 MIKMODAPI UWORD md_mode		= DMODE_STEREO | DMODE_16BITS |
-						 DMODE_SURROUND |
-						 DMODE_SOFT_MUSIC |
-						 DMODE_SOFT_SNDFX;
+				  DMODE_SURROUND |
+				  DMODE_SOFT_MUSIC | DMODE_SOFT_SNDFX;
 MIKMODAPI UBYTE md_pansep	= 128;	/* 128 == 100% (full left/right) */
 MIKMODAPI UBYTE md_reverb	= 0;	/* no reverb */
 MIKMODAPI UBYTE md_volume	= 128;	/* global sound volume (0-128) */
@@ -71,7 +68,7 @@ MIKMODAPI UBYTE md_sndfxvolume	= 128;	/* volume of sound effects */
 /* INTERNAL GLOBALS */
 UWORD md_bpm = 125;	/* tempo */
 
-/* Do not modify the numchn variables yourself!  use MD_SetVoices() */
+/* Do not modify the numchn variables yourself!  use MikMod_SetNumVoices() */
 UBYTE md_numchn  = 0, md_sngchn = 0, md_sfxchn = 0;
 UBYTE md_hardchn = 0, md_softchn= 0;
 
@@ -196,7 +193,7 @@ MIKMODAPI CHAR* MikMod_InfoDriver(void)
 		len += 4 + (l->next ? 1 : 0) + strlen(l->Version);
 
 	if(len)
-	  if((list=(CHAR*)MikMod_malloc(len*sizeof(CHAR)))) {
+	  if((list=(CHAR*)MikMod_malloc(len*sizeof(CHAR))) != NULL) {
 		CHAR *list_end = list;
 		list[0] = 0;
 		/* list all registered device drivers : */
@@ -588,8 +585,8 @@ void MikMod_Exit_internal(void)
 	md_numchn = md_sfxchn = md_sngchn = 0;
 	md_driver = &drv_nos;
 
-	if(sfxinfo) MikMod_free(sfxinfo);
-	if(md_sample) MikMod_free(md_sample);
+	MikMod_free(sfxinfo);
+	MikMod_free(md_sample);
 	md_sample  = NULL;
 	sfxinfo    = NULL;
 
@@ -637,7 +634,7 @@ static int _mm_reset(const CHAR *cmdline)
 		}
 	}
 
-	if (wasplaying) md_driver->PlayStart();
+	if (wasplaying) return md_driver->PlayStart();
 	return 0;
 }
 
@@ -668,8 +665,8 @@ int MikMod_SetNumVoices_internal(int music, int sfx)
 		resume = 1;
 	}
 
-	if(sfxinfo) MikMod_free(sfxinfo);
-	if(md_sample) MikMod_free(md_sample);
+	MikMod_free(sfxinfo);
+	MikMod_free(md_sample);
 	md_sample  = NULL;
 	sfxinfo    = NULL;
 
@@ -971,4 +968,4 @@ int MD_DropPrivileges(void)
 
 #endif
 
-/* ex:set ts=4: */
+/* ex:set ts=8: */

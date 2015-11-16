@@ -20,8 +20,6 @@
 
 /*==============================================================================
 
-  $Id$
-
   Routine for registering all drivers in libmikmod for the current platform.
 
 ==============================================================================*/
@@ -52,6 +50,9 @@ static void _mm_registeralldrivers(void)
 #ifdef DRV_ULTRA
 	_mm_registerdriver(&drv_ultra);
 #endif
+#ifdef DRV_SAM9407
+	_mm_registerdriver(&drv_sam9407);
+#endif
 
 	/* Register multi-platform drivers -- software mixing */
 #ifdef DRV_SDL
@@ -73,6 +74,9 @@ static void _mm_registeralldrivers(void)
 #endif
 #ifdef DRV_HP
 	_mm_registerdriver(&drv_hp);
+#endif
+#ifdef DRV_SNDIO
+	_mm_registerdriver(&drv_sndio);
 #endif
 #ifdef DRV_OSS
 	_mm_registerdriver(&drv_oss);
@@ -148,7 +152,7 @@ static void _mm_registeralldrivers(void)
 	_mm_registerdriver(&drv_nos);
 }
 
-void MikMod_RegisterAllDrivers(void)
+MIKMODAPI void MikMod_RegisterAllDrivers(void)
 {
 	MUTEX_LOCK(lists);
 	_mm_registeralldrivers();

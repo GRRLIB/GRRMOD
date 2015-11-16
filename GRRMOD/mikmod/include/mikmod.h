@@ -74,7 +74,7 @@ extern "C" {
 
 #define LIBMIKMOD_VERSION_MAJOR 3L
 #define LIBMIKMOD_VERSION_MINOR 3L
-#define LIBMIKMOD_REVISION      7L
+#define LIBMIKMOD_REVISION      8L
 
 #define LIBMIKMOD_VERSION \
     ((LIBMIKMOD_VERSION_MAJOR<<16)| \
@@ -289,6 +289,9 @@ enum {
     MMERR_ALSA_PCM_START,
     MMERR_ALSA_PCM_WRITE,
     MMERR_ALSA_PCM_RECOVER,
+
+    MMERR_SNDIO_SETPARAMS,
+    MMERR_SNDIO_BADPARAMS,
 
     MMERR_MAX
 };
@@ -816,6 +819,7 @@ MIKMODAPI extern struct MDRIVER drv_oss;    /* OpenSound System (Linux,FreeBSD..
 MIKMODAPI extern struct MDRIVER drv_openal; /* OpenAL driver */
 MIKMODAPI extern struct MDRIVER drv_sdl;    /* SDL audio driver */
 MIKMODAPI extern struct MDRIVER drv_sgi;    /* SGI audio library */
+MIKMODAPI extern struct MDRIVER drv_sndio;  /* OpenBSD sndio */
 MIKMODAPI extern struct MDRIVER drv_sun;    /* Sun/NetBSD/OpenBSD audio device */
 
 MIKMODAPI extern struct MDRIVER drv_dart;   /* OS/2 Direct Audio RealTime */

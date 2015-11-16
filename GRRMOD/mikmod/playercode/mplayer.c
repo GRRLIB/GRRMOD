@@ -843,6 +843,9 @@ static int DoPTEffectB(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 		mod->sngpos=dat;
 		mod->posjmp=2;
 		mod->patpos=0;
+		/* cancel the FT2 pattern loop (E60) bug.
+		 * also see DoEEffects() below for it. */
+		if (flags & UF_FT2QUIRKS) mod->patbrk=0;
 	}
 
 	return 0;
@@ -950,8 +953,13 @@ static void DoEEffects(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod,
 				} else
 					mod->patpos=a->pat_reppos;
 			} else a->pat_reppos=POS_NONE;
-		} else
+		} else {
 			a->pat_reppos=mod->patpos-1; /* set reppos - can be (-1) */
+			/* emulate the FT2 pattern loop (E60) bug:
+			 * http://milkytracker.org/docs/MilkyTracker.html#fxE6x
+			 * roadblas.xm plays correctly with this. */
+			if (flags & UF_FT2QUIRKS) mod->patbrk=mod->patpos;
+		}
 		break;
 	case 0x7: /* set tremolo waveform */
 		a->wavecontrol&=0x0f;
@@ -1513,7 +1521,7 @@ static int DoXMEffectL(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 		INSTRUMENT *i=a->main.i;
 		MP_VOICE *aout;
 
-		if ((aout=a->slave)) {
+		if ((aout=a->slave) != NULL) {
 			if (aout->venv.env) {
 				points=i->volenv[i->volpts-1].pos;
 				aout->venv.p=aout->venv.env[(dat>points)?points:dat].pos;
@@ -2231,7 +2239,7 @@ static int pt_playeffects(MODULE *mod, SWORD channel, MP_CONTROL *a)
 	int explicitslides = 0;
 	effect_func f;
 
-	while((c=UniGetByte())) {
+	while((c=UniGetByte()) != 0) {
 #if 0 /* this doesn't normally happen unless things go fubar elsewhere */
 		if (c >= UNI_LAST)
 		    fprintf(stderr,"fubar'ed opcode %u\n",c);
@@ -2540,7 +2548,7 @@ static void pt_Notes(MODULE *mod)
 		UniSetRow(a->row);
 		funky=0;
 
-		while((c=UniGetByte()))
+		while((c=UniGetByte()) != 0)
 			switch (c) {
 			case UNI_NOTE:
 				funky|=1;
@@ -2573,7 +2581,7 @@ static void pt_Notes(MODULE *mod)
 			INSTRUMENT *i;
 			SAMPLE *s;
 
-			if ((i=a->main.i)) {
+			if ((i=a->main.i) != NULL) {
 				if (i->samplenumber[a->anote] >= mod->numsmp) continue;
 				s=&mod->samples[i->samplenumber[a->anote]];
 				a->main.note=i->samplenote[a->anote];
@@ -2662,7 +2670,7 @@ static void pt_EffectsPass1(MODULE *mod)
 	for (channel=0;channel<mod->numchn;channel++) {
 		a=&mod->control[channel];
 
-		if ((aout=a->slave)) {
+		if ((aout=a->slave) != NULL) {
 			a->main.fadevol=aout->main.fadevol;
 			a->main.period=aout->main.period;
 			if (a->main.kick==KICK_KEYOFF)
@@ -2808,7 +2816,7 @@ static void pt_SetupVoices(MODULE *mod)
 				a->slave=&mod->voice[a->slavechn=channel];
 
 			/* assign parts of MP_VOICE only done for a KICK_NOTE */
-			if ((aout=a->slave)) {
+			if ((aout=a->slave) != NULL) {
 				if (aout->mflag && aout->master) aout->master->slave=NULL;
 				aout->master=a;
 				a->slave=aout;
@@ -2837,7 +2845,7 @@ static void pt_EffectsPass2(MODULE *mod)
 		if (!a->row) continue;
 		UniSetRow(a->row);
 
-		while((c=UniGetByte()))
+		while((c=UniGetByte()) != 0)
 			if (c==UNI_ITEFFECTS0) {
 				c=UniGetByte();
 				if ((c>>4)==SS_S7EFFECTS)

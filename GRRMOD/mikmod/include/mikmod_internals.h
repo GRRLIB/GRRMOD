@@ -128,7 +128,7 @@ DECLARE_MUTEX(vars);
 
 /*========== Portable file I/O */
 
-extern MREADER* _mm_new_mem_reader(const void *buffer, int len);
+extern MREADER* _mm_new_mem_reader(const void *buffer, long len);
 extern void _mm_delete_mem_reader(MREADER *reader);
 
 extern MREADER* _mm_new_file_reader(FILE* fp);
@@ -623,6 +623,16 @@ extern const CHAR *STM_Signatures[STM_NTRACKERS];
 extern int    Player_Init(MODULE*);
 extern void   Player_Exit(MODULE*);
 extern void   Player_HandleTick(void);
+
+/*========== UnPackers */
+
+typedef BOOL (*MUNPACKER) (struct MREADER*,
+                           void** /* unpacked data out */ ,
+                           long* /* unpacked data size */ );
+extern BOOL PP20_Unpack(MREADER*, void**, long*);
+extern BOOL MMCMP_Unpack(MREADER*, void**, long*);
+extern BOOL XPK_Unpack(MREADER*, void**, long*);
+extern BOOL S404_Unpack(MREADER*, void**, long*);
 
 /*========== Drivers */
 

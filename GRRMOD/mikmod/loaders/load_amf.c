@@ -338,7 +338,7 @@ static BOOL AMF_Load(BOOL curious)
 	AMFSAMPLE s;
 	SAMPLE *q;
 	UWORD *track_remap;
-	ULONG samplepos;
+	ULONG samplepos, fileend;
 	int channel_remap[16];
 
 	/* try to read module header  */
@@ -466,7 +466,10 @@ static BOOL AMF_Load(BOOL curious)
 		s.c2spd     =_mm_read_I_UWORD(modreader);
 		if(s.c2spd==8368) s.c2spd=8363;
 		s.volume    =_mm_read_UBYTE(modreader);
-		if(mh->version>=11) {
+		/* "the tribal zone.amf" and "the way its gonna b.amf" by Maelcum
+		 * are the only version 10 files I can find, and they have 32 bit
+		 * reppos and repend, not 16. */
+		if(mh->version>=10) {/* was 11 */
 			s.reppos    =_mm_read_I_ULONG(modreader);
 			s.repend    =_mm_read_I_ULONG(modreader);
 		} else {
@@ -531,18 +534,32 @@ static BOOL AMF_Load(BOOL curious)
 	for(t=realtrackcnt;t<of.numtrk;t++) of.tracks[t]=NULL;
 
 	/* compute sample offsets */
+	if(_mm_eof(modreader)) goto fail;
 	samplepos=_mm_ftell(modreader);
+	_mm_fseek(modreader,0,SEEK_END);
+	fileend=_mm_ftell(modreader);
+	_mm_fseek(modreader,samplepos,SEEK_SET);
 	for(realsmpcnt=t=0;t<of.numsmp;t++)
 		if(realsmpcnt<of.samples[t].seekpos)
 			realsmpcnt=of.samples[t].seekpos;
 	for(t=1;t<=realsmpcnt;t++) {
 		q=of.samples;
-		while(q->seekpos!=t) q++;
+		u=0;
+		while(q->seekpos!=t) {
+			if(++u==of.numsmp)
+				goto fail;
+			q++;
+		}
 		q->seekpos=samplepos;
 		samplepos+=q->length;
 	}
+	if(samplepos>fileend)
+		goto fail;
 
 	return 1;
+fail:
+	_mm_errno = MMERR_LOADING_SAMPLEINFO;
+	return 0;
 }
 
 static CHAR *AMF_LoadTitle(void)
