@@ -30,6 +30,9 @@ static int GRRMOD_Get(MREADER * reader);
 static int GRRMOD_Seek(MREADER * reader, long offset, int whence);
 static long GRRMOD_Tell(MREADER * reader);
 
+// This is normally in the mikmod.h file of the MikMod project
+MIKMODAPI extern struct MDRIVER drv_wii;     /* Wii driver */
+
 /**
  * Structure to hold the music information.
  */
@@ -78,7 +81,7 @@ void GRRMOD_MOD_Register(GRRLIB_FuntionsList *RegFunc) {
  * @see GRRMOD_MOD_End
  */
 s8 GRRMOD_MOD_Init(bool stereo) {
-    MikMod_RegisterAllDrivers();
+    MikMod_RegisterDriver(&drv_wii);
     MikMod_RegisterAllLoaders();
     md_device = 1; // Only one device is used
 

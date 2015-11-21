@@ -22,13 +22,13 @@
 
   $Id$
 
-  Driver for Nintendo Wii
+  Driver for no output
 
 ==============================================================================*/
 
 /*
 
-	Written by GRRLIB Team
+	Written by Jean-Paul Mikkers <mikmak@via.nl>
 
 */
 
@@ -40,58 +40,56 @@
 #include <unistd.h>
 #endif
 
-#include <string.h>
-#include <gctypes.h>
 #include "mikmod_internals.h"
 
-static int sLen=0;
-static SBYTE *audiobuffer=NULL;
+#define ZEROLEN 32768
 
-static BOOL WII_IsThere(void)
+static	SBYTE *zerobuf=NULL;
+
+static BOOL NS_IsThere(void)
 {
 	return 1;
 }
 
-static void WII_CommandLine(const CHAR *cmdline)
+static int NS_Init(void)
 {
-	CHAR *ptr=MD_GetAtom("buffer",cmdline,0);
-
-	if (ptr) {
-		sLen = atoi(ptr);
-		free(ptr);
-	}
+	zerobuf=(SBYTE*)MikMod_malloc(ZEROLEN);
+	return VC_Init();
 }
 
-static void	WII_Update(void)
+static void NS_Exit(void)
 {
-	VC_WriteBytes(audiobuffer,sLen);
+	VC_Exit();
+	MikMod_free(zerobuf);
+	zerobuf=NULL;
 }
 
-void setBuffer(int16_t *buffer, int renderSamples)
+static void NS_Update(void)
 {
-	audiobuffer = (SBYTE *)buffer;
+	if (zerobuf)
+		VC_WriteBytes(zerobuf,ZEROLEN);
 }
 
-MIKMODAPI MDRIVER drv_wii={
+MIKMODAPI MDRIVER drv_nos={
 	NULL,
-	"Wii",
-	"Wii Driver v1.0",
-	0,255,
-	"wii",
-	"buffer:r:5760:Audio buffer size\n",
-	WII_CommandLine,
-	WII_IsThere,
+	"No Sound",
+	"Nosound Driver v3.0",
+	255,255,
+	"nosound",
+	NULL,
+	NULL,
+	NS_IsThere,
 	VC_SampleLoad,
 	VC_SampleUnload,
 	VC_SampleSpace,
 	VC_SampleLength,
-	VC_Init,
-	VC_Exit,
+	NS_Init,
+	NS_Exit,
 	NULL,
 	VC_SetNumVoices,
 	VC_PlayStart,
 	VC_PlayStop,
-	WII_Update,
+	NS_Update,
 	NULL,
 	VC_VoiceSetVolume,
 	VC_VoiceGetVolume,
