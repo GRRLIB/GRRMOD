@@ -22,13 +22,13 @@
 
   $Id$
 
-  Driver for no output
+  Driver for Nintendo Wii
 
 ==============================================================================*/
 
 /*
 
-	Written by Jean-Paul Mikkers <mikmak@via.nl>
+	Written by GRRLIB Team
 
 */
 
@@ -47,12 +47,12 @@
 static int sLen=0;
 static SBYTE *audiobuffer=NULL;
 
-static BOOL NS_IsThere(void)
+static BOOL WII_IsThere(void)
 {
 	return 1;
 }
 
-static void NS_CommandLine(const CHAR *cmdline)
+static void WII_CommandLine(const CHAR *cmdline)
 {
 	CHAR *ptr=MD_GetAtom("buffer",cmdline,0);
 
@@ -62,7 +62,7 @@ static void NS_CommandLine(const CHAR *cmdline)
 	}
 }
 
-static void	NS_Update(void)
+static void	WII_Update(void)
 {
 	VC_WriteBytes(audiobuffer,sLen);
 }
@@ -74,13 +74,13 @@ void setBuffer(int16_t *buffer, int renderSamples)
 
 MIKMODAPI MDRIVER drv_nos={
 	NULL,
-	"No Sound",
-	"Nosound Driver v3.0",
+	"Wii",
+	"Wii Driver v1.0",
 	0,255,
-	"nosound",
+	"wii",
 	"buffer:r:5760:Audio buffer size\n",
-	NS_CommandLine,
-	NS_IsThere,
+	WII_CommandLine,
+	WII_IsThere,
 	VC_SampleLoad,
 	VC_SampleUnload,
 	VC_SampleSpace,
@@ -91,7 +91,7 @@ MIKMODAPI MDRIVER drv_nos={
 	VC_SetNumVoices,
 	VC_PlayStart,
 	VC_PlayStop,
-	NS_Update,
+	WII_Update,
 	NULL,
 	VC_VoiceSetVolume,
 	VC_VoiceGetVolume,

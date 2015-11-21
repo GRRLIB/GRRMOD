@@ -606,7 +606,7 @@ static BOOL LoadInstruments(void)
 					next+=s->length;
 
 					/* last instrument is at the end of file in version 0x0104 */
-					if(_mm_eof(modreader)) {
+					if(_mm_eof(modreader) && (mh->version<0x0104 || t<of.numins-1)) {
 						MikMod_free(nextwav);MikMod_free(wh);
 						nextwav=NULL;wh=NULL;
 						_mm_errno = MMERR_LOADING_SAMPLEINFO;
@@ -625,7 +625,7 @@ static BOOL LoadInstruments(void)
 				for(u=headend-_mm_ftell(modreader);u;u--) _mm_read_UBYTE(modreader);
 
 				/* last instrument is at the end of file in version 0x0104 */
-				if(_mm_eof(modreader)) {
+				if(_mm_eof(modreader) && (mh->version<0x0104 || t<of.numins-1)) {
 					MikMod_free(nextwav);MikMod_free(wh);
 					nextwav=NULL;wh=NULL;
 					_mm_errno = MMERR_LOADING_SAMPLEINFO;
@@ -687,7 +687,7 @@ static BOOL XM_Load(BOOL curious)
 	of.initspeed = mh->tempo;
 	of.inittempo = mh->bpm;
 	strncpy(tracker,mh->trackername,20);tracker[20]=0;
-	for(t=20;(tracker[t]<=' ')&&(t>=0);t--) tracker[t]=0;
+	for(t=20;(t>=0)&&(tracker[t]<=' ');t--) tracker[t]=0;
 
 	/* some modules have the tracker name empty */
 	if (!tracker[0])
