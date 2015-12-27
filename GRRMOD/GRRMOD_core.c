@@ -38,7 +38,6 @@ static u8 audioBuf[2][SNDBUFFERSIZE] ATTRIBUTE_ALIGN(32);
 static lwpq_t player_queue;
 static lwp_t hplayer;
 static u8 player_stack[STACKSIZE] ATTRIBUTE_ALIGN(8);
-static void* player(void *);
 
 static s32 mod_freq = 48000;
 static AESNDPB  *modvoice = NULL;
@@ -122,7 +121,7 @@ void GRRMOD_Unload() {
  * This function starts the specified module playback.
  */
 void GRRMOD_Start() {
-    if(sndPlaying) {
+    if(sndPlaying==true) {
         return;
     }
 
@@ -150,7 +149,7 @@ void GRRMOD_Start() {
  * This function stops the currently playing module.
  */
 void GRRMOD_Stop() {
-    if(!sndPlaying) {
+    if(sndPlaying==false) {
         return;
     }
     AESND_SetVoiceStop(modvoice, true);
@@ -167,7 +166,7 @@ void GRRMOD_Stop() {
  * This function toggles the playing/paused status of the module.
  */
 void GRRMOD_Pause() {
-    if(!sndPlaying) {
+    if(sndPlaying==false) {
         return;
     }
 
@@ -193,7 +192,7 @@ char *GRRMOD_GetModType() {
 
 /**
  * Set the frequency. Only 32000Hz and 48000Hz are available.
- * @param freq Frequency to set in kHz.
+ * @param freq Frequency to set in Hz.
  */
 void GRRMOD_SetFrequency(u32 freq) {
     if(freq==32000 || freq==48000) {
@@ -242,6 +241,7 @@ u32 GRRMOD_GetRealVoiceVolume(u8 voice) {
 
 /**
  * Set a buffer to update. This routine is called inside a thread.
+ * @param arg Not used.
  */
 static void* player(void *arg) {
 #ifdef _GRRMOD_DEBUG
@@ -250,10 +250,10 @@ u64 start;
 
     u32 i;
     thr_running = true;
-    while(sndPlaying) {
+    while(sndPlaying==true) {
         LWP_ThreadSleep(player_queue);
-        if(sndPlaying) {
-            if(paused) {
+        if(sndPlaying==true) {
+            if(paused==true) {
                 for(i=0; i<(SNDBUFFERSIZE>>1); i++) {
                     ((u16*)((u8*)audioBuf[curr_audio]))[i] = 0;
                 }
