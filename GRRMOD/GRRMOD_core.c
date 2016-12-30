@@ -104,6 +104,8 @@ void GRRMOD_End() {
 
 /**
  * Load a MOD file from memory.
+ * @param mem Memory to set.
+ * @param size Size of the memory to set.
  */
 void GRRMOD_SetMOD(const void *mem, u64 size) {
     RegFunc.SetMOD(mem, size);
