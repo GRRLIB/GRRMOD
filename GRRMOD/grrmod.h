@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-Copyright (c) 2010-2016 The GRRLIB Team
+Copyright (c) 2010-2017 The GRRLIB Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -101,7 +101,7 @@ u32 GRRMOD_MixingTime();
  * Documentation : Crayon, NoNameNo\n
  *
  * @section Licence
- * Copyright (c) 2010-2016 The GRRLIB Team
+ * Copyright (c) 2010-2017 The GRRLIB Team
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
