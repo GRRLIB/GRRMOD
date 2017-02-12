@@ -34,7 +34,6 @@
 #include <unistd.h>
 #endif
 
-#include <ctype.h>
 #include <stdio.h>
 #ifdef HAVE_MEMORY_H
 #include <memory.h>
@@ -42,10 +41,10 @@
 #include <string.h>
 
 #include "mikmod_internals.h"
+#include "mikmod_ctype.h"
 
 #ifdef SUNOS
 extern int fprintf(FILE *, const char *, ...);
-extern int toupper(int);
 #endif
 
 /*========== Module structure */
@@ -177,7 +176,7 @@ static const CHAR* IT_Version[]={
 };
 
 /* table for porta-to-note command within volume/panning column */
-static UBYTE portatable[10]= {0,1,4,8,16,32,64,96,128,255};
+static const UBYTE portatable[10]= {0,1,4,8,16,32,64,96,128,255};
 
 /*========== Loader code */
 
@@ -394,7 +393,7 @@ static void LoadMidiString(MREADER* r,CHAR* dest)
 	curp=lastp=dest;
 	/* remove blanks and uppercase all */
 	while(*lastp) {
-		if(isalnum((int)*lastp)) *(curp++)=toupper((int)*lastp);
+		if(mik_isalnum((int)*lastp)) *(curp++)=mik_toupper((int)*lastp);
 		lastp++;
 	}
 	*curp=0;

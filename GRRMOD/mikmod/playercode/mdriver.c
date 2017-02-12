@@ -33,9 +33,6 @@
 #endif
 
 #include <string.h>
-#ifdef HAVE_STRINGS_H
-#include <strings.h>
-#endif
 
 #include "mikmod_internals.h"
 
@@ -246,7 +243,7 @@ MIKMODAPI int MikMod_DriverFromAlias(const CHAR *alias)
 	cruise=firstdriver;
 	while(cruise) {
 		if (cruise->Alias) {
-			if (!(strcasecmp(alias,cruise->Alias))) break;
+			if (!(_mm_strcasecmp(alias,cruise->Alias))) break;
 			rank++;
 		}
 		cruise=cruise->next;
@@ -863,8 +860,8 @@ MIKMODAPI BOOL MikMod_InitThreads(void)
 		} else
 			result=1;
 #elif defined(_WIN32)
-		if((!(_mm_mutex_lists=CreateMutex(NULL,FALSE,"libmikmod(lists)")))||
-		   (!(_mm_mutex_vars=CreateMutex(NULL,FALSE,"libmikmod(vars)"))))
+		if((!(_mm_mutex_lists=CreateMutex(NULL,FALSE,TEXT("libmikmod(lists)"))))||
+		   (!(_mm_mutex_vars=CreateMutex(NULL,FALSE,TEXT("libmikmod(vars)")))))
 			result=0;
 		else
 			result=1;

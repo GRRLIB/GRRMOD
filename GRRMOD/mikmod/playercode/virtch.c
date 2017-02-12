@@ -1119,6 +1119,33 @@ static void AddChannel(SLONG* ptr,NATIVE todo)
 	}
 }
 
+#ifdef NO_HQMIXER
+#define VC_SetupPointers() do{}while(0)
+#define VC1_Init VC_Init
+#define VC1_Exit VC_Exit
+#define VC1_PlayStart VC_PlayStart
+#define VC1_PlayStop VC_PlayStop
+#define VC1_SampleLength VC_SampleLength
+#define VC1_SampleSpace VC_SampleSpace
+#define VC1_SampleLoad VC_SampleLoad
+#define VC1_SampleUnload VC_SampleUnload
+#define VC1_SetNumVoices VC_SetNumVoices
+#define VC1_SilenceBytes VC_SilenceBytes
+#define VC1_VoicePlay VC_VoicePlay
+#define VC1_VoiceStop VC_VoiceStop
+#define VC1_VoiceGetFrequency VC_VoiceGetFrequency
+#define VC1_VoiceGetPanning VC_VoiceGetPanning
+#define VC1_VoiceGetPosition VC_VoiceGetPosition
+#define VC1_VoiceGetVolume VC_VoiceGetVolume
+#define VC1_VoiceRealVolume VC_VoiceRealVolume
+#define VC1_VoiceSetFrequency VC_VoiceSetFrequency
+#define VC1_VoiceSetPanning VC_VoiceSetPanning
+#define VC1_VoiceSetVolume VC_VoiceSetVolume
+#define VC1_VoiceStopped VC_VoiceStopped
+#define VC1_WriteBytes VC_WriteBytes
+#define VC1_WriteSamples VC_WriteSamples
+#endif
+
 #define _IN_VIRTCH_
 #include "virtch_common.c"
 #undef _IN_VIRTCH_
@@ -1218,17 +1245,19 @@ void VC1_WriteSamples(SBYTE* buf,ULONG todo)
 
 int VC1_Init(void)
 {
+#ifndef NO_HQMIXER
 	VC_SetupPointers();
 
 	if (md_mode&DMODE_HQMIXER)
 		return VC2_Init();
+#endif
 
-	if(!(Samples=(SWORD**)MikMod_malloc_aligned16(MAXSAMPLEHANDLES*sizeof(SWORD*)))) {
+	if(!(Samples=(SWORD**)MikMod_amalloc(MAXSAMPLEHANDLES*sizeof(SWORD*)))) {
 		_mm_errno = MMERR_INITIALIZING_MIXER;
 		return 1;
 	}
 	if(!vc_tickbuf) {
-		if(!(vc_tickbuf=(SLONG*)MikMod_malloc_aligned16((TICKLSIZE+32)*sizeof(SLONG)))) {
+		if(!(vc_tickbuf=(SLONG*)MikMod_amalloc((TICKLSIZE+32)*sizeof(SLONG)))) {
 			_mm_errno = MMERR_INITIALIZING_MIXER;
 			return 1;
 		}
@@ -1264,14 +1293,17 @@ int VC1_PlayStart(void)
 	if(!(RVbufL7=(SLONG*)MikMod_calloc((RVc7+1),sizeof(SLONG)))) return 1;
 	if(!(RVbufL8=(SLONG*)MikMod_calloc((RVc8+1),sizeof(SLONG)))) return 1;
 
-	if(!(RVbufR1=(SLONG*)MikMod_calloc((RVc1+1),sizeof(SLONG)))) return 1;
-	if(!(RVbufR2=(SLONG*)MikMod_calloc((RVc2+1),sizeof(SLONG)))) return 1;
-	if(!(RVbufR3=(SLONG*)MikMod_calloc((RVc3+1),sizeof(SLONG)))) return 1;
-	if(!(RVbufR4=(SLONG*)MikMod_calloc((RVc4+1),sizeof(SLONG)))) return 1;
-	if(!(RVbufR5=(SLONG*)MikMod_calloc((RVc5+1),sizeof(SLONG)))) return 1;
-	if(!(RVbufR6=(SLONG*)MikMod_calloc((RVc6+1),sizeof(SLONG)))) return 1;
-	if(!(RVbufR7=(SLONG*)MikMod_calloc((RVc7+1),sizeof(SLONG)))) return 1;
-	if(!(RVbufR8=(SLONG*)MikMod_calloc((RVc8+1),sizeof(SLONG)))) return 1;
+	/* allocate reverb buffers for the right channel if in stereo mode only. */
+	if (vc_mode & DMODE_STEREO) {
+		if(!(RVbufR1=(SLONG*)MikMod_calloc((RVc1+1),sizeof(SLONG)))) return 1;
+		if(!(RVbufR2=(SLONG*)MikMod_calloc((RVc2+1),sizeof(SLONG)))) return 1;
+		if(!(RVbufR3=(SLONG*)MikMod_calloc((RVc3+1),sizeof(SLONG)))) return 1;
+		if(!(RVbufR4=(SLONG*)MikMod_calloc((RVc4+1),sizeof(SLONG)))) return 1;
+		if(!(RVbufR5=(SLONG*)MikMod_calloc((RVc5+1),sizeof(SLONG)))) return 1;
+		if(!(RVbufR6=(SLONG*)MikMod_calloc((RVc6+1),sizeof(SLONG)))) return 1;
+		if(!(RVbufR7=(SLONG*)MikMod_calloc((RVc7+1),sizeof(SLONG)))) return 1;
+		if(!(RVbufR8=(SLONG*)MikMod_calloc((RVc8+1),sizeof(SLONG)))) return 1;
+	}
 
 	RVRindex = 0;
 	return 0;

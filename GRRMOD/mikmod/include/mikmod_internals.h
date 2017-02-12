@@ -33,8 +33,8 @@ extern "C" {
 
 #include <stdarg.h>
 
-#if defined(__OS2__) || defined(__EMX__) || (defined(_WIN32) && !defined(__MINGW32__))
-#define strcasecmp(s,t) stricmp(s,t)
+#if defined(_MSC_VER) && !defined(__cplusplus) && !defined(HAVE_CONFIG_H)
+#define inline __inline
 #endif
 
 #ifndef MIKMOD_UNIX
@@ -125,6 +125,10 @@ extern MikMod_handler_t _mm_errorhandler;
 
 DECLARE_MUTEX(lists);
 DECLARE_MUTEX(vars);
+
+/*========== Replacement funcs */
+
+extern int _mm_strcasecmp (const char *__s1, const char *__s2);
 
 /*========== Portable file I/O */
 
@@ -334,7 +338,7 @@ enum {
     UNI_LAST
 };
 
-extern UWORD unioperands[UNI_LAST];
+extern const UWORD unioperands[UNI_LAST];
 
 /* IT / S3M Extended SS effects: */
 enum {
@@ -570,9 +574,9 @@ typedef struct MLOADER {
 
 /* internal loader variables */
 extern MREADER* modreader;
-extern UWORD   finetune[16];
 extern MODULE  of;                  /* static unimod loading space */
-extern UWORD   npertab[7*OCTAVE];   /* used by the original MOD loaders */
+extern const UWORD finetune[16];
+extern const UWORD npertab[7*OCTAVE];/* used by the original MOD loaders */
 
 extern SBYTE   remap[UF_MAXCHAN];   /* for removing empty channels */
 extern UBYTE*  poslookup;           /* lookup table for pattern jumps after
@@ -838,13 +842,25 @@ static __inline __m128i mm_hiqq(const __m128i a) {
 
 #endif
 
-/* MikMod_malloc_aligned16() returns a 16 byte aligned zero-filled
+#if defined(HAVE_SSE2) || defined(HAVE_ALTIVEC)
+/* MikMod_amalloc() returns a 16 byte aligned zero-filled
    memory in SIMD-enabled builds.
- - the returned memory can be reclaimed using MikMod_free_aligned16()
+ - the returned memory can be freed with MikMod_afree()
  - the returned memory CAN NOT be realloc()'ed safely.  */
-void* MikMod_malloc_aligned16(size_t);
-void MikMod_free_aligned16(void *);  /* frees if ptr != NULL */
-
+#ifdef __cplusplus
+extern "C" {
 #endif
+void* MikMod_amalloc(size_t);
+void MikMod_afree(void *);  /* frees if ptr != NULL */
+#ifdef __cplusplus
+}
+#endif
+
+#else /* NO SIMD */
+#define MikMod_amalloc MikMod_malloc
+#define MikMod_afree MikMod_free
+#endif
+
+#endif /* _MIKMOD_INTERNALS_H */
 
 /* ex:set ts=4: */

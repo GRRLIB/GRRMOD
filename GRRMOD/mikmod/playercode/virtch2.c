@@ -39,6 +39,8 @@
 #include "config.h"
 #endif
 
+#ifndef NO_HQMIXER
+
 #ifdef HAVE_MEMORY_H
 #include <memory.h>
 #endif
@@ -437,9 +439,6 @@ end:
 	return idx;
 }
 
-#endif
-
-
 static SLONGLONG MixStereoNormal(const SWORD* const srce,SLONG* dest,SLONGLONG idx,SLONGLONG increment,ULONG todo)
 {
 	SWORD sample=0;
@@ -492,11 +491,9 @@ static SLONGLONG MixStereoNormal(const SWORD* const srce,SLONG* dest,SLONGLONG i
 
 	if (todo)
 	{
-#if defined HAVE_SSE2 || defined HAVE_ALTIVEC
 		if (md_mode & DMODE_SIMDMIXER) {
 			return MixSIMDStereoNormal(srce, dest, idx, increment, todo);
 		}
-#endif
 		while(todo)
 		{
 			i=idx>>FRACBITS,
@@ -515,6 +512,52 @@ static SLONGLONG MixStereoNormal(const SWORD* const srce,SLONG* dest,SLONGLONG i
 
 	return idx;
 }
+
+#else /* HAVE_SSE2 || HAVE_ALTIVEC */
+static SLONGLONG MixStereoNormal(const SWORD* const srce,SLONG* dest,SLONGLONG idx,SLONGLONG increment,ULONG todo)
+{
+	SWORD sample=0;
+	SLONGLONG i,f;
+
+	while(todo--) {
+		i=idx>>FRACBITS,f=idx&FRACMASK;
+		sample=(SWORD)(((((SLONGLONG)srce[i]*(FRACMASK+1L-f)) +
+			((SLONGLONG)srce[i+1] * f)) >> FRACBITS));
+		idx += increment;
+
+		if(vnf->rampvol) {
+			*dest++ += (long)(
+			  ( ( ((SLONGLONG)vnf->oldlvol*vnf->rampvol) +
+			      (vnf->lvolsel*(CLICK_BUFFER-vnf->rampvol))
+			    ) * (SLONGLONG)sample ) >> CLICK_SHIFT );
+			*dest++ += (long)(
+			  ( ( ((SLONGLONG)vnf->oldrvol*vnf->rampvol) +
+			      (vnf->rvolsel*(CLICK_BUFFER-vnf->rampvol))
+			    ) * (SLONGLONG)sample ) >> CLICK_SHIFT );
+			vnf->rampvol--;
+		} else
+		  if(vnf->click) {
+			*dest++ += (long)(
+			  ( ( (SLONGLONG)(vnf->lvolsel*(CLICK_BUFFER-vnf->click)) *
+			      (SLONGLONG)sample ) + (vnf->lastvalL * vnf->click) )
+			    >> CLICK_SHIFT );
+			*dest++ += (long)(
+			  ( ( ((SLONGLONG)vnf->rvolsel*(CLICK_BUFFER-vnf->click)) *
+			      (SLONGLONG)sample ) + (vnf->lastvalR * vnf->click) )
+			    >> CLICK_SHIFT );
+			vnf->click--;
+		} else {
+			*dest++ +=vnf->lvolsel*sample;
+			*dest++ +=vnf->rvolsel*sample;
+		}
+	}
+	vnf->lastvalL=vnf->lvolsel*sample;
+	vnf->lastvalR=vnf->rvolsel*sample;
+
+	return idx;
+}
+#endif /* HAVE_SSE2 || HAVE_ALTIVEC */
+
 
 static SLONGLONG MixStereoSurround(const SWORD* srce,SLONG* dest,SLONGLONG idx,SLONGLONG increment,ULONG todo)
 {
@@ -880,6 +923,7 @@ static void Mix32To16_Stereo_SIMD_4Tap(SWORD* dste, const SLONG* srce, NATIVE co
 		srce+=32; /* 32 = 4 * 8  */
 	}
 
+	/* FIXME: THIS PART WRITES PAST DST !! */
 	if (remain)
 	{
 		Mix32To16_Stereo(dste, srce, remain);
@@ -1200,12 +1244,12 @@ int VC2_Init(void)
 	if (!(md_mode&DMODE_HQMIXER))
 		return VC1_Init();
 
-	if(!(Samples=(SWORD**)MikMod_malloc_aligned16(MAXSAMPLEHANDLES*sizeof(SWORD*)))) {
+	if(!(Samples=(SWORD**)MikMod_amalloc(MAXSAMPLEHANDLES*sizeof(SWORD*)))) {
 		_mm_errno = MMERR_INITIALIZING_MIXER;
 		return 1;
 	}
 	if(!vc_tickbuf) {
-		if(!(vc_tickbuf=(SLONG*)MikMod_malloc_aligned16((TICKLSIZE+32)*sizeof(SLONG)))) {
+		if(!(vc_tickbuf=(SLONG*)MikMod_amalloc((TICKLSIZE+32)*sizeof(SLONG)))) {
 			_mm_errno = MMERR_INITIALIZING_MIXER;
 			return 1;
 		}
@@ -1261,14 +1305,17 @@ int VC2_PlayStart(void)
 	if(!(RVbufL7=(SLONG*)MikMod_calloc((RVc7+1),sizeof(SLONG)))) return 1;
 	if(!(RVbufL8=(SLONG*)MikMod_calloc((RVc8+1),sizeof(SLONG)))) return 1;
 
-	if(!(RVbufR1=(SLONG*)MikMod_calloc((RVc1+1),sizeof(SLONG)))) return 1;
-	if(!(RVbufR2=(SLONG*)MikMod_calloc((RVc2+1),sizeof(SLONG)))) return 1;
-	if(!(RVbufR3=(SLONG*)MikMod_calloc((RVc3+1),sizeof(SLONG)))) return 1;
-	if(!(RVbufR4=(SLONG*)MikMod_calloc((RVc4+1),sizeof(SLONG)))) return 1;
-	if(!(RVbufR5=(SLONG*)MikMod_calloc((RVc5+1),sizeof(SLONG)))) return 1;
-	if(!(RVbufR6=(SLONG*)MikMod_calloc((RVc6+1),sizeof(SLONG)))) return 1;
-	if(!(RVbufR7=(SLONG*)MikMod_calloc((RVc7+1),sizeof(SLONG)))) return 1;
-	if(!(RVbufR8=(SLONG*)MikMod_calloc((RVc8+1),sizeof(SLONG)))) return 1;
+	/* allocate reverb buffers for the right channel if in stereo mode only. */
+	if (vc_mode & DMODE_STEREO) {
+		if(!(RVbufR1=(SLONG*)MikMod_calloc((RVc1+1),sizeof(SLONG)))) return 1;
+		if(!(RVbufR2=(SLONG*)MikMod_calloc((RVc2+1),sizeof(SLONG)))) return 1;
+		if(!(RVbufR3=(SLONG*)MikMod_calloc((RVc3+1),sizeof(SLONG)))) return 1;
+		if(!(RVbufR4=(SLONG*)MikMod_calloc((RVc4+1),sizeof(SLONG)))) return 1;
+		if(!(RVbufR5=(SLONG*)MikMod_calloc((RVc5+1),sizeof(SLONG)))) return 1;
+		if(!(RVbufR6=(SLONG*)MikMod_calloc((RVc6+1),sizeof(SLONG)))) return 1;
+		if(!(RVbufR7=(SLONG*)MikMod_calloc((RVc7+1),sizeof(SLONG)))) return 1;
+		if(!(RVbufR8=(SLONG*)MikMod_calloc((RVc8+1),sizeof(SLONG)))) return 1;
+	}
 
 	RVRindex = 0;
 	return 0;
@@ -1315,5 +1362,7 @@ int VC2_SetNumVoices(void)
 
 	return 0;
 }
+
+#endif /* ! NO_HQMIXER */
 
 /* ex:set ts=4: */

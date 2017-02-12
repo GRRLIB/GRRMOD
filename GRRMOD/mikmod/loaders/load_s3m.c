@@ -113,7 +113,7 @@ static const CHAR * S3M_Version[] = {
 	"Impulse Tracker 2.14p4 (S3M format)"
 };
 /* version number position in above array */
-static int numeric[NUMTRACKERS]={14,14,16,16};
+static const int numeric[NUMTRACKERS]={14,14,16,16};
 
 /*========== Loader code */
 
@@ -394,7 +394,7 @@ static BOOL S3M_Load(BOOL curious)
 		q->loopstart  = s.loopbeg;
 		q->loopend    = s.loopend;
 		q->volume     = s.volume;
-		q->seekpos    = (((long)s.memsegh)<<16|s.memsegl)<<4;
+		q->seekpos    = (((ULONG)s.memsegh)<<16|s.memsegl)<<4;
 
 		if(s.flags&1) q->flags |= SF_LOOP;
 		if(s.flags&4) q->flags |= SF_16BITS;

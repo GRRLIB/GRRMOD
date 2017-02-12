@@ -32,6 +32,7 @@
 #endif
 #include "mikmod_internals.h"
 
+#ifndef NO_HQMIXER
 extern ULONG VC1_SilenceBytes(SBYTE*,ULONG);
 extern ULONG VC2_SilenceBytes(SBYTE*,ULONG);
 extern ULONG VC1_WriteBytes(SBYTE*,ULONG);
@@ -68,10 +69,12 @@ extern ULONG VC1_SampleLength(int,SAMPLE*);
 extern ULONG VC2_SampleLength(int,SAMPLE*);
 extern ULONG VC1_VoiceRealVolume(UBYTE);
 extern ULONG VC2_VoiceRealVolume(UBYTE);
+#endif
 
 
 #ifndef _IN_VIRTCH_
 
+#ifndef NO_HQMIXER
 extern int   VC1_Init(void);
 extern int   VC2_Init(void);
 static int  (*VC_Init_ptr)(void)=VC1_Init;
@@ -223,8 +226,9 @@ void VC_SetupPointers(void)
 		VC_VoiceRealVolume_ptr=VC1_VoiceRealVolume;
 	}
 }
+#endif/* !NO_HQMIXER */
 
-#else
+#else /* _IN_VIRTCH_ */
 
 #ifndef _VIRTCH_COMMON_
 #define _VIRTCH_COMMON_
@@ -252,9 +256,7 @@ ULONG VC1_SilenceBytes(SBYTE* buf,ULONG todo)
 	todo=samples2bytes(bytes2samples(todo));
 
 	/* clear the buffer to zero (16 bits signed) or 0x80 (8 bits unsigned) */
-	if(vc_mode & DMODE_FLOAT)
-		memset(buf,0,todo);
-	else if(vc_mode & DMODE_16BITS)
+	if(vc_mode &(DMODE_16BITS|DMODE_FLOAT))
 		memset(buf,0,todo);
 	else
 		memset(buf,0x80,todo);
@@ -281,8 +283,8 @@ ULONG VC1_WriteBytes(SBYTE* buf,ULONG todo)
 void VC1_Exit(void)
 {
 	MikMod_free(vinf);
-	MikMod_free_aligned16(vc_tickbuf);
-	MikMod_free_aligned16(Samples);
+	MikMod_afree(vc_tickbuf);
+	MikMod_afree(Samples);
 
 	vc_tickbuf = NULL;
 	vinf = NULL;
@@ -358,7 +360,7 @@ void VC1_VoiceSetPanning(UBYTE voice,ULONG pan)
 void VC1_SampleUnload(SWORD handle)
 {
 	if (Samples && (handle < MAXSAMPLEHANDLES)) {
-		MikMod_free_aligned16(Samples[handle]);
+		MikMod_afree(Samples[handle]);
 		Samples[handle]=NULL;
 	}
 }
@@ -393,7 +395,7 @@ SWORD VC1_SampleLoad(struct SAMPLOAD* sload,int type)
 	SL_SampleSigned(sload);
 	SL_Sample8to16(sload);
 
-	if(!(Samples[handle]=(SWORD*)MikMod_malloc_aligned16((length+20)<<1))) {
+	if(!(Samples[handle]=(SWORD*)MikMod_amalloc((length+20)<<1))) {
 		_mm_errno = MMERR_SAMPLE_TOO_BIG;
 		return -1;
 	}
