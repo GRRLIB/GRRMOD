@@ -244,6 +244,7 @@ u32 GRRMOD_GetRealVoiceVolume(u8 voice) {
 /**
  * Set a buffer to update. This routine is called inside a thread.
  * @param arg Not used.
+ * @return Always returns NULL.
  */
 static void* player(void *arg) {
 #ifdef _GRRMOD_DEBUG
@@ -273,11 +274,13 @@ u64 start;
     }
     thr_running = false;
 
-    return 0;
+    return NULL;
 }
 
 /**
  * Callback function for AESND_AllocateVoice.
+ * @param pb Pointer to buffer.
+ * @param state Voice state.
  */
 static void __aesndvoicecallback(AESNDPB *pb, u32 state) {
     switch(state) {
