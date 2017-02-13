@@ -6,9 +6,14 @@ GRRMOD is a MOD player library for Wii application developers.
 
 It supports the following format:
  * 669 (Composer 669)
- * MOD (15 and 31 instruments)
- * MED (OctaMED)
- * MTM (MultiTracker Module editor)
+ * FAR (Farandole Composer)
+ * GDM (General DigiMusic)
+ * IMF (Imago Orpheus)
  * IT (Impulse Tracker)
+ * MED (OctaMED)
+ * MOD (15 and 31 instruments)
+ * MTM (MultiTracker Module editor)
  * S3M (Scream Tracker 3)
+ * STM (Scream Tracker)
+ * ULT (UltraTracker)
  * XM (FastTracker 2)

@@ -13,13 +13,18 @@
 
 // Mod file
 #include "music_mp3.h"
-#include "music_mod.h"
-#include "music_xm.h"
-#include "music_s3m.h"
-#include "music_it.h"
 #include "music_669.h"
+#include "music_far.h"
+#include "music_gdm.h"
+#include "music_imf.h"
+#include "music_it.h"
 #include "music_med.h"
+#include "music_mod.h"
 #include "music_mtm.h"
+#include "music_s3m.h"
+#include "music_stm.h"
+#include "music_ult.h"
+#include "music_xm.h"
 
 #define MAX_WIDTH 6.0f
 #define MIN_WIDTH 0.2f
@@ -51,13 +56,18 @@ int main(int argc, char **argv) {
     s16 Volume = 255;
     s8 SongNum = 0;
     PLAYLIST PlayList[] = { {(u8 *)music_mp3, music_mp3_size},
-                            {(u8 *)music_mod, music_mod_size},
-                            {(u8 *)music_s3m, music_s3m_size},
-                            {(u8 *)music_it, music_it_size},
-                            {(u8 *)music_xm, music_xm_size},
                             {(u8 *)music_669, music_669_size},
+                            {(u8 *)music_far, music_far_size},
+                            {(u8 *)music_gdm, music_gdm_size},
+                            {(u8 *)music_imf, music_imf_size},
+                            {(u8 *)music_it, music_it_size},
                             {(u8 *)music_med, music_med_size},
-                            {(u8 *)music_mtm, music_mtm_size} };
+                            {(u8 *)music_mod, music_mod_size},
+                            {(u8 *)music_mtm, music_mtm_size},
+                            {(u8 *)music_s3m, music_s3m_size},
+                            {(u8 *)music_stm, music_stm_size},
+                            {(u8 *)music_ult, music_ult_size},
+                            {(u8 *)music_xm, music_xm_size} };
     const u8 LastIndex = sizeof(PlayList) / sizeof(*PlayList) - 1;
 
     GRRLIB_Init();
