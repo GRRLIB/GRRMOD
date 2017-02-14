@@ -91,6 +91,7 @@ u32 GRRMOD_MixingTime();
  * - MED (OctaMED)
  * - MOD (15 and 31 instruments)
  * - MTM (MultiTracker Module editor)
+ * - OKT (Amiga Oktalyzer)
  * - S3M (Scream Tracker 3)
  * - STM (Scream Tracker)
  * - ULT (UltraTracker)

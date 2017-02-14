@@ -21,6 +21,7 @@
 #include "music_med.h"
 #include "music_mod.h"
 #include "music_mtm.h"
+#include "music_okta.h"
 #include "music_s3m.h"
 #include "music_stm.h"
 #include "music_ult.h"
@@ -64,6 +65,7 @@ int main(int argc, char **argv) {
                             {(u8 *)music_med, music_med_size},
                             {(u8 *)music_mod, music_mod_size},
                             {(u8 *)music_mtm, music_mtm_size},
+                            {(u8 *)music_okta, music_okta_size},
                             {(u8 *)music_s3m, music_s3m_size},
                             {(u8 *)music_stm, music_stm_size},
                             {(u8 *)music_ult, music_ult_size},
