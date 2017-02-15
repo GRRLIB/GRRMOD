@@ -343,11 +343,13 @@ static BOOL OKT_Load(BOOL curious)
 	of.initspeed = 6;
 	of.inittempo = 125;
 
-	while (!_mm_eof(modreader)) {
+	while (1) {
 		/* read block header */
 		_mm_read_UBYTES(id, 4, modreader);
 		len = _mm_read_M_ULONG(modreader);
 
+		if (_mm_eof(modreader))
+			break;
 		fp = _mm_ftell(modreader);
 
 		if (!memcmp(id, "CMOD", 4)) {

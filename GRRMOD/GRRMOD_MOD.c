@@ -248,7 +248,7 @@ void GRRMOD_MOD_Update(u8 *buffer) {
 static BOOL GRRMOD_Eof(MREADER * reader) {
     MOD_READER *pReader = (MOD_READER *) reader;
 
-    return (pReader->Size == (pReader->Offset)) ? true : false;
+    return (pReader->Offset >= pReader->Size) ? true : false;
 }
 
 /**
@@ -268,9 +268,8 @@ static BOOL GRRMOD_Read(MREADER * reader, void *ptr, size_t size) {
  */
 static int GRRMOD_Get(MREADER * reader) {
     MOD_READER *pReader = (MOD_READER *) reader;
-    char buf;
 
-    buf = *(pReader->BufferPtr + pReader->Offset);
+    char buf = *(pReader->BufferPtr + pReader->Offset);
     pReader->Offset++;
 
     return((int)buf);
