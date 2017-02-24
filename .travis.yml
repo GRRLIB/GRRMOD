@@ -10,7 +10,7 @@ env:
     - DEVKITPPC=${DEVKITPRO}/devkitPPC
 
 before_install:
-  - mkdir "${DEVKITPRO}" && mkdir "${DEVKITPRO}/libogc"
+  - mkdir -p "${DEVKITPRO}/libogc"
   - wget http://download.sourceforge.net/devkitpro/devkitPPC_r29-1-x86_64-linux.tar.bz2 -O devkitPPC-linux.tar.bz2
   - wget http://download.sourceforge.net/devkitpro/libogc-1.8.16.tar.bz2 -O libogc.tar.bz2
   - wget http://download.sourceforge.net/devkitpro/libfat-ogc-1.1.0.tar.bz2 -O libfat-ogc.tar.bz2
@@ -24,4 +24,4 @@ install:
   - (cd GRRLIB-4.3.2/GRRLIB && make DEVKITPRO=${DEVKITPRO} DEVKITPPC=${DEVKITPPC} all install)
 
 script:
-  - cd GRRMOD && make && cd ..
+  - (cd GRRMOD && make)
