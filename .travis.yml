@@ -21,7 +21,7 @@ install:
   - tar -xjf libogc.tar.bz2 -C ${DEVKITPRO}/libogc
   - tar -xjf libfat-ogc.tar.bz2 -C ${DEVKITPRO}/libogc
   - tar -xzvf GRRLIB.tar.gz
-  - (cd GRRLIB-4.3.2/GRRLIB && make DEVKITPRO=${DEVKITPRO} DEVKITPPC=${DEVKITPPC} all install)
+  - (cd GRRLIB-4.3.2/GRRLIB && make all install)
 
 script:
   - (cd GRRMOD && make && make install)
