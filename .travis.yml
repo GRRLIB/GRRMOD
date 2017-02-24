@@ -25,3 +25,4 @@ install:
 
 script:
   - (cd GRRMOD && make && make install)
+  - (cd demo && make)

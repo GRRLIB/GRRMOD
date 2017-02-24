@@ -17,16 +17,15 @@ include $(DEVKITPPC)/wii_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source ../GRRMOD ../GRRMOD/mikmod/drivers ../GRRMOD/mikmod/loaders \
-				../GRRMOD/mikmod/mmio ../GRRMOD/mikmod/playercode ../GRRMOD/mpg123
+SOURCES		:=	source
 DATA		:=	data
-INCLUDES	:=  ../GRRMOD ../GRRMOD/mikmod/include ../GRRMOD/mpg123
+INCLUDES	:=	
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS	= -g -O2 -Wall $(MACHDEP) $(INCLUDE) -DHAVE_MALLOC_H -DOPT_GENERIC -DREAL_IS_FLOAT -DNOXFERMEM
+CFLAGS	= -g -O2 -Wall $(MACHDEP) $(INCLUDE)
 CXXFLAGS	=	$(CFLAGS)
 
 LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
@@ -37,7 +36,7 @@ LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 #---------------------------------------------------------------------------------
 LIBS	:= -lgrrlib -lfreetype -lpngu -lpng -ljpeg -lz -lfat
 LIBS	+= -lwiiuse
-#LIBS	+= -lmodplay
+LIBS	+= -lgrrmod
 LIBS	+= -laesnd
 LIBS	+= -lbte -logc -lm
 
