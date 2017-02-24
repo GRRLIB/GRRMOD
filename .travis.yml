@@ -24,5 +24,4 @@ install:
   - (cd GRRLIB-4.3.2/GRRLIB && make DEVKITPRO=${DEVKITPRO} DEVKITPPC=${DEVKITPPC} all install)
 
 script:
-  - (cd GRRMOD && make)
-  - (cd demo && make)
+  - (cd GRRMOD && make && make install)
