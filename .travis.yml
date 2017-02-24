@@ -10,6 +10,10 @@ env:
     - DEVKITPRO=$HOME/devkitPro
     - DEVKITPPC=${DEVKITPRO}/devkitPPC
 
+cache:
+  directories:
+    - GRRLIB-4.3.2/GRRLIB
+
 before_install:
   - mkdir -p "${DEVKITPRO}/libogc"
   - wget http://download.sourceforge.net/devkitpro/devkitPPC_r29-1-x86_64-linux.tar.bz2 -O devkitPPC-linux.tar.bz2
