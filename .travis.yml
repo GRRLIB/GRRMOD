@@ -1,4 +1,5 @@
 language: c
+sudo: false
 
 os:
   - linux
@@ -20,7 +21,7 @@ install:
   - tar -xjf libogc.tar.bz2 -C ${DEVKITPRO}/libogc
   - tar -xjf libfat-ogc.tar.bz2 -C ${DEVKITPRO}/libogc
   - tar -xzvf GRRLIB.tar.gz
-  - cd GRRLIB-4.3.2/GRRLIB && sudo -E make all install && cd ../..
+  - cd GRRLIB-4.3.2/GRRLIB && make DEVKITPRO=$HOME/devkitPro DEVKITPPC=$HOME/devkitPro/devkitPPC all install && cd ../..
 
 script:
   - cd GRRMOD && make && cd ..
