@@ -112,6 +112,8 @@ void GRRMOD_MOD_End() {
 
 /**
  * Load a MOD file from memory.
+ * @param mem Memory to set.
+ * @param size Size of the memory to set.
  */
 void GRRMOD_MOD_SetMOD(const void *mem, u64 size) {
     MOD_READER Reader;

@@ -90,6 +90,8 @@ void GRRMOD_MP3_End() {
 
 /**
  * Load a MP3 file from memory.
+ * @param mem Memory to set.
+ * @param size Size of the memory to set.
  */
 void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
     int result, i;
@@ -164,7 +166,7 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
  * Unload a MP3 file.
  */
 void GRRMOD_MP3_Unload() {
-    if(mh) {
+    if(mh != NULL) {
         mpg123_delete(mh);
         mh = NULL;
     }

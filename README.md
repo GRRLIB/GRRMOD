@@ -23,8 +23,8 @@ It supports the following format:
 
 To install GRRMOD in a single command:
 ```bash
-  cd GRRMOD
-  make clean && make && make install
+cd GRRMOD
+make clean && make && make install
 ```
 
 This process may take some time depending on the speed of your PC.
@@ -33,13 +33,13 @@ This process may take some time depending on the speed of your PC.
 
 After everything is installed, simply put
 ```c
-    #include <grrmod.h>
+#include <grrmod.h>
 ```
 at the top of your .c/.cpp file and use the functions as required
 
 You will also need to add
 ```make
-  -lgrrmod -laesnd
+-lgrrmod -laesnd
 ```
 to the libs line in your makefile
 
@@ -47,3 +47,7 @@ to the libs line in your makefile
 other libraries in the middle of the list, you may need to add others to the
 start, or even the end - but do _not_ change the order of the libraries shown
 here.
+
+## Licence
+
+See the [LICENCE](LICENCE.md) file for licence rights and limitations (MIT).

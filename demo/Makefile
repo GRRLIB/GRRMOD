@@ -35,9 +35,8 @@ LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 # the order can-be/is critical
 #---------------------------------------------------------------------------------
 LIBS	:= -lgrrlib -lfreetype -lpngu -lpng -ljpeg -lz -lfat
-LIBS	+= -lwiiuse
 LIBS	+= -lgrrmod -laesnd
-LIBS	+= -lbte -logc -lm
+LIBS	+= -lwiiuse -lbte -logc -lm
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
