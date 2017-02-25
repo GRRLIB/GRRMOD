@@ -31,7 +31,7 @@ static int GRRMOD_Seek(MREADER * reader, long offset, int whence);
 static long GRRMOD_Tell(MREADER * reader);
 
 // This is normally in the mikmod.h file of the MikMod project
-MIKMODAPI extern struct MDRIVER drv_wii;     /* Wii driver */
+MIKMODAPI extern struct MDRIVER drv_wii; /* Wii driver. */
 
 /**
  * Structure to hold the music information.
@@ -90,13 +90,13 @@ s8 GRRMOD_MOD_Init(bool stereo) {
               DMODE_SOFT_MUSIC |
               DMODE_SOFT_SNDFX;
 
-    if(stereo) {
+    if(stereo == true) {
         md_mode |= DMODE_STEREO; //this causes some modules (s3m mostly) to play back incorrectly on Wii
     }
 
     char CommandLine[15] = {};
     sprintf(CommandLine, "buffer=%d", SNDBUFFERSIZE);
-    if(MikMod_Init(CommandLine)) {
+    if(MikMod_Init(CommandLine) != 0) {
         return -1;
     }
     return 0;
@@ -127,11 +127,11 @@ void GRRMOD_MOD_SetMOD(const void *mem, u64 size) {
     Reader.Core.Seek = &GRRMOD_Seek;
     Reader.Core.Tell = &GRRMOD_Tell;
 
-    if(module) {
+    if(module != NULL) {
         GRRMOD_MOD_Unload();
     }
     module = Player_LoadGeneric((MREADER *)&Reader, 128, 0);
-    if(module) {
+    if(module != NULL) {
         module->wrap = true; // The module will restart when it's finished
         MusicData.SongTitle = strdup(module->songname);
         MusicData.ModType = strdup(module->modtype);
@@ -142,7 +142,7 @@ void GRRMOD_MOD_SetMOD(const void *mem, u64 size) {
  * Unload a MOD file.
  */
 void GRRMOD_MOD_Unload() {
-    if(module) {
+    if(module != NULL) {
         Player_Free(module);
         module = NULL;
     }
@@ -238,7 +238,7 @@ u32 GRRMOD_MOD_GetRealVoiceVolume(u8 voice) {
  * @param buffer The buffer to update.
  */
 void GRRMOD_MOD_Update(u8 *buffer) {
-    if(module) {
+    if(module != NULL) {
         setBuffer((s16 *)buffer, SNDBUFFERSIZE);
         MikMod_Update();
     }

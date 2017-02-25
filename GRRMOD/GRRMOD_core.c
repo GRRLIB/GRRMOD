@@ -26,9 +26,9 @@ THE SOFTWARE.
 #include <aesndlib.h>
 #include <ogc/lwp_watchdog.h>
 
-#define STACKSIZE       8192
+#define STACKSIZE       8192 /* Stack size. */
 
-static bool thr_running = false;
+static bool thr_running = false; /* Status of the thread. If set to true, the thread is running. */
 static bool sndPlaying = false;
 static bool paused = false;
 
