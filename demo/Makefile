@@ -36,8 +36,7 @@ LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 #---------------------------------------------------------------------------------
 LIBS	:= -lgrrlib -lfreetype -lpngu -lpng -ljpeg -lz -lfat
 LIBS	+= -lwiiuse
-LIBS	+= -lgrrmod
-LIBS	+= -laesnd
+LIBS	+= -lgrrmod -laesnd
 LIBS	+= -lbte -logc -lm
 
 #---------------------------------------------------------------------------------

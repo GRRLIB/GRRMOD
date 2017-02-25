@@ -3,7 +3,7 @@
         - Test Code -
 ============================================*/
 #include <grrlib.h>
-#include "grrmod.h"
+#include <grrmod.h>
 
 #include <stdlib.h>
 #include <wiiuse/wpad.h>
