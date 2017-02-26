@@ -147,17 +147,19 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
     samples = mpg123_length(mh);
 
     char Temp[1024];
-/*
+
     mpg123_id3v1 *v1;
     mpg123_id3v2 *v2;
-    //mpg123_scan(mh);
-    if(mpg123_meta_check(mh) & MPG123_ID3 && mpg123_id3(mh, &v1, &v2) == MPG123_OK) {
-        //memcpy(Temp, v1->title, sizeof(v1->title));
-        //Temp[sizeof(v1->title)] = 0;
-        //sprintf(Temp, "ID3: %s", v1->title);
-        MusicData.SongTitle = strdup(v1->title);
+    mpg123_scan(mh);
+    if(mpg123_seek(mh, 0, SEEK_SET) >= 0 && mpg123_meta_check(mh) & MPG123_ID3 && mpg123_id3(mh, &v1, &v2) == MPG123_OK) {
+        if(v2 != NULL && v2->title != NULL && v2->title->fill > 0) {
+            MusicData.SongTitle = strdup(v2->title->p);
+        }
+        else if(v1 != NULL) {
+            MusicData.SongTitle = strdup(v1->title);
+        }
     }
-*/
+
     sprintf(Temp, "MP3: %li Hz, %i channels, encoding value %i\n", frequency, channels, encoding);
     MusicData.ModType = strdup(Temp);
 }
@@ -308,7 +310,7 @@ void GRRMOD_MP3_Update(u8 *outbuf) {
         need -= have_now;
         have_read += have_now;
 
-        // if we finished, then exit with success
+        // If we finished, then exit with success
         if(need == 0) {
             // More data next time
             return;
