@@ -109,7 +109,6 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
 
     // Get new mpg123 handle
     mh = mpg123_new(NULL, &result);
-
     if(mh == NULL) {
         return;
     }
@@ -127,7 +126,6 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
     }
 
     result = mpg123_decode(mh, (u8 *)BufferPtr, Size, NULL, 0, &fakegot);
-
     if(result != MPG123_NEW_FORMAT) {
         // Failed to get data
         mpg123_close(mh);
@@ -146,8 +144,7 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
     // Grab length
     samples = mpg123_length(mh);
 
-    char Temp[1024];
-
+    // Set title
     mpg123_id3v1 *v1;
     mpg123_id3v2 *v2;
     mpg123_scan(mh);
@@ -160,7 +157,15 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
         }
     }
 
-    sprintf(Temp, "MP3: %li Hz, %i channels, encoding value %i\n", frequency, channels, encoding);
+    // Set music type
+    char Temp[1024];
+    struct mpg123_frameinfo fi;
+    if(mpg123_info(mh, &fi) == MPG123_OK) {
+        sprintf(Temp, "MP%d: %li Hz, %i channels, encoding value %i", fi.layer, frequency, channels, encoding);
+    }
+    else {
+        sprintf(Temp, "MPEG: %li Hz, %i channels, encoding value %i", frequency, channels, encoding);
+    }
     MusicData.ModType = strdup(Temp);
 }
 
