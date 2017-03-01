@@ -51,6 +51,9 @@ typedef struct _GRRMOD_DATA {
 static GRRMOD_DATA MusicData = {};
 static MODULE *module = NULL;   /**< Module structure. */
 
+static u8 *pBuffer; /**< Pointer to the sound buffer. */
+static u8 **ppBuffer = &pBuffer; /**< Pointer to the sound buffer pointer. */
+
 /**
  * Register MOD function list.
  * @param RegFunc The function list to register.
@@ -94,8 +97,8 @@ s8 GRRMOD_MOD_Init(bool stereo) {
         md_mode |= DMODE_STEREO; //this causes some modules (s3m mostly) to play back incorrectly on Wii
     }
 
-    char CommandLine[15] = {};
-    sprintf(CommandLine, "buffer=%d", SNDBUFFERSIZE);
+    char CommandLine[35] = {};
+    sprintf(CommandLine, "buffer=%d,size=%d", ppBuffer, SNDBUFFERSIZE);
     if(MikMod_Init(CommandLine) != 0) {
         return -1;
     }
@@ -239,7 +242,7 @@ u32 GRRMOD_MOD_GetRealVoiceVolume(u8 voice) {
  */
 void GRRMOD_MOD_Update(u8 *buffer) {
     if(module != NULL) {
-        setBuffer((s16 *)buffer, SNDBUFFERSIZE);
+        pBuffer = buffer; // Point to the new sound buffer
         MikMod_Update();
     }
 }

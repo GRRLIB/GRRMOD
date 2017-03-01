@@ -36,40 +36,47 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-
-#include <string.h>
 #include <gctypes.h>
 #include "mikmod_internals.h"
 
-static int sLen=0;
-static SBYTE *audiobuffer=NULL;
+static int buffersize=0;
+static int *audiobuffer=NULL;
 
 static BOOL WII_IsThere(void)
 {
-	return 1;
+	return TRUE;
+}
+
+static int WII_Init(void)
+{
+	if(audiobuffer==NULL)
+	{
+		return 1;
+	}
+	return VC_Init();
 }
 
 static void WII_CommandLine(const CHAR *cmdline)
 {
-	CHAR *ptr=MD_GetAtom("buffer",cmdline,0);
-
+	CHAR *ptr=MD_GetAtom("buffer",cmdline,FALSE);
 	if (ptr) {
-		sLen = atoi(ptr);
+		audiobuffer = (void *)atoi(ptr);
+		free(ptr);
+	}
+	ptr=MD_GetAtom("size",cmdline,FALSE);
+	if (ptr) {
+		buffersize = atoi(ptr);
 		free(ptr);
 	}
 }
 
 static void	WII_Update(void)
 {
-	VC_WriteBytes(audiobuffer,sLen);
-}
-
-void setBuffer(int16_t *buffer, int renderSamples)
-{
-	audiobuffer = (SBYTE *)buffer;
+	SBYTE* buffer = (SBYTE*)(*audiobuffer);
+	if(buffer!=NULL)
+	{
+		VC_WriteBytes(buffer,buffersize);
+	}
 }
 
 MIKMODAPI MDRIVER drv_wii={
@@ -78,14 +85,15 @@ MIKMODAPI MDRIVER drv_wii={
 	"Wii Driver v1.0",
 	0,255,
 	"wii",
-	"buffer:r:5760:Audio buffer size\n",
+	"buffer:r:0:Audio buffer pointer\n"
+		"size:r:5760:Audio buffer size\n",
 	WII_CommandLine,
 	WII_IsThere,
 	VC_SampleLoad,
 	VC_SampleUnload,
 	VC_SampleSpace,
 	VC_SampleLength,
-	VC_Init,
+	WII_Init,
 	VC_Exit,
 	NULL,
 	VC_SetNumVoices,
