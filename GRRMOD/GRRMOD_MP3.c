@@ -177,6 +177,14 @@ void GRRMOD_MP3_Unload() {
         mpg123_delete(mh);
         mh = NULL;
     }
+    if(MusicData.ModType != NULL) {
+        free(MusicData.ModType);
+        MusicData.ModType = NULL;
+    }
+    if(MusicData.SongTitle != NULL) {
+        free(MusicData.SongTitle);
+        MusicData.SongTitle = NULL;
+    }
 }
 
 /**

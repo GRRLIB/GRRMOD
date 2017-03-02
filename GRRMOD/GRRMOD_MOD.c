@@ -149,11 +149,11 @@ void GRRMOD_MOD_Unload() {
         Player_Free(module);
         module = NULL;
     }
-    if(MusicData.ModType) {
+    if(MusicData.ModType != NULL) {
         free(MusicData.ModType);
         MusicData.ModType = NULL;
     }
-    if(MusicData.SongTitle) {
+    if(MusicData.SongTitle != NULL) {
         free(MusicData.SongTitle);
         MusicData.SongTitle = NULL;
     }
