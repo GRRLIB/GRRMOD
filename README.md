@@ -6,6 +6,7 @@ GRRMOD is a MOD player library for Wii application developers.
 
 It supports the following format:
  * 669 (Composer 669)
+ * DSM (DSIK internal format)
  * FAR (Farandole Composer)
  * GDM (General DigiMusic)
  * IMF (Imago Orpheus)

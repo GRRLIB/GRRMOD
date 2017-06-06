@@ -14,6 +14,7 @@
 // Mod file
 #include "music_mp3.h"
 #include "music_669.h"
+#include "music_dsm.h"
 #include "music_far.h"
 #include "music_gdm.h"
 #include "music_imf.h"
@@ -58,6 +59,7 @@ int main(int argc, char **argv) {
     s8 SongNum = 0;
     PLAYLIST PlayList[] = { {(u8 *)music_mp3, music_mp3_size},
                             {(u8 *)music_669, music_669_size},
+                            {(u8 *)music_dsm, music_dsm_size},
                             {(u8 *)music_far, music_far_size},
                             {(u8 *)music_gdm, music_gdm_size},
                             {(u8 *)music_imf, music_imf_size},
