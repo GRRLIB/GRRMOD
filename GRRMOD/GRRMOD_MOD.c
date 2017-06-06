@@ -282,18 +282,30 @@ static int GRRMOD_Get(MREADER * reader) {
 
 /**
  * This function has the same behaviour as fseek, with offset 0 meaning the start of the object (module, sample) being loaded.
+ * @param offset Number of bytes to offset from whence.
+ * @param whence Position used as reference for the offset.
+ * @return If successful, the function returns zero. Otherwise, it returns non-zero value.
  */
 static int GRRMOD_Seek(MREADER * reader, long offset, int whence) {
+    int ret = 0;
     MOD_READER *pReader = (MOD_READER *) reader;
 
-    if(whence == SEEK_SET) {
-        pReader->Offset = offset;
-    }
-    else {
-        pReader->Offset += offset;
+    switch(whence) {
+        case SEEK_SET:
+            pReader->Offset = offset;
+            break;
+        case SEEK_CUR:
+            pReader->Offset += offset;
+            break;
+        case SEEK_END:
+            pReader->Offset += pReader->Size + offset;
+            break;
+        default:
+            ret = 1;
+            break;
     }
 
-    return 1;
+    return ret;
 }
 
 /**
