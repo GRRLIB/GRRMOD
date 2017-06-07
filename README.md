@@ -7,6 +7,7 @@ GRRMOD is a MOD player library for Wii application developers.
 It supports the following format:
  * 669 (Composer 669)
  * AMF (DSMI Advanced Module Format)
+ * AMF (ASYLUM Music Format V1.0)
  * DSM (DSIK internal format)
  * FAR (Farandole Composer)
  * GDM (General DigiMusic)
@@ -18,6 +19,7 @@ It supports the following format:
  * OKT (Amiga Oktalyzer)
  * S3M (Scream Tracker 3)
  * STM (Scream Tracker)
+ * STX (Scream Tracker Music Interface Kit)
  * ULT (UltraTracker)
  * XM (FastTracker 2)
 

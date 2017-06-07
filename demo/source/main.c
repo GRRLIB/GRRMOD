@@ -15,6 +15,7 @@
 #include "music_mp3.h"
 #include "music_669.h"
 #include "music_amf.h"
+#include "music_asy.h"
 #include "music_dsm.h"
 #include "music_far.h"
 #include "music_gdm.h"
@@ -26,6 +27,7 @@
 #include "music_okta.h"
 #include "music_s3m.h"
 #include "music_stm.h"
+#include "music_stx.h"
 #include "music_ult.h"
 #include "music_xm.h"
 
@@ -61,6 +63,7 @@ int main(int argc, char **argv) {
     PLAYLIST PlayList[] = { {(u8 *)music_mp3, music_mp3_size},
                             {(u8 *)music_669, music_669_size},
                             {(u8 *)music_amf, music_amf_size},
+                            {(u8 *)music_asy, music_asy_size},
                             {(u8 *)music_dsm, music_dsm_size},
                             {(u8 *)music_far, music_far_size},
                             {(u8 *)music_gdm, music_gdm_size},
@@ -72,6 +75,7 @@ int main(int argc, char **argv) {
                             {(u8 *)music_okta, music_okta_size},
                             {(u8 *)music_s3m, music_s3m_size},
                             {(u8 *)music_stm, music_stm_size},
+                            {(u8 *)music_stx, music_stx_size},
                             {(u8 *)music_ult, music_ult_size},
                             {(u8 *)music_xm, music_xm_size} };
     const u8 LastIndex = sizeof(PlayList) / sizeof(*PlayList) - 1;
