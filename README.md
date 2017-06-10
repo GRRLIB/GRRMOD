@@ -8,6 +8,7 @@ It supports the following format:
  * 669 (Composer 669)
  * AMF (DSMI Advanced Module Format)
  * AMF (ASYLUM Music Format V1.0)
+ * APUN (APlayer)
  * DSM (DSIK internal format)
  * FAR (Farandole Composer)
  * GDM (General DigiMusic)
@@ -21,6 +22,7 @@ It supports the following format:
  * STM (Scream Tracker)
  * STX (Scream Tracker Music Interface Kit)
  * ULT (UltraTracker)
+ * UNI (MikMod)
  * XM (FastTracker 2)
 
 ## Installing GRRMOD

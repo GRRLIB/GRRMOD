@@ -29,6 +29,7 @@
 #include "music_stm.h"
 #include "music_stx.h"
 #include "music_ult.h"
+#include "music_uni.h"
 #include "music_xm.h"
 
 #define MAX_WIDTH 6.0f
@@ -77,6 +78,7 @@ int main(int argc, char **argv) {
                             {(u8 *)music_stm, music_stm_size},
                             {(u8 *)music_stx, music_stx_size},
                             {(u8 *)music_ult, music_ult_size},
+                            {(u8 *)music_uni, music_uni_size},
                             {(u8 *)music_xm, music_xm_size} };
     const u8 LastIndex = sizeof(PlayList) / sizeof(*PlayList) - 1;
 
