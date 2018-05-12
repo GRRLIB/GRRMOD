@@ -6,7 +6,7 @@ os:
 
 env:
   global:
-    - DEVKITPRO=$HOME/devkitPro
+    - DEVKITPRO=/opt/devkitpro
     - DEVKITPPC=${DEVKITPRO}/devkitPPC
     - GRRLIBVERS=4.3.2
 

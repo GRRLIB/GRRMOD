@@ -4,7 +4,7 @@
 
 GRRMOD is a MOD player library for Wii application developers.
 
-It supports the following format:
+It supports the following formats:
  * 669 (Composer 669)
  * AMF (DSMI Advanced Module Format)
  * AMF (ASYLUM Music Format V1.0)
