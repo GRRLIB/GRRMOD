@@ -1,5 +1,5 @@
 language: c
-sudo: false
+sudo: required
 
 os:
   - linux
@@ -12,22 +12,19 @@ env:
 
 cache:
   directories:
+    - ${DEVKITPRO}
     - GRRLIB-${GRRLIBVERS}/GRRLIB
 
 before_install:
-  - mkdir -p "${DEVKITPRO}/libogc"
-  - wget http://download.sourceforge.net/devkitpro/devkitPPC_r29-1-x86_64-linux.tar.bz2 -O devkitPPC-linux.tar.bz2
-  - wget http://download.sourceforge.net/devkitpro/libogc-1.8.17.tar.bz2 -O libogc.tar.bz2
-  - wget http://download.sourceforge.net/devkitpro/libfat-ogc-1.1.2.tar.bz2 -O libfat-ogc.tar.bz2
+  - wget https://github.com/devkitPro/pacman/releases/download/devkitpro-pacman-1.0.1/devkitpro-pacman.deb
   - wget https://github.com/GRRLIB/GRRLIB/archive/${GRRLIBVERS}.tar.gz -O GRRLIB.tar.gz
 
 install:
-  - tar -xjf devkitPPC-linux.tar.bz2 -C ${DEVKITPRO}/
-  - tar -xjf libogc.tar.bz2 -C ${DEVKITPRO}/libogc
-  - tar -xjf libfat-ogc.tar.bz2 -C ${DEVKITPRO}/libogc
+  - sudo dpkg --install devkitpro-pacman.deb
+  - sudo dkp-pacman --sync --sysupgrade --refresh --needed --noconfirm devkitPPC libogc libfat-ogc general-tools gamecube-tools
   - tar -xzvf GRRLIB.tar.gz
-  - (cd GRRLIB-${GRRLIBVERS}/GRRLIB && make all install)
+  - (cd GRRLIB-${GRRLIBVERS}/GRRLIB && sudo -E make all install)
 
 script:
-  - (cd GRRMOD && make && make install)
+  - (cd GRRMOD && make && sudo -E make install)
   - (cd demo && make)
