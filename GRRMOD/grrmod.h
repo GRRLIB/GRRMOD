@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-Copyright (c) 2010-2017 The GRRLIB Team
+Copyright (c) 2010-2018 The GRRLIB Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -84,6 +84,10 @@ u32 GRRMOD_MixingTime();
  * GRRMOD is a MOD player library for Wii application developers.
  * It supports the following format:
  * - 669 (Composer 669)
+ * - AMF (DSMI Advanced Module Format)
+ * - AMF (ASYLUM Music Format V1.0)
+ * - APUN (APlayer)
+ * - DSM (DSIK internal format)
  * - FAR (Farandole Composer)
  * - GDM (General DigiMusic)
  * - IMF (Imago Orpheus)
@@ -94,7 +98,9 @@ u32 GRRMOD_MixingTime();
  * - OKT (Amiga Oktalyzer)
  * - S3M (Scream Tracker 3)
  * - STM (Scream Tracker)
+ * - STX (Scream Tracker Music Interface Kit)
  * - ULT (UltraTracker)
+ * - UNI (MikMod)
  * - XM (FastTracker 2)
  *
  * @section Links
