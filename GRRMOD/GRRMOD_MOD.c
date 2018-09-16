@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-Copyright (c) 2010-2017 The GRRLIB Team
+Copyright (c) 2010-2018 The GRRLIB Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -58,7 +58,7 @@ static u8 **ppBuffer = &pBuffer; /**< Pointer to the sound buffer pointer. */
  * Register MOD function list.
  * @param RegFunc The function list to register.
  */
-void GRRMOD_MOD_Register(GRRLIB_FuntionsList *RegFunc) {
+void GRRMOD_MOD_Register(GRRMOD_FuntionsList *RegFunc) {
     RegFunc->Init = GRRMOD_MOD_Init;
     RegFunc->End = GRRMOD_MOD_End;
     RegFunc->SetMOD = GRRMOD_MOD_SetMOD;

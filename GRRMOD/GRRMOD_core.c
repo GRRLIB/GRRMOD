@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-Copyright (c) 2010-2017 The GRRLIB Team
+Copyright (c) 2010-2018 The GRRLIB Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ static AESNDPB  *modvoice = NULL;
 static u64 mixtime = 0;
 #endif
 
-static GRRLIB_FuntionsList RegFunc;
+static GRRMOD_FuntionsList RegFunc;
 
 // Static Functions
 static void* player(void *arg);

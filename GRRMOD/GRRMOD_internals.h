@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-Copyright (c) 2010-2017 The GRRLIB Team
+Copyright (c) 2010-2018 The GRRLIB Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ THE SOFTWARE.
 /**
  * Structure to hold the list of functions to use.
  */
-typedef struct GRRLIB_FuntionsList {
+typedef struct GRRMOD_FuntionsList {
     s8 (*Init)(bool stereo);
     void (*End)(void);
     void (*SetMOD)(const void *mem, u64 size);
@@ -61,10 +61,10 @@ typedef struct GRRLIB_FuntionsList {
     char *(*GetSongTitle)(void);
     char *(*GetModType)(void);
     void (*Update)(u8 *buffer);
-} GRRLIB_FuntionsList;
+} GRRMOD_FuntionsList;
 
 // Module functions
-void GRRMOD_MOD_Register(GRRLIB_FuntionsList *RegFunc);
+void GRRMOD_MOD_Register(GRRMOD_FuntionsList *RegFunc);
 s8 GRRMOD_MOD_Init(bool stereo);
 void GRRMOD_MOD_End();
 void GRRMOD_MOD_SetMOD(const void *mem, u64 size);
@@ -81,7 +81,7 @@ char *GRRMOD_MOD_GetModType();
 void GRRMOD_MOD_Update(u8 *buffer);
 
 // MP3 functions
-void GRRMOD_MP3_Register(GRRLIB_FuntionsList *RegFunc);
+void GRRMOD_MP3_Register(GRRMOD_FuntionsList *RegFunc);
 s8 GRRMOD_MP3_Init(bool stereo);
 void GRRMOD_MP3_End();
 void GRRMOD_MP3_SetMOD(const void *mem, u64 size);
