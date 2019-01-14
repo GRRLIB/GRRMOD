@@ -272,6 +272,10 @@ static BOOL STM_Load(BOOL curious)
 	mh->numpat      =_mm_read_UBYTE(modreader);
 	mh->globalvol   =_mm_read_UBYTE(modreader);
 	_mm_read_UBYTES(mh->reserved,13,modreader);
+	if(mh->numpat > 128) {
+		_mm_errno = MMERR_NOT_A_MODULE;
+		return 0;
+	}
 
 	for(t=0;t<31;t++) {
 		STMSAMPLE *s=&mh->sample[t];	/* STM sample data */
@@ -314,7 +318,10 @@ static BOOL STM_Load(BOOL curious)
 	/* 99 terminates the patorder list */
 	while((mh->patorder[t]<=99)&&(mh->patorder[t]<mh->numpat)) {
 		of.positions[t]=mh->patorder[t];
-		t++;
+		if(++t == 0x80) {
+			_mm_errno = MMERR_NOT_A_MODULE;
+			return 0;
+		}
 	}
 	if(mh->patorder[t]<=99) t++;
 	of.numpos=t;
