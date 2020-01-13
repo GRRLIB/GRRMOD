@@ -1,4 +1,5 @@
 language: c
+dist: bionic
 sudo: required
 
 os:
@@ -8,7 +9,7 @@ env:
   global:
     - DEVKITPRO=/opt/devkitpro
     - DEVKITPPC=${DEVKITPRO}/devkitPPC
-    - GRRLIBVERS=4.3.2
+    - GRRLIBVERS=4.4.0
 
 cache:
   directories:
@@ -17,11 +18,11 @@ cache:
 
 before_install:
   - wget https://github.com/devkitPro/pacman/releases/download/devkitpro-pacman-1.0.1/devkitpro-pacman.deb
-  - wget https://github.com/GRRLIB/GRRLIB/archive/${GRRLIBVERS}.tar.gz -O GRRLIB.tar.gz
+  - wget https://github.com/GRRLIB/GRRLIB/archive/v${GRRLIBVERS}.tar.gz -O GRRLIB.tar.gz
 
 install:
   - sudo dpkg --install devkitpro-pacman.deb
-  - sudo dkp-pacman --sync --sysupgrade --refresh --needed --noconfirm wii-dev
+  - sudo dkp-pacman --sync --sysupgrade --refresh --needed --noconfirm wii-dev libfat-ogc ppc-libpng ppc-freetype ppc-libjpeg-turbo
   - tar -xzvf GRRLIB.tar.gz
   - (cd GRRLIB-${GRRLIBVERS}/GRRLIB && sudo -E make all install)
 

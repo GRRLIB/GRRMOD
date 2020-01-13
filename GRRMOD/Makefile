@@ -15,6 +15,9 @@ include $(DEVKITPPC)/base_rules
 LIBOGC_INC	:=	$(DEVKITPRO)/libogc/include
 LIBOGC_LIB	:=	$(DEVKITPRO)/libogc/lib/wii
 
+INSTALL_INC	:=	$(DEVKITPRO)/portlibs/ppc/include
+INSTALL_LIB	:=	$(DEVKITPRO)/portlibs/ppc/lib
+
 #---------------------------------------------------------------------------------
 # options for building the library, set to yes to include, anything else to exclude
 #---------------------------------------------------------------------------------
@@ -128,9 +131,9 @@ clean:
 
 #---------------------------------------------------------------------------------
 install :
-	mkdir -p  $(LIBOGC_LIB)  $(LIBOGC_INC)
-	cp -f $(TARGET).a $(LIBOGC_LIB)/
-	cp -f $(HDR) $(LIBOGC_INC)/
+	mkdir -p  $(INSTALL_LIB)  $(INSTALL_INC)
+	cp -f $(TARGET).a $(INSTALL_LIB)/
+	cp -f $(HDR) $(INSTALL_INC)/
 
 
 #---------------------------------------------------------------------------------

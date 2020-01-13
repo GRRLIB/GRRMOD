@@ -34,7 +34,7 @@ LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 # any extra libraries we wish to link with the project
 # the order can-be/is critical
 #---------------------------------------------------------------------------------
-LIBS	:= -lgrrlib -lfreetype -lpngu -lpng -ljpeg -lz -lfat
+LIBS	:= -lgrrlib -lfreetype -lbz2 -lpngu -lpng -ljpeg -lz -lfat
 LIBS	+= -lgrrmod -laesnd
 LIBS	+= -lwiiuse -lbte -logc -lm
 
@@ -42,7 +42,7 @@ LIBS	+= -lwiiuse -lbte -logc -lm
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:=
+LIBDIRS	:= $(PORTLIBS)
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -91,8 +91,7 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES), -iquote $(CURDIR)/$(dir)) \
 #---------------------------------------------------------------------------------
 # build a list of library paths
 #---------------------------------------------------------------------------------
-export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib) \
-					-L$(LIBOGC_LIB)
+export LIBPATHS	:= -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
 .PHONY: $(BUILD) clean
