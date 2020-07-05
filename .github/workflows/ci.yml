@@ -7,31 +7,23 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    container:
+      image: devkitpro/devkitppc:latest
     env:
-      DEVKITPRO: /opt/devkitpro
-      DEVKITPPC: ${DEVKITPRO}/devkitPPC
       GRRLIBVERS: 4.4.0
 
     steps:
 
     - name: Checkout the Git repository
-      uses: actions/checkout@v1
-
-    - name: Download and install devkitPro
-      run: |
-        wget -nv https://github.com/devkitPro/pacman/releases/download/devkitpro-pacman-1.0.1/devkitpro-pacman.deb
-        sudo dpkg --install devkitpro-pacman.deb
-
-    - name: Install required packages
-      run: sudo dkp-pacman --sync --sysupgrade --refresh --needed --noconfirm wii-dev libfat-ogc ppc-libpng ppc-freetype ppc-libjpeg-turbo
+      uses: actions/checkout@v2
 
     - name: Download and install GRRLIB
       run: |
         wget https://github.com/GRRLIB/GRRLIB/archive/v${GRRLIBVERS}.tar.gz -O GRRLIB.tar.gz
         tar -xzvf GRRLIB.tar.gz
-        (cd GRRLIB-${GRRLIBVERS}/GRRLIB && sudo -E make all install)
+        (cd GRRLIB-${GRRLIBVERS}/GRRLIB && make all install)
 
     - name: Build library and demo
       run: |
-        (cd GRRMOD && make && sudo -E make install)
+        (cd GRRMOD && make && make install)
         (cd demo && make)
