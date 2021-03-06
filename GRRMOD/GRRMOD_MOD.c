@@ -38,9 +38,7 @@ MIKMODAPI extern struct MDRIVER drv_wii; /* Wii driver. */
  */
 typedef struct _MOD_READER {
     MREADER Core;       /**< Structure with a bunch of pointers to functions. */
-    u64     Offset;     /**< Current file position. */
-    char    *BufferPtr; /**< Pointer to the music data. */
-    u64     Size;       /**< Size of the music data. */
+    FILE *File;         /**< Memory stream pointer. */
 } MOD_READER;
 
 typedef struct _GRRMOD_DATA {
@@ -121,9 +119,7 @@ void GRRMOD_MOD_End() {
 void GRRMOD_MOD_SetMOD(const void *mem, u64 size) {
     MOD_READER Reader;
 
-    Reader.Offset = 0;
-    Reader.BufferPtr = (char *)mem;
-    Reader.Size = size;
+    Reader.File = fmemopen((void *)mem, size, "rb");
     Reader.Core.Eof = &GRRMOD_Eof;
     Reader.Core.Read = &GRRMOD_Read;
     Reader.Core.Get = &GRRMOD_Get;
@@ -252,8 +248,7 @@ void GRRMOD_MOD_Update(u8 *buffer) {
  */
 static BOOL GRRMOD_Eof(MREADER * reader) {
     MOD_READER *pReader = (MOD_READER *) reader;
-
-    return (pReader->Offset >= pReader->Size) ? true : false;
+    return feof(pReader->File);
 }
 
 /**
@@ -261,11 +256,7 @@ static BOOL GRRMOD_Eof(MREADER * reader) {
  */
 static BOOL GRRMOD_Read(MREADER * reader, void *ptr, size_t size) {
     MOD_READER *pReader = (MOD_READER *) reader;
-
-    memcpy(ptr, pReader->BufferPtr + pReader->Offset, size);
-    pReader->Offset += size;
-
-    return 1;
+    return fread(ptr, 1, size, pReader->File);
 }
 
 /**
@@ -273,11 +264,7 @@ static BOOL GRRMOD_Read(MREADER * reader, void *ptr, size_t size) {
  */
 static int GRRMOD_Get(MREADER * reader) {
     MOD_READER *pReader = (MOD_READER *) reader;
-
-    char buf = *(pReader->BufferPtr + pReader->Offset);
-    pReader->Offset++;
-
-    return((int)buf);
+    return fgetc(pReader->File);
 }
 
 /**
@@ -287,25 +274,8 @@ static int GRRMOD_Get(MREADER * reader) {
  * @return If successful, the function returns zero. Otherwise, it returns non-zero value.
  */
 static int GRRMOD_Seek(MREADER * reader, long offset, int whence) {
-    int ret = 0;
     MOD_READER *pReader = (MOD_READER *) reader;
-
-    switch(whence) {
-        case SEEK_SET:
-            pReader->Offset = offset;
-            break;
-        case SEEK_CUR:
-            pReader->Offset += offset;
-            break;
-        case SEEK_END:
-            pReader->Offset += pReader->Size + offset;
-            break;
-        default:
-            ret = 1;
-            break;
-    }
-
-    return ret;
+    return fseek(pReader->File, offset, whence);
 }
 
 /**
@@ -313,6 +283,5 @@ static int GRRMOD_Seek(MREADER * reader, long offset, int whence) {
  */
 static long GRRMOD_Tell(MREADER * reader) {
     MOD_READER *pReader = (MOD_READER *) reader;
-
-    return pReader->Offset;
+    return ftell(pReader->File);
 }
