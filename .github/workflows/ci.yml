@@ -19,9 +19,8 @@ jobs:
 
     - name: Download and install GRRLIB
       run: |
-        wget https://github.com/GRRLIB/GRRLIB/archive/v${GRRLIBVERS}.tar.gz -O GRRLIB.tar.gz
-        tar -xzvf GRRLIB.tar.gz
-        (cd GRRLIB-${GRRLIBVERS}/GRRLIB && make all install)
+        wget https://github.com/GRRLIB/GRRLIB/archive/v${GRRLIBVERS}.tar.gz -O - | tar -xzv --directory=/tmp/
+        (cd /tmp/GRRLIB-${GRRLIBVERS}/GRRLIB && make all install)
 
     - name: Build library and demo
       run: |

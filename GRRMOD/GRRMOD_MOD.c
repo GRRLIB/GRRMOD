@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-Copyright (c) 2010-2018 The GRRLIB Team
+Copyright (c) 2010-2021 The GRRLIB Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,24 +24,8 @@ THE SOFTWARE.
 #include "mikmod/include/mikmod.h"
 #include <string.h>
 
-static BOOL GRRMOD_Eof(MREADER * reader);
-static BOOL GRRMOD_Read(MREADER * reader, void *ptr, size_t size);
-static int GRRMOD_Get(MREADER * reader);
-static int GRRMOD_Seek(MREADER * reader, long offset, int whence);
-static long GRRMOD_Tell(MREADER * reader);
-
 // This is normally in the mikmod.h file of the MikMod project
 MIKMODAPI extern struct MDRIVER drv_wii; /* Wii driver. */
-
-/**
- * Structure to hold the music information.
- */
-typedef struct _MOD_READER {
-    MREADER Core;       /**< Structure with a bunch of pointers to functions. */
-    u64     Offset;     /**< Current file position. */
-    char    *BufferPtr; /**< Pointer to the music data. */
-    u64     Size;       /**< Size of the music data. */
-} MOD_READER;
 
 typedef struct _GRRMOD_DATA {
     char *ModType;    /**< A string representing the MOD type. */
@@ -119,21 +103,11 @@ void GRRMOD_MOD_End() {
  * @param size Size of the memory to set.
  */
 void GRRMOD_MOD_SetMOD(const void *mem, u64 size) {
-    MOD_READER Reader;
-
-    Reader.Offset = 0;
-    Reader.BufferPtr = (char *)mem;
-    Reader.Size = size;
-    Reader.Core.Eof = &GRRMOD_Eof;
-    Reader.Core.Read = &GRRMOD_Read;
-    Reader.Core.Get = &GRRMOD_Get;
-    Reader.Core.Seek = &GRRMOD_Seek;
-    Reader.Core.Tell = &GRRMOD_Tell;
-
     if(module != NULL) {
         GRRMOD_MOD_Unload();
     }
-    module = Player_LoadGeneric((MREADER *)&Reader, 128, 0);
+    FILE *File = fmemopen((void *)mem, size, "rb");
+    module = Player_LoadFP(File, 128, 0);
     if(module != NULL) {
         module->wrap = true; // The module will restart when it's finished
         MusicData.SongTitle = strdup(module->songname);
@@ -245,74 +219,4 @@ void GRRMOD_MOD_Update(u8 *buffer) {
         pBuffer = buffer; // Point to the new sound buffer
         MikMod_Update();
     }
-}
-
-/**
- * This function has the same behaviour as feof.
- */
-static BOOL GRRMOD_Eof(MREADER * reader) {
-    MOD_READER *pReader = (MOD_READER *) reader;
-
-    return (pReader->Offset >= pReader->Size) ? true : false;
-}
-
-/**
- * This function copies length bytes of data into dest, and return zero if an error occured, and any nonzero value otherwise. Note that an end-of-file condition will not be considered as an error in this case.
- */
-static BOOL GRRMOD_Read(MREADER * reader, void *ptr, size_t size) {
-    MOD_READER *pReader = (MOD_READER *) reader;
-
-    memcpy(ptr, pReader->BufferPtr + pReader->Offset, size);
-    pReader->Offset += size;
-
-    return 1;
-}
-
-/**
- * This function has the same behaviour as fgetc.
- */
-static int GRRMOD_Get(MREADER * reader) {
-    MOD_READER *pReader = (MOD_READER *) reader;
-
-    char buf = *(pReader->BufferPtr + pReader->Offset);
-    pReader->Offset++;
-
-    return((int)buf);
-}
-
-/**
- * This function has the same behaviour as fseek, with offset 0 meaning the start of the object (module, sample) being loaded.
- * @param offset Number of bytes to offset from whence.
- * @param whence Position used as reference for the offset.
- * @return If successful, the function returns zero. Otherwise, it returns non-zero value.
- */
-static int GRRMOD_Seek(MREADER * reader, long offset, int whence) {
-    int ret = 0;
-    MOD_READER *pReader = (MOD_READER *) reader;
-
-    switch(whence) {
-        case SEEK_SET:
-            pReader->Offset = offset;
-            break;
-        case SEEK_CUR:
-            pReader->Offset += offset;
-            break;
-        case SEEK_END:
-            pReader->Offset += pReader->Size + offset;
-            break;
-        default:
-            ret = 1;
-            break;
-    }
-
-    return ret;
-}
-
-/**
- * This function has the same behaviour as ftell, with offset 0 meaning the start of the object being loaded.
- */
-static long GRRMOD_Tell(MREADER * reader) {
-    MOD_READER *pReader = (MOD_READER *) reader;
-
-    return pReader->Offset;
 }
