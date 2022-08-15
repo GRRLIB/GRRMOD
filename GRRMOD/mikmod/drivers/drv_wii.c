@@ -37,6 +37,7 @@
 #endif
 
 #include <gctypes.h>
+#include <gcbool.h>
 #include "mikmod_internals.h"
 
 static int buffersize=0;
