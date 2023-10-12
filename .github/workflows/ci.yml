@@ -15,7 +15,7 @@ jobs:
     steps:
 
     - name: Checkout the Git repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Download and install GRRLIB
       run: |
