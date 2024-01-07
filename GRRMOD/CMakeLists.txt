@@ -8,9 +8,8 @@ include(GNUInstallDirs)
 
 find_package(PkgConfig REQUIRED)
 
-file(GLOB_RECURSE SRC_FILES
-  "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD_core.c"
-  if(GRRMOD_USE_MOD)
+if(GRRMOD_USE_MOD)
+  file(GLOB MOD_SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD_MOD.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/mikmod/drivers/*.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/mikmod/loaders/*.c"
@@ -18,12 +17,14 @@ file(GLOB_RECURSE SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/mikmod/playercode/*.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/mikmod/depackers/*.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/mikmod/posix/*.c"
-  endif()
-  if(GRRMOD_USE_MP3)
+  )
+endif()
+if(GRRMOD_USE_MP3)
+  file(GLOB MP3_SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD_MP3.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/mpg123/*.c"
-  endif()
-)
+  )
+endif()
 
 add_library(grrmod STATIC)
 
@@ -35,7 +36,9 @@ target_compile_options(grrmod
 
 target_sources(grrmod
   PRIVATE
-  ${SRC_FILES}
+  "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD_core.c"
+  "${MOD_SRC_FILES}"
+  "${MP3_SRC_FILES}"
 )
 
 target_compile_options(grrmod PRIVATE
