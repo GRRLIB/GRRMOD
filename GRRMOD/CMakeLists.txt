@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-project(grrmod)
+project(grrmod VERSION 0.0.1)
 
 option(GRRMOD_USE_MOD "Enable MOD support" ON)
 option(GRRMOD_USE_MP3 "Enable MP3 support" ON)
@@ -61,7 +61,7 @@ target_include_directories(grrmod PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}/mpg123"
 )
 
-target_link_libraries(grrmod
+target_link_libraries(grrmod PUBLIC
   aesnd
 )
 
