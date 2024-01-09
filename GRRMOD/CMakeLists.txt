@@ -58,8 +58,10 @@ if(GRRMOD_USE_MP3)
   )
 endif()
 
-target_include_directories(grrmod PUBLIC
+target_include_directories(grrmod
+  PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}"
+  PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/mikmod/include"
   "${CMAKE_CURRENT_SOURCE_DIR}/mpg123"
 )
