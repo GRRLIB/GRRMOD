@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-Copyright (c) 2010-2021 The GRRLIB Team
+Copyright (c) 2010-2024 The GRRLIB Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -82,7 +82,7 @@ s8 GRRMOD_MOD_Init(bool stereo) {
     }
 
     char CommandLine[35] = {};
-    sprintf(CommandLine, "buffer=%d,size=%d", ppBuffer, SNDBUFFERSIZE);
+    sprintf(CommandLine, "buffer=%d,size=%d", (int)ppBuffer, SNDBUFFERSIZE);
     if(MikMod_Init(CommandLine) != 0) {
         return -1;
     }
