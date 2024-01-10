@@ -201,7 +201,7 @@ static UBYTE* readtrack(void)
 					opcode++;
 			}
 
-			if((!opcode)||(opcode>=UNI_LAST)) {
+			if((!opcode)||(opcode>=UNI_FORMAT_LAST)) {
 				MikMod_free(t);
 				return NULL;
 			}
@@ -308,7 +308,7 @@ static BOOL loadinstr6(void)
 		i->rpanvar      = _mm_read_UBYTE(modreader);
 		i->volfade      = _mm_read_M_UWORD(modreader);
 
-#if defined __STDC__ || defined _MSC_VER || defined MPW_C
+#if defined __STDC__ || defined _MSC_VER || defined __WATCOMC__ || defined MPW_C
 #define UNI_LoadEnvelope6(name) 										\
 		i-> name##flg=_mm_read_UBYTE(modreader);						\
 		i-> name##pts=_mm_read_UBYTE(modreader);						\
@@ -373,7 +373,7 @@ static BOOL loadinstr5(void)
 		for(u=0;u<96;u++)
 			i->samplenumber[u]=of.numsmp+_mm_read_UBYTE(modreader);
 
-#if defined __STDC__ || defined _MSC_VER || defined MPW_C
+#if defined __STDC__ || defined _MSC_VER || defined __WATCOMC__ || defined MPW_C
 #define UNI_LoadEnvelope5(name) 									\
 		i-> name##flg=_mm_read_UBYTE(modreader);					\
 		i-> name##pts=_mm_read_UBYTE(modreader);					\
@@ -477,14 +477,23 @@ static BOOL loadsmp5(void)
 
 		/* convert flags */
 		q->flags=0;
-		if(s->flags&128) q->flags|=SF_REVERSE;
-		if(s->flags& 64) q->flags|=SF_SUSTAIN;
-		if(s->flags& 32) q->flags|=SF_BIDI;
-		if(s->flags& 16) q->flags|=SF_LOOP;
-		if(s->flags&  8) q->flags|=SF_BIG_ENDIAN;
-		if(s->flags&  4) q->flags|=SF_DELTA;
-		if(s->flags&  2) q->flags|=SF_SIGNED;
-		if(s->flags&  1) q->flags|=SF_16BITS;
+		if (universion < 5) {
+		/* UN04 flags, as suggested by Thomas Neumann */
+			if(s->flags& 64) q->flags|=SF_OWNPAN;
+			if(s->flags& 32) q->flags|=SF_SIGNED;
+			if(s->flags& 16) q->flags|=SF_BIDI;
+			if(s->flags&  8) q->flags|=SF_LOOP;
+			if(s->flags&  4) q->flags|=SF_DELTA;
+		} else {
+			if(s->flags&128) q->flags|=SF_REVERSE;
+			if(s->flags& 64) q->flags|=SF_OWNPAN;
+			if(s->flags& 32) q->flags|=SF_BIDI;
+			if(s->flags& 16) q->flags|=SF_LOOP;
+			if(s->flags&  8) q->flags|=SF_BIG_ENDIAN;
+			if(s->flags&  4) q->flags|=SF_DELTA;
+			if(s->flags&  2) q->flags|=SF_SIGNED;
+			if(s->flags&  1) q->flags|=SF_16BITS;
+		}
 	}
 
 	d=of.instruments;s=wh;
@@ -573,6 +582,8 @@ static BOOL UNI_Load(BOOL curious)
 		of.bpmlimit=32;
 
 	of.songname=readstring();
+	if(!of.songname)
+		of.songname=MikMod_strdup("");
 	if(universion<0x102)
 		oldtype=readstring();
 	if(oldtype) {
@@ -623,9 +634,14 @@ static BOOL UNI_Load(BOOL curious)
 		for(t=0;t<of.numchn;t++) of.panning[t]=mh.panning[t];
 	}
 	/* convert the ``end of song'' pattern code if necessary */
-	if(universion<0x106)
-		for(t=0;t<of.numpos;t++)
-			if(of.positions[t]==255) of.positions[t]=LAST_PATTERN;
+	for(t=0;t<of.numpos;t++) {
+		if(universion<0x106 && of.positions[t]==255) of.positions[t]=LAST_PATTERN;
+		else if (of.positions[t]>of.numpat) { /* SANITIY CHECK */
+		/*	fprintf(stderr,"position[%d]=%d > numpat=%d\n",t,of.positions[t],of.numpat);*/
+			_mm_errno = MMERR_LOADING_HEADER;
+			return 0;
+		}
+	}
 
 	/* instruments and samples */
 	if(universion>=6) {
@@ -692,13 +708,16 @@ static CHAR *UNI_LoadTitle(void)
 {
 	UBYTE ver;
 	int posit[3]={304,306,26};
+	CHAR *title;
 
 	_mm_fseek(modreader,3,SEEK_SET);
 	ver=_mm_read_UBYTE(modreader);
 	if(ver=='N') ver='6';
 
 	_mm_fseek(modreader,posit[ver-'4'],SEEK_SET);
-	return readstring();
+	title=readstring();
+	if(!title) title=MikMod_strdup("");
+	return title;
 }
 
 /*========== Loader information */

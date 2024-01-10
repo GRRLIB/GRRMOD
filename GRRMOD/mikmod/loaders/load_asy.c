@@ -57,8 +57,12 @@ typedef struct MSAMPINFO {
 
 typedef struct MODULEHEADER {
 	CHAR songname[21];
+	UBYTE initspeed;
+	UBYTE inittempo;
+	UBYTE num_samples;
 	UBYTE num_patterns;	/* number of patterns used */
 	UBYTE num_orders;
+	UBYTE reppos;
 	UBYTE positions[256];	/* which pattern to play at pos */
 	MSAMPINFO samples[64];	/* all sampleinfo */
 } MODULEHEADER;
@@ -144,11 +148,10 @@ static void ASY_Cleanup(void)
 	patbuf = NULL;
 }
 
-static void ConvertNote(MODNOTE *n)
+static int ConvertNote(MODNOTE *n)
 {
 	UBYTE instrument, effect, effdat, note;
 	UWORD period;
-	UBYTE lastnote = 0;
 
 	instrument = n->b&0x1f;
 	effect = n->c;
@@ -176,7 +179,7 @@ static void ConvertNote(MODNOTE *n)
 
 	if (instrument) {
 		/* if instrument does not exist, note cut */
-		if ((instrument > 31) || (!mh->samples[instrument - 1].length)) {
+		if ((instrument > mh->num_samples) || (!mh->samples[instrument - 1].length)) {
 			UniPTEffect(0xc, 0);
 			if (effect == 0xc)
 				effect = effdat = 0;
@@ -193,7 +196,6 @@ static void ConvertNote(MODNOTE *n)
 					 * played */
 					if (effect || effdat) {
 						UniInstrument(instrument - 1);
-						note = lastnote;
 					} else
 						UniPTEffect(0xc,
 							mh->samples[instrument -
@@ -202,14 +204,11 @@ static void ConvertNote(MODNOTE *n)
 			} else {
 				/* Fasttracker handling */
 				UniInstrument(instrument - 1);
-				if (!note)
-					note = lastnote;
 			}
 		}
 	}
 	if (note) {
 		UniNote(note + 2 * OCTAVE - 1);
-		lastnote = note;
 	}
 
 	/* Convert pattern jump from Dec to Hex */
@@ -220,7 +219,15 @@ static void ConvertNote(MODNOTE *n)
 	if ((effect == 0xa) && (effdat & 0xf) && (effdat & 0xf0))
 		effdat &= 0xf0;
 
+	if (effect == 0x1b) {
+		return 0; /* UniEffect(UNI_S3MEFFECTQ,dat) ? */
+	}
+	if (effect > 0xf) {
+		return 0;		/* return -1 to fail? */
+	}
+
 	UniPTEffect(effect, effdat);
+	return 0;
 }
 
 static UBYTE *ConvertTrack(MODNOTE *n)
@@ -229,7 +236,8 @@ static UBYTE *ConvertTrack(MODNOTE *n)
 
 	UniReset();
 	for (t = 0; t < 64; t++) {
-		ConvertNote(n);
+		if (ConvertNote(n) < 0)
+			return NULL;
 		UniNewline();
 		n += of.numchn;
 	}
@@ -283,22 +291,33 @@ static BOOL ASY_Load(BOOL curious)
 	/* no title in asylum amf files :( */
 	mh->songname[0] = '\0';
 
-	_mm_fseek(modreader, 0x23, SEEK_SET);
+	_mm_fseek(modreader, 0x20, SEEK_SET);
+	mh->initspeed = _mm_read_UBYTE(modreader);
+	mh->inittempo = _mm_read_UBYTE(modreader);
+	mh->num_samples = _mm_read_UBYTE(modreader);
 	mh->num_patterns = _mm_read_UBYTE(modreader);
 	mh->num_orders = _mm_read_UBYTE(modreader);
+	mh->reppos = _mm_read_UBYTE(modreader);
 
-	/* skip unknown byte */
-	_mm_skip_BYTE(modreader);
 	_mm_read_UBYTES(mh->positions, 256, modreader);
 
+	#ifdef MIKMOD_DEBUG
+	fprintf(stderr, "ASY: bpm=%d, spd=%d, numins=%d, numpat=%d\n",
+		mh->inittempo, mh->initspeed, mh->num_samples, mh->num_patterns);
+	#endif
+	if (!mh->initspeed || !mh->inittempo || mh->num_samples > 64) {
+		_mm_errno = MMERR_NOT_A_MODULE;
+		return 0;
+	}
+
 	/* read samples headers*/
-	for (t = 0; t < 64; t++) {
+	for (t = 0; t < mh->num_samples; t++) {
 		s = &mh->samples[t];
 
 		_mm_fseek(modreader, 0x126 + (t*37), SEEK_SET);
 
 		_mm_read_string(s->samplename, 22, modreader);
-		s->samplename[21] = 0;	/* just in case */
+		s->samplename[22] = 0;
 
 		s->finetune = _mm_read_UBYTE(modreader);
 		s->volume = _mm_read_UBYTE(modreader);
@@ -313,14 +332,16 @@ static BOOL ASY_Load(BOOL curious)
 		return 0;
 	}
 
+	_mm_fseek(modreader, 37*(64-mh->num_samples), SEEK_CUR);
+
 	/* set module variables */
-	of.initspeed = 6;
-	of.inittempo = 125;
+	of.initspeed = mh->initspeed;
+	of.inittempo = mh->inittempo;
 	of.numchn = 8;
 	modtype = 0;
-	of.songname = DupStr(mh->songname, 21, 1);
+	of.songname = MikMod_strdup("");
 	of.numpos = mh->num_orders;
-	of.reppos = 0;
+	of.reppos = mh->reppos;
 	of.numpat = mh->num_patterns;
 	of.numtrk = of.numpat * of.numchn;
 
@@ -329,11 +350,16 @@ static BOOL ASY_Load(BOOL curious)
 		return 0;
 	for (t = 0; t < of.numpos; t++) {
 		of.positions[t] = mh->positions[t];
+		if (of.positions[t]>of.numpat) { /* SANITIY CHECK */
+		/*	fprintf(stderr,"positions[%d]=%d > numpat=%d\n",t,of.positions[t],of.numpat);*/
+			_mm_errno = MMERR_LOADING_HEADER;
+			return 0;
+		}
 	}
 
 	/* Finally, init the sampleinfo structures  */
-	of.numins = 31;
-	of.numsmp = 31;
+	of.numins = mh->num_samples;
+	of.numsmp = mh->num_samples;
 	if (!AllocSamples())
 		return 0;
 	s = mh->samples;
