@@ -50,10 +50,6 @@ typedef struct
     float width;
 } CH;
 
-static CH channel1 = {0, 0, 0, MIN_WIDTH};
-static CH channel2 = {0, 0, 0, MIN_WIDTH};
-static CH channel3 = {0, 0, 0, MIN_WIDTH};
-static CH channel4 = {0, 0, 0, MIN_WIDTH};
 static float calc_size(u8 voice, CH* channel);
 
 
@@ -61,26 +57,30 @@ int main(int argc, char **argv) {
     float a = 0.0f;
     s16 Volume = 255;
     s8 SongNum = 0;
-    PLAYLIST PlayList[] = { {(u8 *)music_mp3, music_mp3_size},
-                            {(u8 *)music_669, music_669_size},
-                            {(u8 *)music_amf, music_amf_size},
-                            {(u8 *)music_asy, music_asy_size},
-                            {(u8 *)music_dsm, music_dsm_size},
-                            {(u8 *)music_far, music_far_size},
-                            {(u8 *)music_gdm, music_gdm_size},
-                            {(u8 *)music_imf, music_imf_size},
-                            {(u8 *)music_it, music_it_size},
-                            {(u8 *)music_med, music_med_size},
-                            {(u8 *)music_mod, music_mod_size},
-                            {(u8 *)music_mtm, music_mtm_size},
-                            {(u8 *)music_okta, music_okta_size},
-                            {(u8 *)music_s3m, music_s3m_size},
-                            {(u8 *)music_stm, music_stm_size},
-                            {(u8 *)music_stx, music_stx_size},
-                            {(u8 *)music_ult, music_ult_size},
-                            {(u8 *)music_uni, music_uni_size},
-                            {(u8 *)music_xm, music_xm_size} };
+    const PLAYLIST PlayList[] = { {(u8 *)music_mp3, music_mp3_size},
+                                  {(u8 *)music_669, music_669_size},
+                                  {(u8 *)music_amf, music_amf_size},
+                                  {(u8 *)music_asy, music_asy_size},
+                                  {(u8 *)music_dsm, music_dsm_size},
+                                  {(u8 *)music_far, music_far_size},
+                                  {(u8 *)music_gdm, music_gdm_size},
+                                  {(u8 *)music_imf, music_imf_size},
+                                  {(u8 *)music_it, music_it_size},
+                                  {(u8 *)music_med, music_med_size},
+                                  {(u8 *)music_mod, music_mod_size},
+                                  {(u8 *)music_mtm, music_mtm_size},
+                                  {(u8 *)music_okta, music_okta_size},
+                                  {(u8 *)music_s3m, music_s3m_size},
+                                  {(u8 *)music_stm, music_stm_size},
+                                  {(u8 *)music_stx, music_stx_size},
+                                  {(u8 *)music_ult, music_ult_size},
+                                  {(u8 *)music_uni, music_uni_size},
+                                  {(u8 *)music_xm, music_xm_size} };
     const u8 LastIndex = sizeof(PlayList) / sizeof(*PlayList) - 1;
+    CH Channel[] = { {0, 0, 0, MIN_WIDTH},
+                     {0, 0, 0, MIN_WIDTH},
+                     {0, 0, 0, MIN_WIDTH},
+                     {0, 0, 0, MIN_WIDTH} };
 
     GRRLIB_Init();
     GRRLIB_texImg *tex_Font = GRRLIB_LoadTexture(Impact_9_png);
@@ -149,19 +149,19 @@ int main(int argc, char **argv) {
         GRRLIB_SetLightDiff(3,(guVector){13.0f,0.0f,3.0f},20.0f,1.0f,0xFF0000FF);
         GRRLIB_SetLightDiff(4,(guVector){-13.0f,0.0f,3.0f},20.0f,1.0f,0x00FF00FF);
 
-        GRRLIB_3dMode(0.1,1000,45,0,1);
+        GRRLIB_3dMode(0.1, 1000, 45, 0, 1);
 
-        GRRLIB_ObjectViewInv(-3.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(0, &channel1),1.0f);
-        GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
+        GRRLIB_ObjectViewInv(-3.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(0, &Channel[0]),1.0f);
+        GRRLIB_DrawCube(1.0, true, 0xFFFFFFFF);
 
-        GRRLIB_ObjectViewInv(-1.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(1, &channel2),1.0f);
-        GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
+        GRRLIB_ObjectViewInv(-1.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(1, &Channel[1]),1.0f);
+        GRRLIB_DrawCube(1.0, true, 0xFFFFFFFF);
 
-        GRRLIB_ObjectViewInv(1.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(2, &channel3),1.0f);
-        GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
+        GRRLIB_ObjectViewInv(1.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(2, &Channel[2]),1.0f);
+        GRRLIB_DrawCube(1.0, true, 0xFFFFFFFF);
 
-        GRRLIB_ObjectViewInv(3.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(3, &channel4),1.0f);
-        GRRLIB_DrawCube(1.0,true,0xFFFFFFFF);
+        GRRLIB_ObjectViewInv(3.0f, 0.0f, 0.0f, a,a*2,a*3, 1.0f,calc_size(3, &Channel[3]),1.0f);
+        GRRLIB_DrawCube(1.0, true, 0xFFFFFFFF);
 
 
         a+=0.5f;
@@ -184,9 +184,9 @@ int main(int argc, char **argv) {
 }
 
 static float calc_size(u8 voice, CH* channel) {
-    int freq = GRRMOD_GetVoiceFrequency(voice);
-    int vol = GRRMOD_GetVoiceVolume(voice);
-    int realvol = GRRMOD_GetRealVoiceVolume(voice);
+    const int freq = GRRMOD_GetVoiceFrequency(voice);
+    const int vol = GRRMOD_GetVoiceVolume(voice);
+    const int realvol = GRRMOD_GetRealVoiceVolume(voice);
 
     if (freq != channel->freq || vol != channel->vol || realvol > channel->realvol) {
         channel->width = MAX_WIDTH;
