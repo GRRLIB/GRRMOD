@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-Copyright (c) 2010-2018 The GRRLIB Team
+Copyright (c) 2010-2024 The GRRLIB Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -96,7 +96,7 @@ s8 GRRMOD_Init(bool stereo) {
  * Call this before exiting your application.
  * Ensure this function is only ever called once.
  */
-void GRRMOD_End() {
+void GRRMOD_End(void) {
     GRRMOD_Unload();
 
     RegFunc.End();
@@ -114,7 +114,7 @@ void GRRMOD_SetMOD(const void *mem, u64 size) {
 /**
  * Unload a MOD file.
  */
-void GRRMOD_Unload() {
+void GRRMOD_Unload(void) {
     GRRMOD_Stop();
     RegFunc.Unload();
 }
@@ -122,7 +122,7 @@ void GRRMOD_Unload() {
 /**
  * This function starts the specified module playback.
  */
-void GRRMOD_Start() {
+void GRRMOD_Start(void) {
     if(sndPlaying==true) {
         return;
     }
@@ -150,7 +150,7 @@ void GRRMOD_Start() {
 /**
  * This function stops the currently playing module.
  */
-void GRRMOD_Stop() {
+void GRRMOD_Stop(void) {
     if(sndPlaying==false) {
         return;
     }
@@ -167,7 +167,7 @@ void GRRMOD_Stop() {
 /**
  * This function toggles the playing/paused status of the module.
  */
-void GRRMOD_Pause() {
+void GRRMOD_Pause(void) {
     if(sndPlaying==false) {
         return;
     }
@@ -180,7 +180,7 @@ void GRRMOD_Pause() {
  * Get the song title.
  * @return Pointer to the song title.
  */
-char *GRRMOD_GetSongTitle() {
+char *GRRMOD_GetSongTitle(void) {
     return RegFunc.GetSongTitle();
 }
 
@@ -188,7 +188,7 @@ char *GRRMOD_GetSongTitle() {
  * Get the MOD type.
  * @return Pointer to the MOD type.
  */
-char *GRRMOD_GetModType() {
+char *GRRMOD_GetModType(void) {
     return RegFunc.GetModType();
 }
 
@@ -296,7 +296,7 @@ static void __aesndvoicecallback(AESNDPB *pb, u32 state) {
 }
 
 #ifdef _GRRMOD_DEBUG
-u32 GRRMOD_MixingTime() {
+u32 GRRMOD_MixingTime(void) {
     return ticks_to_microsecs(mixtime);
 }
 #endif

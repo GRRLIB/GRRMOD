@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-Copyright (c) 2010-2018 The GRRLIB Team
+Copyright (c) 2010-2024 The GRRLIB Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -84,7 +84,7 @@ s8 GRRMOD_MP3_Init(bool stereo) {
  * Call this before exiting your application.
  * Ensure this function is only ever called once.
  */
-void GRRMOD_MP3_End() {
+void GRRMOD_MP3_End(void) {
     mpg123_exit();
 }
 
@@ -114,13 +114,17 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
     }
 
     // Streaming mode
-    mpg123_open_feed(mh);
+    if(mpg123_open_feed(mh) != MPG123_OK) {
+        return;
+    }
 
     // Ensure that this output format will not change (it could, when we allow it).
-    mpg123_format_none(mh);
+    if(mpg123_format_none(mh) != MPG123_OK) {
+        return;
+    }
 
     // Set all bitrates as ok
-    u8 channelcount = IsStereo ? MPG123_STEREO : MPG123_MONO;
+    const u8 channelcount = IsStereo ? MPG123_STEREO : MPG123_MONO;
     for(i = 0; i < (int)num_rates; ++i) {
         mpg123_format(mh, frequency, channelcount, MPG123_ENC_SIGNED_16);
     }
@@ -172,7 +176,7 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
 /**
  * Unload a MP3 file.
  */
-void GRRMOD_MP3_Unload() {
+void GRRMOD_MP3_Unload(void) {
     if(mh != NULL) {
         mpg123_delete(mh);
         mh = NULL;
@@ -190,7 +194,7 @@ void GRRMOD_MP3_Unload() {
 /**
  * This function starts the specified module playback.
  */
-void GRRMOD_MP3_Start() {
+void GRRMOD_MP3_Start(void) {
     if(mh == NULL) {
         return;
     }
@@ -199,14 +203,14 @@ void GRRMOD_MP3_Start() {
 /**
  * This function stops the currently playing module.
  */
-void GRRMOD_MP3_Stop() {
+void GRRMOD_MP3_Stop(void) {
     Offset = 0;
 }
 
 /**
  * This function toggles the playing/paused status of the module.
  */
-void GRRMOD_MP3_Pause() {
+void GRRMOD_MP3_Pause(void) {
 
 }
 
@@ -214,7 +218,7 @@ void GRRMOD_MP3_Pause() {
  * Get the song title.
  * @return Pointer to the song title.
  */
-char *GRRMOD_MP3_GetSongTitle() {
+char *GRRMOD_MP3_GetSongTitle(void) {
     return MusicData.SongTitle;
 }
 
@@ -222,7 +226,7 @@ char *GRRMOD_MP3_GetSongTitle() {
  * Get the MP3 type.
  * @return Pointer to the MOD type.
  */
-char *GRRMOD_MP3_GetModType() {
+char *GRRMOD_MP3_GetModType(void) {
     return MusicData.ModType;
 }
 

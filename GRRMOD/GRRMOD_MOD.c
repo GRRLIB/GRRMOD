@@ -93,7 +93,7 @@ s8 GRRMOD_MOD_Init(bool stereo) {
  * Call this before exiting your application.
  * Ensure this function is only ever called once.
  */
-void GRRMOD_MOD_End() {
+void GRRMOD_MOD_End(void) {
     MikMod_Exit();
 }
 
@@ -118,7 +118,7 @@ void GRRMOD_MOD_SetMOD(const void *mem, u64 size) {
 /**
  * Unload a MOD file.
  */
-void GRRMOD_MOD_Unload() {
+void GRRMOD_MOD_Unload(void) {
     if(module != NULL) {
         Player_Free(module);
         module = NULL;
@@ -136,7 +136,7 @@ void GRRMOD_MOD_Unload() {
 /**
  * This function starts the specified module playback.
  */
-void GRRMOD_MOD_Start() {
+void GRRMOD_MOD_Start(void) {
     if(module == NULL) {
         return;
     }
@@ -147,7 +147,7 @@ void GRRMOD_MOD_Start() {
 /**
  * This function stops the currently playing module.
  */
-void GRRMOD_MOD_Stop() {
+void GRRMOD_MOD_Stop(void) {
     Player_SetPosition(0);
     Player_Stop();
 }
@@ -155,7 +155,7 @@ void GRRMOD_MOD_Stop() {
 /**
  * This function toggles the playing/paused status of the module.
  */
-void GRRMOD_MOD_Pause() {
+void GRRMOD_MOD_Pause(void) {
     Player_TogglePause();
 }
 
@@ -163,7 +163,7 @@ void GRRMOD_MOD_Pause() {
  * Get the song title.
  * @return Pointer to the song title.
  */
-char *GRRMOD_MOD_GetSongTitle() {
+char *GRRMOD_MOD_GetSongTitle(void) {
     return MusicData.SongTitle;
 }
 
@@ -171,7 +171,7 @@ char *GRRMOD_MOD_GetSongTitle() {
  * Get the MOD type.
  * @return Pointer to the MOD type.
  */
-char *GRRMOD_MOD_GetModType() {
+char *GRRMOD_MOD_GetModType(void) {
     return MusicData.ModType;
 }
 

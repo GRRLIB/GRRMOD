@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-Copyright (c) 2010-2018 The GRRLIB Team
+Copyright (c) 2010-2024 The GRRLIB Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -66,35 +66,35 @@ typedef struct GRRMOD_FuntionsList {
 // Module functions
 void GRRMOD_MOD_Register(GRRMOD_FuntionsList *RegFunc);
 s8 GRRMOD_MOD_Init(bool stereo);
-void GRRMOD_MOD_End();
+void GRRMOD_MOD_End(void);
 void GRRMOD_MOD_SetMOD(const void *mem, u64 size);
-void GRRMOD_MOD_Unload();
+void GRRMOD_MOD_Unload(void);
 void GRRMOD_MOD_SetFrequency(u32 freq);
 u32 GRRMOD_MOD_GetVoiceFrequency(u8 voice);
 u32 GRRMOD_MOD_GetVoiceVolume(u8 voice);
 u32 GRRMOD_MOD_GetRealVoiceVolume(u8 voice);
-void GRRMOD_MOD_Start();
-void GRRMOD_MOD_Stop();
-void GRRMOD_MOD_Pause();
-char *GRRMOD_MOD_GetSongTitle();
-char *GRRMOD_MOD_GetModType();
+void GRRMOD_MOD_Start(void);
+void GRRMOD_MOD_Stop(void);
+void GRRMOD_MOD_Pause(void);
+char *GRRMOD_MOD_GetSongTitle(void);
+char *GRRMOD_MOD_GetModType(void);
 void GRRMOD_MOD_Update(u8 *buffer);
 
 // MP3 functions
 void GRRMOD_MP3_Register(GRRMOD_FuntionsList *RegFunc);
 s8 GRRMOD_MP3_Init(bool stereo);
-void GRRMOD_MP3_End();
+void GRRMOD_MP3_End(void);
 void GRRMOD_MP3_SetMOD(const void *mem, u64 size);
-void GRRMOD_MP3_Unload();
+void GRRMOD_MP3_Unload(void);
 void GRRMOD_MP3_SetFrequency(u32 freq);
 u32 GRRMOD_MP3_GetVoiceFrequency(u8 voice);
 u32 GRRMOD_MP3_GetVoiceVolume(u8 voice);
 u32 GRRMOD_MP3_GetRealVoiceVolume(u8 voice);
-void GRRMOD_MP3_Start();
-void GRRMOD_MP3_Stop();
-void GRRMOD_MP3_Pause();
-char *GRRMOD_MP3_GetSongTitle();
-char *GRRMOD_MP3_GetModType();
+void GRRMOD_MP3_Start(void);
+void GRRMOD_MP3_Stop(void);
+void GRRMOD_MP3_Pause(void);
+char *GRRMOD_MP3_GetSongTitle(void);
+char *GRRMOD_MP3_GetModType(void);
 void GRRMOD_MP3_Update(u8 *buffer);
 
 //==============================================================================

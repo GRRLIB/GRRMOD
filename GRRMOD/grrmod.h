@@ -48,22 +48,22 @@ THE SOFTWARE.
 #endif /* __cplusplus */
 
 s8 GRRMOD_Init(bool stereo);
-void GRRMOD_End();
+void GRRMOD_End(void);
 void GRRMOD_SetMOD(const void *mem, u64 size);
-void GRRMOD_Unload();
+void GRRMOD_Unload(void);
 void GRRMOD_SetFrequency(u32 freq);
 void GRRMOD_SetVolume(s16 volume_l, s16 volume_r);
 u32 GRRMOD_GetVoiceFrequency(u8 voice);
 u32 GRRMOD_GetVoiceVolume(u8 voice);
 u32 GRRMOD_GetRealVoiceVolume(u8 voice);
-void GRRMOD_Start();
-void GRRMOD_Stop();
-void GRRMOD_Pause();
-char *GRRMOD_GetSongTitle();
-char *GRRMOD_GetModType();
+void GRRMOD_Start(void);
+void GRRMOD_Stop(void);
+void GRRMOD_Pause(void);
+char *GRRMOD_GetSongTitle(void);
+char *GRRMOD_GetModType(void);
 
 #ifdef _GRRMOD_DEBUG
-u32 GRRMOD_MixingTime();
+u32 GRRMOD_MixingTime(void);
 #endif
 
 //==============================================================================
