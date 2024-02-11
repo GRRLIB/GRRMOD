@@ -251,13 +251,12 @@ static void* player(void *arg) {
 u64 start;
 #endif
 
-    u32 i;
     thr_running = true;
     while(sndPlaying==true) {
         LWP_ThreadSleep(player_queue);
         if(sndPlaying==true) {
             if(paused==true) {
-                for(i=0; i<(SNDBUFFERSIZE>>1); i++) {
+                for(u32 i=0; i<(SNDBUFFERSIZE>>1); i++) {
                     ((u16*)((u8*)audioBuf[curr_audio]))[i] = 0;
                 }
             }

@@ -94,7 +94,7 @@ void GRRMOD_MP3_End(void) {
  * @param size Size of the memory to set.
  */
 void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
-    int result, i;
+    int result;
     int encoding; // Unneeded value encoding
     size_t fakegot;
     size_t num_rates;
@@ -125,7 +125,7 @@ void GRRMOD_MP3_SetMOD(const void *mem, u64 size) {
 
     // Set all bitrates as ok
     const u8 channelcount = IsStereo ? MPG123_STEREO : MPG123_MONO;
-    for(i = 0; i < (int)num_rates; ++i) {
+    for(size_t i = 0; i < num_rates; ++i) {
         mpg123_format(mh, frequency, channelcount, MPG123_ENC_SIGNED_16);
     }
 
