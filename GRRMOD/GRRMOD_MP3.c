@@ -280,7 +280,7 @@ void GRRMOD_MP3_Update(u8 *outbuf) {
     int result = MPG123_OK;
 
     // Remember end of file
-    int over = 0;
+    bool is_over = false;
 
     // Bookkeeping
     int need = (SNDBUFFERSIZE / 4) * channels * 2;//int need = renderSamples * channels * 2;
@@ -294,7 +294,7 @@ void GRRMOD_MP3_Update(u8 *outbuf) {
 
         // Figure out if we need more data
         if(result == MPG123_NEED_MORE) {
-            if(over) {
+            if(is_over == true) {
                 // Ensure we don't create garbage audio
                 memset(outbuf + have_read, 0, need);
                 Offset = 0;
@@ -306,7 +306,7 @@ void GRRMOD_MP3_Update(u8 *outbuf) {
             // Read in
             if(Offset + MP3_READ_SIZE > Size) {
                 dataIn = Size - Offset;
-                //over = 1;
+                //is_over = true;
             }
             else {
                 dataIn = MP3_READ_SIZE;
@@ -314,7 +314,7 @@ void GRRMOD_MP3_Update(u8 *outbuf) {
 
             if(dataIn < MP3_READ_SIZE) {
                 // End of file :<
-                over = 1;
+                is_over = true;
             }
         }
 
