@@ -10,7 +10,7 @@ jobs:
     container:
       image: devkitpro/devkitppc:latest
     env:
-      GRRLIBVERS: 4.5.0
+      GRRLIBVERS: 4.5.1
 
     steps:
 
