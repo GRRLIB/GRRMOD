@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
                      {0, 0, 0, MIN_WIDTH} };
 
     GRRLIB_Init();
-    GRRLIB_texImg *tex_Font = GRRLIB_LoadTexture(Impact_9_png);
+    GRRLIB_texImg *tex_Font = GRRLIB_LoadTexturePNG(Impact_9_png);
     GRRLIB_InitTileSet(tex_Font, 10, 16, 32);
 
     GRRMOD_Init(true);
@@ -143,11 +143,11 @@ int main(int argc, char **argv) {
         GRRLIB_Camera3dSettings(0.0f, 0.0f,13.0f, 0,1,0, 0,0,0);
 
         GRRLIB_SetLightAmbient(0x333333FF);
-        GRRLIB_SetLightDiff(0,(guVector){0.0f,0.0f,0.0f},20.0f,1.0f,0x00FFFFFF);
-        GRRLIB_SetLightDiff(1,(guVector){0.0f,13.0f,3.0f},20.0f,1.0f,0xFF00FFFF);
-        GRRLIB_SetLightDiff(2,(guVector){0.0f,-13.0f,3.0f},20.0f,1.0f,0xFFFF00FF);
-        GRRLIB_SetLightDiff(3,(guVector){13.0f,0.0f,3.0f},20.0f,1.0f,0xFF0000FF);
-        GRRLIB_SetLightDiff(4,(guVector){-13.0f,0.0f,3.0f},20.0f,1.0f,0x00FF00FF);
+        GRRLIB_SetLightDiff(0, (guVector){0.0f,0.0f,0.0f}, 20.0f, 1.0f, 0x00FFFFFF);
+        GRRLIB_SetLightDiff(1, (guVector){0.0f,13.0f,3.0f}, 20.0f, 1.0f, 0xFF00FFFF);
+        GRRLIB_SetLightDiff(2, (guVector){0.0f,-13.0f,3.0f}, 20.0f, 1.0f, 0xFFFF00FF);
+        GRRLIB_SetLightDiff(3, (guVector){13.0f,0.0f,3.0f}, 20.0f, 1.0f, 0xFF0000FF);
+        GRRLIB_SetLightDiff(4, (guVector){-13.0f,0.0f,3.0f}, 20.0f, 1.0f, 0x00FF00FF);
 
         GRRLIB_3dMode(0.1, 1000, 45, 0, 1);
 

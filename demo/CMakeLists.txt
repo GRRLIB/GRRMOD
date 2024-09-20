@@ -7,7 +7,6 @@ find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(GRRMOD REQUIRED grrmod)
 pkg_check_modules(PNG REQUIRED libpng)
-pkg_check_modules(JPEG REQUIRED libjpeg)
 pkg_check_modules(FREETYPE REQUIRED freetype2)
 
 find_library(AESND aesnd
@@ -55,7 +54,6 @@ target_link_libraries(demo
   ${GRRLIB}
   ${PNGU}
   ${PNG_LIBRARIES}
-  ${JPEG_LIBRARIES}
   ${FREETYPE_LIBRARIES}
   ${FAT}
 )
