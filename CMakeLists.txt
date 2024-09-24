@@ -6,23 +6,26 @@ option(GRRMOD_USE_MP3 "Enable MP3 support" ON)
 
 include(GNUInstallDirs)
 
-find_package(PkgConfig REQUIRED)
+find_library(AESND aesnd
+  PATHS "${OGC_ROOT}/lib/${OGC_SUBDIR}"
+  REQUIRED
+)
 
 if(GRRMOD_USE_MOD)
   file(GLOB MOD_SRC_FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD_MOD.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/mikmod/drivers/*.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/mikmod/loaders/*.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/mikmod/mmio/*.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/mikmod/playercode/*.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/mikmod/depackers/*.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/mikmod/posix/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/GRRMOD_MOD.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mikmod/drivers/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mikmod/loaders/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mikmod/mmio/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mikmod/playercode/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mikmod/depackers/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mikmod/posix/*.c"
   )
 endif()
 if(GRRMOD_USE_MP3)
   file(GLOB MP3_SRC_FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD_MP3.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/mpg123/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/GRRMOD_MP3.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mpg123/*.c"
   )
 endif()
 
@@ -36,7 +39,7 @@ target_compile_options(grrmod
 
 target_sources(grrmod
   PRIVATE
-  "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD_core.c"
+  "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/GRRMOD_core.c"
   "${MOD_SRC_FILES}"
   "${MP3_SRC_FILES}"
 )
@@ -60,19 +63,19 @@ endif()
 
 target_include_directories(grrmod
   PUBLIC
-  "${CMAKE_CURRENT_SOURCE_DIR}"
+  "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/GRRMOD"
   PRIVATE
-  "${CMAKE_CURRENT_SOURCE_DIR}/mikmod/include"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mpg123"
+  "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mikmod/include"
+  "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mpg123"
 )
 
-target_link_libraries(grrmod PUBLIC
-  aesnd
+target_link_libraries(grrmod PRIVATE
+  ${AESND}
 )
 
 configure_file(grrmod.pc.in ${CMAKE_BINARY_DIR}/grrmod.pc @ONLY)
 
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/grrmod.h
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/grrmod.h
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 

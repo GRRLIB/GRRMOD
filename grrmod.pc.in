@@ -8,4 +8,4 @@ Description: MOD player library
 URL: https://github.com/GRRLIB/GRRMOD
 Version: @PROJECT_VERSION@
 Cflags: -I${includedir}
-Libs: -L${libdir} -lgrrmod
+Libs: -L${libdir} -lgrrmod -laesnd

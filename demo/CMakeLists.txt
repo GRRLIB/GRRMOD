@@ -9,10 +9,6 @@ pkg_check_modules(GRRMOD REQUIRED grrmod)
 pkg_check_modules(PNG REQUIRED libpng)
 pkg_check_modules(FREETYPE REQUIRED freetype2)
 
-find_library(AESND aesnd
-  PATHS "${OGC_ROOT}/lib/${OGC_SUBDIR}"
-  REQUIRED
-)
 find_library(FAT fat
   PATHS "${OGC_ROOT}/lib/${OGC_SUBDIR}"
   REQUIRED
@@ -50,7 +46,6 @@ dkp_add_embedded_binary_library(data
 target_link_libraries(demo
   data
   ${GRRMOD_LIBRARIES}
-  ${AESND}
   ${GRRLIB}
   ${PNGU}
   ${PNG_LIBRARIES}
