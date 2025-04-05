@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 project(grrmod VERSION 0.0.1)
 
+option(GRRMOD_INSTALL "Generate the install target" ON)
 option(GRRMOD_USE_MOD "Enable MOD support" ON)
 option(GRRMOD_USE_MP3 "Enable MP3 support" ON)
 
@@ -73,17 +74,21 @@ target_link_libraries(grrmod PRIVATE
   ${AESND}
 )
 
-configure_file(grrmod.pc.in ${CMAKE_BINARY_DIR}/grrmod.pc @ONLY)
+if(GRRMOD_INSTALL)
 
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/grrmod.h
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
+  configure_file(grrmod.pc.in ${CMAKE_BINARY_DIR}/grrmod.pc @ONLY)
 
-install(FILES ${CMAKE_BINARY_DIR}/grrmod.pc
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-)
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/grrmod.h
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  )
 
-install(
-  TARGETS grrmod EXPORT grrmod-targets
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
+  install(FILES ${CMAKE_BINARY_DIR}/grrmod.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+  )
+
+  install(
+    TARGETS grrmod EXPORT grrmod-targets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  )
+
+endif()
