@@ -26,7 +26,7 @@ typedef char CHAR;
 typedef unsigned long int ULONG;
 
 #include "GRRMOD_internals.h"
-#include "mikmod/include/mikmod.h"
+#include "mikmod.h"
 #include <string.h>
 
 // This is normally in the mikmod.h file of the MikMod project
