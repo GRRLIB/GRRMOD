@@ -29,16 +29,7 @@ It supports the following formats:
 
 ## Installing GRRMOD
 
-GRRMOD can be installed using Make or CMake.
-
-With Make:
-
-```bash
-cd GRRMOD
-make clean && make && make install
-```
-
-With CMake:
+To install GRRMOD use these commands:
 
 ```bash
 /opt/devkitpro/portlibs/wii/bin/powerpc-eabi-cmake -B build

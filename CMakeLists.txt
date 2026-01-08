@@ -12,16 +12,22 @@ find_library(AESND aesnd
   REQUIRED
 )
 
+include(FetchContent)
+FetchContent_Declare(mikmod
+  URL https://codeload.github.com/sezero/mikmod/tar.gz/6b9bab2460052156de6a2a847fd14e51b187061a
+)
+FetchContent_MakeAvailable(mikmod)
+
 if(GRRMOD_USE_MOD)
   file(GLOB MOD_SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/GRRMOD_MOD.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mikmod/drivers/drv_nos.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mikmod/drivers/drv_wii.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mikmod/loaders/*.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mikmod/mmio/*.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mikmod/playercode/*.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mikmod/depackers/*.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mikmod/posix/*.c"
+    "${mikmod_SOURCE_DIR}/libmikmod/drivers/drv_nos.c"
+    "${mikmod_SOURCE_DIR}/libmikmod/loaders/*.c"
+    "${mikmod_SOURCE_DIR}/libmikmod/mmio/*.c"
+    "${mikmod_SOURCE_DIR}/libmikmod/playercode/*.c"
+    "${mikmod_SOURCE_DIR}/libmikmod/depackers/*.c"
+    "${mikmod_SOURCE_DIR}/libmikmod/posix/*.c"
   )
 endif()
 if(GRRMOD_USE_MP3)
@@ -67,7 +73,7 @@ target_include_directories(grrmod
   PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/GRRMOD"
   PRIVATE
-  "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mikmod/include"
+  "${mikmod_SOURCE_DIR}/libmikmod/include"
   "${CMAKE_CURRENT_SOURCE_DIR}/GRRMOD/mpg123"
 )
 
